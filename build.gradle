@@ -217,3 +217,34 @@ jar {
 }
 
 jar.finalizedBy('reobfJar')
+
+publishing {
+	publications {
+		if(System.getenv('GITHUB_TOKEN') != null) {
+			gpr(MavenPublication) {
+				// GitHub Packages **require** names to be in lowercase
+				groupId = 'xyz.apex.forge.utility'
+				artifactId = 'registrator'
+				version = "${project.version}"
+
+				artifact jar
+				artifact sourcesJar
+				artifact deobfJar
+				artifact javadocJar
+				artifact shadowJar
+			}
+
+			repositories {
+				maven {
+					name = 'GitHubPackages'
+					url = uri('https://maven.pkg.github.com/ApexModder/Registrator')
+
+					credentials {
+						username = System.getenv('GITHUB_ACTOR')
+						password = System.getenv('GITHUB_TOKEN')
+					}
+				}
+			}
+		}
+	}
+}
