@@ -11,6 +11,8 @@ The access transformer is used to make various elements across Minecraft public-
 Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.apex.forge.utility.registrator.entry.similar`) onto the correct object types.
 
 ### Registrator vs Registrate
+<details>
+<summary></summary>
 - Adds support for various new Registration types
   - `PaintingType`
   - `PointOfInterestType`
@@ -34,8 +36,11 @@ Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.a
   - TemplatePoolProvider
     - This provider type has not been thoroughly tested but should allow you to generate template pools used during world generation.
     - Use at your own risk.
+</details>
 
 ### How to Use
+<details>
+<summary></summary>
 For an example mod on how to use Registrator, see the [TestMod here](https://github.com/ApexModder/Registrator/blob/src/testmod/java/xyz/apex/forge/testmod/init/TRegistry.java).
 
 This system is used in a very similar way to how vanilla Registrate is used. So their _How to Use_ guide should also be applicable here.
@@ -68,8 +73,11 @@ To register more advanced object types, a factory method can be appended to the 
 `block("<your_block_name_here>", [parentObj], <some_block_factory>)`
 These factory types take the default constructor parameters of what ever type you are trying to build.
 For example, a `BlockFactory` takes in the finalized `AbstractBlock.Properties` object (Similar to how the `Block` constructor takes in a `AbstractBlock.Properties` object).
+</details>
 
 ### Project Setup
+<details>
+<summary></summary>
 Due to Registrator including a `mods.toml` file, it has to be added as a dependency to your mod.
 Unlike how vanilla Registrate includes no mod data and be be shaded right into your mod jar.
 
@@ -84,8 +92,12 @@ To do this, add the following snippet of code to your `mods.toml` file.
 ```
 
 #### The following is only required when shipping your mod via CurseForge.<br>
+<details>
+<summary></summary>
 While uploading / editing uploaded releases, find the `Releated Projects` section.<br>
 ![Releated-Projects](https://i.imgur.com/Lj5jXZj.png)
 
 Search for `Registrator` and click `Add Project` on the right.<br>
 This will add Registrator as a dependency on CurseForge. When users download your mod via the CurseForge launcher (or any launchers using CurseForges API), Registrator will automatically be downloaded alongside it.
+</details>
+</details>
