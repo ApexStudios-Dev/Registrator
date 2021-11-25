@@ -3,7 +3,7 @@
 	"priority": 1100,
 	"package": "xyz.apex.forge.utility.registrator.mixins",
 	"compatibilityLevel": "JAVA_8",
-	"refmap": "funnies.refmap.json",
+	"refmap": "registrator.refmap.json",
 	"mixins": [
 		"BlockEntityTypeMixin",
 		"BlockMixin",
