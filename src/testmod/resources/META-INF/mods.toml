@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="[36,)"
-license="GNU"
+license="MPL 2.0"
 
 [[mods]]
 modId="testmod"

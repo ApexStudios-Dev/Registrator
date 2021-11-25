@@ -20,7 +20,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.0.0'
+version = '1.0.1'
 group = 'xyz.apex.forge.utility.registrator'
 archivesBaseName = "Registrator-1.16.5"
 
