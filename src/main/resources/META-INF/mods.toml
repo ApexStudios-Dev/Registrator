@@ -1,0 +1,25 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="GNU"
+
+[[mods]]
+modId="registrator"
+version="${file.jarVersion}"
+displayName="Registrator"
+credits="Apex - Programming\nTTerrag - Registrate"
+authors="Apex, TTerrag"
+description=""
+
+[[dependencies.registrator]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.registrator]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17]"
+    ordering="NONE"
+    side="BOTH"

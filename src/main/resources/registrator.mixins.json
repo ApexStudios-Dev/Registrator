@@ -1,0 +1,26 @@
+{
+	"required": true,
+	"priority": 1100,
+	"package": "xyz.apex.forge.utility.registrator.mixins",
+	"compatibilityLevel": "JAVA_8",
+	"refmap": "funnies.refmap.json",
+	"mixins": [
+		"BlockEntityTypeMixin",
+		"BlockMixin",
+		"ContainerTypeMixin",
+		"EntityTypeMixin",
+		"IRecipeSerializerMixin",
+		"IRecipeTypeMixin",
+		"ItemMixin",
+		"PaintingTypeMixin",
+		"PointOfInterestTypeMixin",
+		"SoundEventMixin",
+		"VillagerProfessionMixin"
+	],
+	"client": [ ],
+	"server": [ ],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"minVersion": "0.8"
+}

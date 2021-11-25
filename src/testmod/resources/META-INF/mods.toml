@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="GNU"
+
+[[mods]]
+modId="testmod"
+version="${file.jarVersion}"
+displayName="Registrator-TestMod"
+credits="Apex - Programming"
+authors="Apex"
+description=""
+
+[[dependencies.testmod]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.testmod]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17]"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.testmod]]
+    modId="registrator"
+    mandatory=true
+    versionRange="[0.0.1,1.0.0]"
+    ordering="NONE"
+    side="BOTH"

@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:blasting",
+  "ingredient": [
+    {
+      "item": "testmod:copper_pickaxe"
+    },
+    {
+      "item": "testmod:copper_shovel"
+    },
+    {
+      "item": "testmod:copper_axe"
+    },
+    {
+      "item": "testmod:copper_hoe"
+    },
+    {
+      "item": "testmod:copper_sword"
+    },
+    {
+      "item": "testmod:copper_helmet"
+    },
+    {
+      "item": "testmod:copper_chestplate"
+    },
+    {
+      "item": "testmod:copper_leggings"
+    },
+    {
+      "item": "testmod:copper_boots"
+    },
+    {
+      "item": "testmod:copper_horse_armor"
+    }
+  ],
+  "result": "testmod:copper_nugget",
+  "experience": 0.1,
+  "cookingtime": 100
+}
