@@ -17,6 +17,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unused")
 public final class ContainerBuilder<OWNER extends AbstractRegistrator<OWNER>, CONTAINER extends Container, PARENT> extends RegistratorBuilder<OWNER, ContainerType<?>, ContainerType<CONTAINER>, PARENT, ContainerBuilder<OWNER, CONTAINER, PARENT>, ContainerEntry<CONTAINER>>
 {
 	private final ContainerFactory<CONTAINER> containerFactory;

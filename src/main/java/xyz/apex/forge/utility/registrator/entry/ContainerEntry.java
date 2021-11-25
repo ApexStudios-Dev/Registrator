@@ -14,6 +14,7 @@ import xyz.apex.forge.utility.registrator.entry.similar.ContainerTypeLike;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
+@SuppressWarnings("unused")
 public final class ContainerEntry<CONTAINER extends Container> extends RegistryEntry<ContainerType<CONTAINER>> implements ContainerTypeLike, IContainerProvider, NonnullSupplier<ContainerType<CONTAINER>>
 {
 	public ContainerEntry(AbstractRegistrator<?> registrator, RegistryObject<ContainerType<CONTAINER>> delegate)

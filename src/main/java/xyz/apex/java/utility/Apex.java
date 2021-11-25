@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public final class Apex
 {
 	public static <V> List<V> makeImmutableList(NonnullUnaryOperator<ImmutableList.Builder<V>> consumer)

@@ -13,7 +13,6 @@ import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
@@ -22,7 +21,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings("CommentedOutCode")
 public final class ArmorMaterial implements IArmorMaterial
 {
 	// public static final int[] HEALTH_PER_SLOT = ObfuscationReflectionHelper.getPrivateValue(net.minecraft.item.ArmorMaterial.class, null, "field_77882_bY");
@@ -174,6 +173,7 @@ public final class ArmorMaterial implements IArmorMaterial
 		return ObfuscationReflectionHelper.getPrivateValue(net.minecraft.item.ArmorMaterial.class, armorMaterial, "field_78048_f");
 	}*/
 
+	@SuppressWarnings({ "unused", "UnusedReturnValue" })
 	public static final class Builder
 	{
 		private final Map<EquipmentSlotType, Integer> slotDefenseMap = Maps.newEnumMap(EquipmentSlotType.class);
@@ -220,7 +220,6 @@ public final class ArmorMaterial implements IArmorMaterial
 			;
 		}
 
-		@SuppressWarnings("UnusedReturnValue")
 		public Builder defenseForSlot(EquipmentSlotType slotType, int slotDefense)
 		{
 			Validate.isTrue(slotType.getType() == EquipmentSlotType.Group.ARMOR);

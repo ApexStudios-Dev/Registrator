@@ -34,11 +34,11 @@ import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "deprecation", "unused", "UnusedReturnValue" })
 public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM extends Item, PARENT> extends RegistratorBuilder<OWNER, Item, ITEM, PARENT, ItemBuilder<OWNER, ITEM, PARENT>, ItemEntry<ITEM>>
 {
 	private final ItemFactory<ITEM> itemFactory;
-	private NonnullSupplier<Item.Properties> initialProperties = Item.Properties::new;;
+	private NonnullSupplier<Item.Properties> initialProperties = Item.Properties::new;
 	private NonnullUnaryOperator<Item.Properties> propertiesModifier = NonnullUnaryOperator.identity();
 	@Nullable private NonnullSupplier<NonnullSupplier<IItemColor>> colorHandler;
 

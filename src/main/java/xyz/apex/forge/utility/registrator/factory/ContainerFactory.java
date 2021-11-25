@@ -9,6 +9,7 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
 
+@SuppressWarnings("unused")
 @FunctionalInterface
 public interface ContainerFactory<CONTAINER extends Container>
 {

@@ -6,7 +6,7 @@ import xyz.apex.forge.utility.registrator.entry.VillagerProfessionEntry;
 
 public class TVillagerProfessions
 {
-	private static TRegistry REGISTRY = TRegistry.getRegistry();
+	private static final TRegistry REGISTRY = TRegistry.getRegistry();
 
 	public static final VillagerProfessionEntry TEST = REGISTRY
 			.villagerProfession("test_villager_profession")

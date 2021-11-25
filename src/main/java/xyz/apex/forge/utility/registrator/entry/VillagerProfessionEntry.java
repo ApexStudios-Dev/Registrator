@@ -15,6 +15,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unused")
 public final class VillagerProfessionEntry extends RegistryEntry<VillagerProfession> implements VillagerProfessionLike, NonnullSupplier<VillagerProfession>
 {
 	public VillagerProfessionEntry(AbstractRegistrator<?> owner, RegistryObject<VillagerProfession> delegate)

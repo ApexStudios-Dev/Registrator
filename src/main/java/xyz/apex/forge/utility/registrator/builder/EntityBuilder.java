@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "deprecation", "unchecked", "unused", "UnusedReturnValue" })
 public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTITY extends Entity, PARENT> extends RegistratorBuilder<OWNER, EntityType<?>, EntityType<ENTITY>, PARENT, EntityBuilder<OWNER, ENTITY, PARENT>, EntityEntry<ENTITY>>
 {
 	public static final String SPAWN_EGG_SUFFIX = "_spawn_egg";
@@ -66,18 +66,16 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	{
 		if(renderer != null)
 		{
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-				OneTimeEventReceiver.addModListener(FMLClientSetupEvent.class, event -> {
-					try
-					{
-						RenderingRegistry.registerEntityRenderingHandler(entityType, renderer.get());
-					}
-					catch(Exception e)
-					{
-						throw new IllegalStateException("Failed to register renderer for Entity " + entityType.getRegistryName(), e);
-					}
-				});
-			});
+			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> OneTimeEventReceiver.addModListener(FMLClientSetupEvent.class, event -> {
+				try
+				{
+					RenderingRegistry.registerEntityRenderingHandler(entityType, renderer.get());
+				}
+				catch(Exception e)
+				{
+					throw new IllegalStateException("Failed to register renderer for Entity " + entityType.getRegistryName(), e);
+				}
+			}));
 		}
 
 		if(attributes != null)

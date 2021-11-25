@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "UnstableApiUsage", "UnusedReturnValue", "deprecation", "unused" })
 public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK extends Block, PARENT> extends RegistratorBuilder<OWNER, Block, BLOCK, PARENT, BlockBuilder<OWNER, BLOCK, PARENT>, BlockEntry<BLOCK>>
 {
 	private final BlockFactory<BLOCK> blockFactory;

@@ -11,6 +11,7 @@ import net.minecraft.util.IItemProvider;
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
+@SuppressWarnings("unused")
 public final class ItemTier implements IItemTier
 {
 	public final int level;

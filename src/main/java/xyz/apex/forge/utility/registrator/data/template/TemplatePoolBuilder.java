@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public final class TemplatePoolBuilder
 {
 	private final TemplatePools pool;

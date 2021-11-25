@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Set;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "deprecation", "ConstantConditions", "unused" })
 public final class BlockEntityBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK_ENTITY extends TileEntity, PARENT> extends RegistratorBuilder<OWNER, TileEntityType<?>, TileEntityType<BLOCK_ENTITY>, PARENT, BlockEntityBuilder<OWNER, BLOCK_ENTITY, PARENT>, BlockEntityEntry<BLOCK_ENTITY>>
 {
 	private final BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory;

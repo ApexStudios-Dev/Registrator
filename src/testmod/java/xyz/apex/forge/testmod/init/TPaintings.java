@@ -2,6 +2,7 @@ package xyz.apex.forge.testmod.init;
 
 import xyz.apex.forge.utility.registrator.entry.PaintingEntry;
 
+@SuppressWarnings("unused")
 public final class TPaintings
 {
 	private static final TRegistry REGISTRY = TRegistry.getRegistry();

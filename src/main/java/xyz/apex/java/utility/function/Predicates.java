@@ -3,6 +3,7 @@ package xyz.apex.java.utility.function;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public final class Predicates
 {
 	public static <T> Predicate<T> alwaysTrue()

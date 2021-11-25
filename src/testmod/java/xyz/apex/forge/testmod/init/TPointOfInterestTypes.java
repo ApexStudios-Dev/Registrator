@@ -5,6 +5,7 @@ import net.minecraft.village.PointOfInterestType;
 import xyz.apex.forge.utility.registrator.entry.PointOfInterestEntry;
 import xyz.apex.forge.utility.registrator.entry.VillagerProfessionEntry;
 
+@SuppressWarnings({ "unused", "SameParameterValue" })
 public final class TPointOfInterestTypes
 {
 	private static final TRegistry REGISTRY = TRegistry.getRegistry();

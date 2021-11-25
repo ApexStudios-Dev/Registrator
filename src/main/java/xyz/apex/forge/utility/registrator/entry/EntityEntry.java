@@ -17,6 +17,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unused")
 public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<EntityType<ENTITY>> implements EntityTypeLike, NonnullSupplier<EntityType<ENTITY>>
 {
 	public EntityEntry(AbstractRegistrator<?> registrator, RegistryObject<EntityType<ENTITY>> delegate)

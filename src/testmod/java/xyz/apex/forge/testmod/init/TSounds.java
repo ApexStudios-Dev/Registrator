@@ -4,7 +4,7 @@ import xyz.apex.forge.utility.registrator.entry.SoundEntry;
 
 public class TSounds
 {
-	private static TRegistry REGISTRY = TRegistry.getRegistry();
+	private static final TRegistry REGISTRY = TRegistry.getRegistry();
 
 	public static final SoundEntry COPPER_BREAK = REGISTRY
 			.sound("block.copper.break")

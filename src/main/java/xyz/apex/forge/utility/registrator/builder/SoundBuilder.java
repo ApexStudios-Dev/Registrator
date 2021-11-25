@@ -11,6 +11,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.SoundEntry;
 import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
 
+@SuppressWarnings("unused")
 public final class SoundBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, SoundEvent, SoundEvent, PARENT, SoundBuilder<OWNER, PARENT>, SoundEntry>
 {
 	private NonnullUnaryOperator<SoundDefinition> definitionModifier = NonnullUnaryOperator.identity();

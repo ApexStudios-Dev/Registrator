@@ -17,6 +17,7 @@ import xyz.apex.forge.testmod.init.TBlockEntityTypes;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("deprecation")
 public class TestBlock extends Block implements ITileEntityProvider
 {
 	public TestBlock(Properties properties)

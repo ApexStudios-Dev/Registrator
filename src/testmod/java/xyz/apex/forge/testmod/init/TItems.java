@@ -19,6 +19,7 @@ import xyz.apex.forge.utility.registrator.entry.ItemEntry;
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
 import xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider;
 
+@SuppressWarnings({ "SameParameterValue", "unused" })
 public final class TItems
 {
 	private static final TRegistry REGISTRY = TRegistry.getRegistry();

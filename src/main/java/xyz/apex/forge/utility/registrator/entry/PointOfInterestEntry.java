@@ -12,6 +12,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public final class PointOfInterestEntry extends RegistryEntry<PointOfInterestType> implements PointOfInterestLike, NonnullSupplier<PointOfInterestType>
 {
 	public PointOfInterestEntry(AbstractRegistrator<?> owner, RegistryObject<PointOfInterestType> delegate)

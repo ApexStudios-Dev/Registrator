@@ -19,6 +19,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("ConstantConditions")
 public class ForgeSpawnEggItem<ENTITY extends Entity> extends SpawnEggItem
 {
 	private static final IDispenseItemBehavior DEFAULT_DISPENSE_BEHAVIOR = (source, stack) -> {
@@ -43,7 +44,6 @@ public class ForgeSpawnEggItem<ENTITY extends Entity> extends SpawnEggItem
 	private boolean registered = false;
 	private final NonnullSupplier<EntityType<ENTITY>> entityTypeSupplier;
 
-	@SuppressWarnings("ConstantConditions")
 	public ForgeSpawnEggItem(NonnullSupplier<EntityType<ENTITY>> entityTypeSupplier, int backgroundColor, int highlightColor, Properties properties)
 	{
 		super(null, backgroundColor, highlightColor, properties);
@@ -51,7 +51,6 @@ public class ForgeSpawnEggItem<ENTITY extends Entity> extends SpawnEggItem
 		this.entityTypeSupplier = entityTypeSupplier;
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	@Override
 	public EntityType<?> getType(@Nullable CompoundNBT tag)
 	{

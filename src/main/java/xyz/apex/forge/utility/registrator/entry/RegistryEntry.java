@@ -8,6 +8,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
+@SuppressWarnings({ "ConstantConditions", "deprecation", "unchecked", "unused" })
 public class RegistryEntry<T extends IForgeRegistryEntry<? super T>> extends com.tterrag.registrate.util.entry.RegistryEntry<T> implements NonnullSupplier<T>
 {
 	public static final com.tterrag.registrate.util.entry.RegistryEntry<?> EMPTY;

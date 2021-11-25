@@ -9,7 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.ItemProviderEntry;
@@ -20,6 +19,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.Stack;
 
+@SuppressWarnings({ "deprecation", "UnusedReturnValue" })
 public class RegistratorItemGroup extends ItemGroup implements Lazy<ItemStack>
 {
 	protected final AbstractRegistrator<?> registrator;

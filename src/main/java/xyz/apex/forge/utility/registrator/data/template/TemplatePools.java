@@ -7,6 +7,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unused")
 public final class TemplatePools implements IStringSerializable, Comparable<TemplatePools>
 {
 	public static final TemplatePools EMPTY = of("empty");

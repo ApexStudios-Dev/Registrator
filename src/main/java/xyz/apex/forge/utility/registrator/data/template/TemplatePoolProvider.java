@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
 
+@SuppressWarnings({ "unused", "RedundantThrows", "UnstableApiUsage" })
 public abstract class TemplatePoolProvider implements IDataProvider
 {
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

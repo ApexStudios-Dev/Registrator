@@ -11,6 +11,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.similar.ItemLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
+@SuppressWarnings("unused")
 public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super ITEM> & IItemProvider> extends RegistryEntry<ITEM> implements ItemLike, NonnullSupplier<ITEM>
 {
 	public ItemProviderEntry(AbstractRegistrator<?> registrator, RegistryObject<ITEM> delegate)

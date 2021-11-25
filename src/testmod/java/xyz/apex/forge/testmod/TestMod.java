@@ -9,6 +9,7 @@ import xyz.apex.forge.testmod.init.TRegistry;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 @Mod(TestMod.ID)
 public final class TestMod
 {

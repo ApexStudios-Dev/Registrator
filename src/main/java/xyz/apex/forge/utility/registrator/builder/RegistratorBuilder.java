@@ -21,7 +21,7 @@ import xyz.apex.forge.utility.registrator.entry.LazyRegistryEntry;
 import xyz.apex.forge.utility.registrator.entry.RegistryEntry;
 import xyz.apex.java.utility.nullness.*;
 
-@SuppressWarnings("DeprecatedIsStillUsed")
+@SuppressWarnings({ "unchecked", "NullableProblems", "DeprecatedIsStillUsed", "unused", "deprecation" })
 public abstract class RegistratorBuilder<
 		OWNER extends AbstractRegistrator<OWNER>,
 		BASE extends IForgeRegistryEntry<BASE>,
@@ -62,6 +62,7 @@ public abstract class RegistratorBuilder<
 		return owner.idString(getName());
 	}
 
+	@SafeVarargs
 	public final BUILDER removeTags(ProviderType<? extends RegistrateTagsProvider<BASE>> providerType, ITag.INamedTag<BASE>... tags)
 	{
 		return removeTag((ProviderType<RegistrateTagsProvider<BASE>>) providerType, tags);

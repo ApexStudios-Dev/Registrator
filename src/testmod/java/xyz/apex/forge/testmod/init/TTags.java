@@ -17,6 +17,7 @@ public final class TTags
 		Blocks.bootstrap();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static final class Items
 	{
 		public static final ITag.INamedTag<Item> INGOTS_COPPER = REGISTRY.itemTagOptionalForge("ingots/copper");
@@ -24,7 +25,6 @@ public final class TTags
 		public static final ITag.INamedTag<Item> ORES_COPPER = REGISTRY.itemTagOptionalForge("ores/copper");
 		public static final ITag.INamedTag<Item> STORAGE_BLOCKS_COPPER = REGISTRY.itemTagOptionalForge("storage_blocks/copper");
 
-		@SuppressWarnings("unchecked")
 		private static void bootstrap()
 		{
 			REGISTRY.addDataGenerator(ProviderType.ITEM_TAGS, provider -> {
@@ -37,12 +37,12 @@ public final class TTags
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public static final class Blocks
 	{
 		public static final ITag.INamedTag<Block> ORES_COPPER = REGISTRY.blockTagOptionalForge("ores/copper");
 		public static final ITag.INamedTag<Block> STORAGE_BLOCKS_COPPER = REGISTRY.blockTagOptionalForge("storage_blocks/copper");
 
-		@SuppressWarnings("unchecked")
 		private static void bootstrap()
 		{
 			REGISTRY.addDataGenerator(ProviderType.BLOCK_TAGS, provider -> {

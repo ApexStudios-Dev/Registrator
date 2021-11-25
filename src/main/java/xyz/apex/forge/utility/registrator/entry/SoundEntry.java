@@ -15,6 +15,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
+@SuppressWarnings("unused")
 public final class SoundEntry extends RegistryEntry<SoundEvent> implements SoundLike, NonnullSupplier<SoundEvent>
 {
 	public SoundEntry(AbstractRegistrator<?> owner, RegistryObject<SoundEvent> delegate)

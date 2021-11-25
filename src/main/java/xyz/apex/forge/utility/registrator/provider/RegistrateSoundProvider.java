@@ -15,6 +15,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public final class RegistrateSoundProvider extends SoundDefinitionsProvider implements RegistrateProvider
 {
 	private final AbstractRegistrate<?> registrate;

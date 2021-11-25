@@ -8,6 +8,7 @@ import xyz.apex.forge.testmod.block.entity.TestBlockEntity;
 import xyz.apex.forge.utility.registrator.entry.BlockEntityEntry;
 import xyz.apex.forge.utility.registrator.entry.BlockEntry;
 
+@SuppressWarnings({ "unused", "SameParameterValue" })
 public final class TBlockEntityTypes
 {
 	private static final TRegistry REGISTRY = TRegistry.getRegistry();

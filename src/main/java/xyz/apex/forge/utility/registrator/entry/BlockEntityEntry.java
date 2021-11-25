@@ -16,6 +16,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+@SuppressWarnings("unused")
 public final class BlockEntityEntry<BLOCK_ENTITY extends TileEntity> extends RegistryEntry<TileEntityType<BLOCK_ENTITY>> implements BlockEntityTypeLike, NonnullSupplier<TileEntityType<BLOCK_ENTITY>>
 {
 	public BlockEntityEntry(AbstractRegistrator<?> registrator, RegistryObject<TileEntityType<BLOCK_ENTITY>> delegate)

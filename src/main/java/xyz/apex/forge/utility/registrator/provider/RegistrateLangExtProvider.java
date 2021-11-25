@@ -17,7 +17,6 @@ import net.minecraft.potion.Effect;
 import net.minecraft.util.IItemProvider;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
@@ -29,6 +28,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+@SuppressWarnings("unused")
 public final class RegistrateLangExtProvider implements RegistrateProvider
 {
 	// region: Language Keys (Codes)

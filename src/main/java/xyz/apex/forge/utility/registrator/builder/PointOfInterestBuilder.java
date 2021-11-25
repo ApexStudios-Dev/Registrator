@@ -17,6 +17,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+@SuppressWarnings("unused")
 public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, PointOfInterestType, PointOfInterestType, PARENT, PointOfInterestBuilder<OWNER, PARENT>, PointOfInterestEntry>
 {
 	private NonnullSupplier<? extends Block> block = () -> Blocks.AIR;

@@ -29,6 +29,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import java.util.*;
 import java.util.function.Supplier;
 
+@SuppressWarnings({ "UnstableApiUsage", "unused" })
 public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, VillagerProfession, VillagerProfession, PARENT, VillagerProfessionBuilder<OWNER, PARENT>, VillagerProfessionEntry>
 {
 	private final Set<NonnullSupplier<? extends Item>> requestedItems = Sets.newHashSet();

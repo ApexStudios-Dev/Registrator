@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 /**
  * Extends {@link net.minecraftforge.common.util.Lazy} to allow better compatibility with MinecraftForge
  */
+@SuppressWarnings("unused")
 public interface Lazy<T> extends Supplier<T>, net.minecraftforge.common.util.Lazy<T>
 {
 	@Override T get();
@@ -73,7 +74,7 @@ public interface Lazy<T> extends Supplier<T>, net.minecraftforge.common.util.Laz
 		}
 	}
 
-	@SuppressWarnings({ "FieldMayBeFinal", "SynchronizationOnLocalVariableOrMethodParameter", "NullableProblems" })
+	@SuppressWarnings({ "FieldMayBeFinal", "NullableProblems", "SynchronizationOnLocalVariableOrMethodParameter" })
 	final class ConcurrentNullableLazy<T> implements Lazy<T>, NullableSupplier<T>
 	{
 		private volatile NullableSupplier<T> supplier;
@@ -118,6 +119,7 @@ public interface Lazy<T> extends Supplier<T>, net.minecraftforge.common.util.Laz
 	/**
 	 * Implements {@link NonNullLazy} to allow better compatibility with MinecraftForge
 	 */
+	@SuppressWarnings("NullableProblems")
 	final class NonnullLazy<T> implements Lazy<T>, NonnullSupplier<T>, NonNullLazy<T>
 	{
 		private final NonnullSupplier<T> supplier;
@@ -152,7 +154,7 @@ public interface Lazy<T> extends Supplier<T>, net.minecraftforge.common.util.Laz
 	/**
 	 * Implements {@link NonNullLazy} to allow better compatibility with MinecraftForge
 	 */
-	@SuppressWarnings({ "FieldMayBeFinal", "SynchronizationOnLocalVariableOrMethodParameter" })
+	@SuppressWarnings({ "FieldMayBeFinal", "NullableProblems", "SynchronizationOnLocalVariableOrMethodParameter" })
 	final class ConcurrentNonnullLazy<T> implements Lazy<T>, NonnullSupplier<T>, NonNullLazy<T>
 	{
 		private volatile NonnullSupplier<T> supplier;

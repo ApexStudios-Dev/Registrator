@@ -71,7 +71,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
-@SuppressWarnings({ "deprecation", "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "ConstantConditions" })
+@SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode" })
 public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrator<REGISTRATOR>>
 {
 	public static final String REGISTRATOR_ID = "registrator";
@@ -1476,7 +1476,6 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return backend.<BASE, TYPE>get(registryName, registryType);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Beta
 	public final <BASE extends IForgeRegistryEntry<BASE>, TYPE extends BASE> RegistryEntry<TYPE> getOptional(String registryName, Class<? super BASE> registryType)
 	{
@@ -1568,7 +1567,6 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return backend.entry(registryName, backendBuilderFactory);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Beta
 	public final <BASE extends IForgeRegistryEntry<BASE>>  Supplier<IForgeRegistry<BASE>> makeRegistry(String registryName, Class<? super BASE> registryType, NonnullSupplier<RegistryBuilder<BASE>> registryBuilder)
 	{
