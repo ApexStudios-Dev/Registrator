@@ -149,12 +149,6 @@ sourceSets.testmod.resources {
 	srcDir 'src/generated-testmod/resources'
 }
 
-processResources {
-	from(sourceSets.testmod.resources.srcDirs) {
-		include 'META-INF/mods.toml'
-	}
-}
-
 repositories {
 	maven { url "http://maven.tterrag.com/" }
 }
@@ -162,7 +156,7 @@ repositories {
 dependencies {
 	minecraft 'net.minecraftforge:forge:1.16.5-36.2.5'
 
-	annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
 	compileOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
 	runtimeOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')

@@ -1,7 +1,7 @@
 /**
  * <h2>Registrator</h2> - Auto-Magic registration system built on top of <b>Registrate</b>
- *
- * @apiNote {@link xyz.apex.forge.utility.registrator.AbstractRegistrator#backend} is for advanced use only, regular use cases should never have to make use of this method.
+ * <p>
+ * API Note: {@link xyz.apex.forge.utility.registrator.AbstractRegistrator#backend} is for advanced use only, regular use cases should never have to make use of this method.
  *
  * @author Apex
  * @author TTerrag
