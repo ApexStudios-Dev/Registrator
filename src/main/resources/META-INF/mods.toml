@@ -6,9 +6,11 @@ license="MPL 2.0"
 modId="registrator"
 version="${file.jarVersion}"
 displayName="Registrator"
-credits="Apex - Programming\nTTerrag - Registrate"
+credits="Apex - Programming, TTerrag - Registrate"
+updateJSONURL="https://raw.githubusercontent.com/ApexModder/Version/master/registrator.json"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/registrator"
 authors="Apex, TTerrag"
-description=""
+description="Auto-Magic Registration System built ontop of Registrate."
 
 [[dependencies.registrator]]
     modId="forge"
