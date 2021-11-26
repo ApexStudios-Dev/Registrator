@@ -43,7 +43,7 @@ Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.a
 <details>
 <summary></summary>
 
-For an example mod on how to use Registrator, see the [TestMod here](https://github.com/ApexModder/Registrator/blob/src/testmod/java/xyz/apex/forge/testmod/init/TRegistry.java).
+For an example mod on how to use Registrator, see the [TestMod here](https://github.com/ApexModder/Registrator/blob/master/src/testmod/java/xyz/apex/forge/testmod/init/TRegistry.java).
 
 This system is used in a very similar way to how vanilla Registrate is used. So their _How to Use_ guide should also be applicable here.
 Just substitute any Registrate references for Registrator versions.
