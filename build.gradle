@@ -20,7 +20,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.0.3'
+version = '1.0.4'
 group = 'xyz.apex.forge.utility.registrator'
 archivesBaseName = "Registrator-1.16.5"
 
@@ -223,8 +223,8 @@ publishing {
 		publications {
 			gpr(MavenPublication) {
 				// GitHub Packages **require** names to be in lowercase
-				groupId = "${group}"
-				artifactId = "${archivesBaseName.toLowerCase(Locale.ROOT)}"
+				groupId = 'xyz.apex.forge.utility'
+				artifactId = 'registrator-1.16.5'
 				version = "${project.version}"
 
 				artifact jar
