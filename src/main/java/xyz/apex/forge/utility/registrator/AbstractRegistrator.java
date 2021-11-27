@@ -16,6 +16,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.client.gui.IHasContainer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLootTables;
 import net.minecraft.enchantment.Enchantment;
@@ -1389,12 +1391,22 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: ContainerType
-	public final <CONTAINER extends Container, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory)
+	public final <CONTAINER extends Container, SCREEN extends Screen & IHasContainer<CONTAINER>, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
 	{
-		return entry(registryName, callback -> new ContainerBuilder<>(self, parent, registryName, callback, containerFactory));
+		return entry(registryName, callback -> new ContainerBuilder<>(self, parent, registryName, callback, containerFactory, screenFactory));
 	}
 
-	public final <CONTAINER extends Container> ContainerBuilder<REGISTRATOR, CONTAINER, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory)
+	public final <CONTAINER extends Container, SCREEN extends Screen & IHasContainer<CONTAINER>> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
+	{
+		return container(registryName, self, containerFactory, screenFactory);
+	}
+
+	public final <CONTAINER extends Container, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, ?, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory)
+	{
+		return container(registryName, parent, containerFactory, null);
+	}
+
+	public final <CONTAINER extends Container> ContainerBuilder<REGISTRATOR, CONTAINER, ?, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory)
 	{
 		return container(registryName, self, containerFactory);
 	}
