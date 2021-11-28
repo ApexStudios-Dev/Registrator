@@ -26,8 +26,11 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.*;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.potion.Potion;
 import net.minecraft.tags.*;
 import net.minecraft.tileentity.BannerPattern;
@@ -53,10 +56,8 @@ import net.minecraftforge.versions.forge.ForgeVersion;
 
 import xyz.apex.forge.utility.registrator.builder.*;
 import xyz.apex.forge.utility.registrator.entry.PaintingEntry;
-import xyz.apex.forge.utility.registrator.factory.BlockEntityFactory;
-import xyz.apex.forge.utility.registrator.factory.BlockFactory;
-import xyz.apex.forge.utility.registrator.factory.ContainerFactory;
-import xyz.apex.forge.utility.registrator.factory.EntityFactory;
+import xyz.apex.forge.utility.registrator.entry.RecipeSerializerEntry;
+import xyz.apex.forge.utility.registrator.factory.*;
 import xyz.apex.forge.utility.registrator.factory.item.*;
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
 import xyz.apex.forge.utility.registrator.provider.BlockListReporter;
@@ -1479,6 +1480,18 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public final VillagerProfessionBuilder<REGISTRATOR, REGISTRATOR> villagerProfession(String registryName)
 	{
 		return villagerProfession(registryName, self);
+	}
+	// endregion
+
+	// region: RecipeSerializer
+	public <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory, PARENT> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, PARENT parent, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
+	{
+		return entry(registryName, callback -> new RecipeSerializerBuilder<>(self, parent, registryName, callback, recipeSerializerFactory)).register();
+	}
+
+	public <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
+	{
+		return recipeSerializer(registryName, self, recipeSerializerFactory);
 	}
 	// endregion
 
