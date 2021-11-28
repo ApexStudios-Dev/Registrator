@@ -8,6 +8,7 @@ import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.RegistryObject;
 
@@ -51,6 +52,12 @@ public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<Enti
 	public ENTITY create(ServerWorld level, @Nullable CompoundNBT entityTag, @Nullable ITextComponent displayName, @Nullable PlayerEntity player, BlockPos pos, SpawnReason spawnReason, boolean unk1, boolean unk2)
 	{
 		return asEntityType().create(level, entityTag, displayName, player, pos, spawnReason, unk1, unk2);
+	}
+
+	@Nullable
+	public ENTITY create(World level)
+	{
+		return asEntityType().create(level);
 	}
 
 	public EntityClassification getCategory()
