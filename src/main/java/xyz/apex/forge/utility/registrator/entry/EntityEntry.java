@@ -84,6 +84,11 @@ public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<Enti
 		return get();
 	}
 
+	public boolean hasType(Entity entity)
+	{
+		return isEntityType(entity.getType());
+	}
+
 	public static <ENTITY extends Entity> EntityEntry<ENTITY> cast(RegistryEntry<EntityType<ENTITY>> registryEntry)
 	{
 		return cast(EntityEntry.class, registryEntry);
