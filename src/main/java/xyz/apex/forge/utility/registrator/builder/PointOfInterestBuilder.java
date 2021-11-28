@@ -61,7 +61,9 @@ public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNE
 		NonnullPredicate<PointOfInterestType> predicate = poiType -> this.predicate.apply(poiType, result.get());
 		Set<BlockState> matchingBlockStates = PointOfInterestType.getBlockStates(block.get());
 		String registryName = getRegistryNameFull();
-		return new PointOfInterestType(registryName, matchingBlockStates, maxTickets, predicate, validRange);
+		PointOfInterestType poiType = new PointOfInterestType(registryName, matchingBlockStates, maxTickets, predicate, validRange);
+		result.set(poiType);
+		return poiType;
 	}
 
 	@FunctionalInterface
