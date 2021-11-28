@@ -105,6 +105,11 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 		return properties(properties -> properties.durability(durability));
 	}
 
+	public ItemBuilder<OWNER, ITEM, PARENT> craftRemainder(NonnullSupplier<Item> item)
+	{
+		return properties(properties -> properties.craftRemainder(item.get()));
+	}
+
 	public ItemBuilder<OWNER, ITEM, PARENT> itemGroup(NonnullSupplier<ItemGroup> itemGroup)
 	{
 		return properties(properties -> properties.tab(itemGroup.get()));
