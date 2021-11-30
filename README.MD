@@ -19,6 +19,7 @@ Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.a
   - `IRecipeSerializer`
   - `SoundEvent`
   - `VillagerProfession`
+  - `Structure`
 
 - Custom `RegistryEntry` types & builders
   - Custom builders not only gives access to using custom `RegistryEntry` types, but also more freedom in what can be registered during the building process.
@@ -129,6 +130,7 @@ This will add Registrator as a dependency on CurseForge. When users download you
 
 | Registrator Version | CurseForge File ID |
 |:---:|:---:|
+| <b><i>1.0.13</i></b> | [3541415](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541415) |
 | <b><i>1.0.12</i></b> | [3541261](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541261) |
 | <b><i>1.0.11</i></b> | [3541252](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541252) |
 | <b><i>1.0.10</i></b> | [3541180](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541180) |
