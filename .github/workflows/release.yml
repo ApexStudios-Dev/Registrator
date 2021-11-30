@@ -50,3 +50,9 @@ jobs:
           body: Auto-Generated GitHub Release - ${{ steps.tagName.outputs.tag }}
           name: ${{ steps.tagName.outputs.tag }}
           files: ./build/libs/*.jar
+
+      # Publish to CurseForge
+      - run: ./gradlew curseforge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
