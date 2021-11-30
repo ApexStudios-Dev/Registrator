@@ -10,9 +10,8 @@ This project makes use of both mixins & an access transformer.<br>
 The access transformer is used to make various elements across Minecraft public-ly visible for better regitration of various objects.<br>
 Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.apex.forge.utility.registrator.entry.similar`) onto the correct object types.
 
-### Registrator vs Registrate
 <details>
-<summary></summary>
+<summary><b>Registrator vs Registrate</b></summary>
 
 - Adds support for various new Registration types
   - `PaintingType`
@@ -28,7 +27,7 @@ Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.a
     - This is mainly helpful for easier sub `Item` registrations.
     - Things like `ToolItem`, `ArmorItem` use different constructor parameters, many helper methods have been implemented into `AbstractRegistor` to make registering these kinds of items easier.
 - Custom DataProviders
-  - An extended LanguageProvider (`RegistrateLangExtProvider`) has been implemented and many similar `lang()` methods exist, to allow registering translation for various languages. Where as vanilla Registrate only supports `en_us` (& auto `en_ud`) ny default.
+  - An extended LanguageProvider (`RegistrateLangExtProvider`) has been implemented and many similar `lang()` methods exist, to allow registering translation for various languages. Whereas vanilla Registrate only supports `en_us` (& auto `en_ud`) by default.
     - To use this provider, look for any `lang` method whose first parameter is `languageKey` this is the 'language code' you wish to add a translation for, constants for all vanilla Minecraft supported language codes can be found in `RegistrateLangExtProvider`.
     - **Note**: `RegistrateLangExtProvider` **DOES NOT** support registering for the `en_us` language code, use the vanilla `RegistrateLangProvider` provider type & methods for this.
   - Various new tags providers for the missing tag types (`Potion`, `Enchantment` & `BlockEntity` / `TileEntity`).
@@ -39,9 +38,8 @@ Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.a
     - Use at your own risk.
 </details>
 
-### How to Use
 <details>
-<summary></summary>
+<summary><b>How to Use</b></summary>
 
 For an example mod on how to use Registrator, see the [TestMod here](https://github.com/ApexModder/Registrator/blob/master/src/testmod/java/xyz/apex/forge/testmod/init/TRegistry.java).
 
@@ -77,12 +75,11 @@ These factory types take the default constructor parameters of what ever type yo
 For example, a `BlockFactory` takes in the finalized `AbstractBlock.Properties` object (Similar to how the `Block` constructor takes in a `AbstractBlock.Properties` object).
 </details>
 
-### Project Setup
 <details>
-<summary></summary>
+<summary><b>Project Setup</b></summary>
 
 Due to Registrator including a `mods.toml` file, it has to be added as a dependency to your mod.
-Unlike how vanilla Registrate includes no mod data and be be shaded right into your mod jar.
+Unlike how vanilla Registrate includes no mod data and can be shaded right into your mod jar.
 
 To do this, add the following snippet of code to your `mods.toml` file.
 ```toml
@@ -94,9 +91,26 @@ To do this, add the following snippet of code to your `mods.toml` file.
     side="BOTH"
 ```
 
-#### The following is only required when shipping your mod via CurseForge.<br>
+To include Registrator in your mods `build.gradle` file, We make use of the [CurseMaven Gradle plugin](https://www.cursemaven.com/). <br>
+Add the following snippet of code to your `repositories { }` section
+
+```groovy
+maven { // CurseForge
+    url 'https://cursemaven.com'
+    content { includeGroup 'curse.maven' }
+}
+```
+
+Add the following snippet of code to your `dependencies { }` section<br>
+See below for table of CurseForge version IDs
+
+```groovy
+compileOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
+runtimeOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
+```
+
 <details>
-<summary></summary>
+<summary><b>The following is only required when shipping your mod via CurseForge.</b></summary>
 
 While uploading / editing uploaded releases, find the `Releated Projects` section.<br>
 ![Releated-Projects](https://i.imgur.com/Lj5jXZj.png)
@@ -105,4 +119,29 @@ Search for `Registrator` and click `Add Project` on the right.<br>
 This will add Registrator as a dependency on CurseForge. When users download your mod via the CurseForge launcher (or any launchers using CurseForges API), Registrator will automatically be downloaded alongside it.
 
 </details>
+</details>
+
+<details>
+<summary><b>CurseForge Versions</b></summary>
+
+<details>
+<summary><b><i>1.16.5</i></b></summary>
+
+| Registrator Version | CurseForge File ID |
+|:---:|:---:|
+| <b><i>1.0.12</i></b> | [3541261](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541261) |
+| <b><i>1.0.11</i></b> | [3541252](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541252) |
+| <b><i>1.0.10</i></b> | [3541180](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541180) |
+| <b><i>1.0.9</i></b> | [3541175](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541175) |
+| <b><i>1.0.8</i></b> | [3541170](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541170) |
+| <b><i>1.0.7</i></b> | [3539396](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539396) |
+| <b><i>1.0.6</i></b> | [3539331](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539331) |
+| <b><i>1.0.5</i></b> | [3538337](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3538337) |
+| <b><i>1.0.4</i></b> | [3537821](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537821) |
+| <b><i>1.0.3</i></b> | [3537477](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537477) |
+| <b><i>1.0.2</i></b> | [3537398](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537398) |
+| <b><i>1.0.1</i></b> | [3537338](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537338) |
+
+</details>
+
 </details>
