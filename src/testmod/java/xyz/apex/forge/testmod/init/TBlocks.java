@@ -6,6 +6,7 @@ import com.tterrag.registrate.util.DataIngredient;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.ToolType;
 
 import xyz.apex.forge.testmod.block.TestBlock;
@@ -55,7 +56,7 @@ public class TBlocks
 				.requiresCorrectToolForDrops()
 				.strength(3F, 6F)
 				.sound(TElements.COPPER_SOUND_TYPE)
-				.tag(TTags.Blocks.STORAGE_BLOCKS_COPPER)
+				.tag(TTags.Blocks.STORAGE_BLOCKS_COPPER, BlockTags.BEACON_BASE_BLOCKS)
 				.clearDataGenerator(ProviderType.BLOCKSTATE)
 
 				.item()

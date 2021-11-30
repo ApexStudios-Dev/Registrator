@@ -15,6 +15,7 @@
 		"PaintingTypeMixin",
 		"PointOfInterestTypeMixin",
 		"SoundEventMixin",
+		"StructureMixin",
 		"VillagerProfessionMixin"
 	],
 	"client": [ ],

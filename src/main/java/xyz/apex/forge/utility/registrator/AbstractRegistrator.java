@@ -3,6 +3,7 @@ package xyz.apex.forge.utility.registrator;
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
+import com.mojang.serialization.Codec;
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.Builder;
 import com.tterrag.registrate.builders.BuilderCallback;
@@ -41,6 +42,9 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.Util;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.Tags;
@@ -1484,14 +1488,36 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: RecipeSerializer
-	public <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory, PARENT> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, PARENT parent, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
+	public final <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory, PARENT> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, PARENT parent, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
 	{
 		return entry(registryName, callback -> new RecipeSerializerBuilder<>(self, parent, registryName, callback, recipeSerializerFactory)).register();
 	}
 
-	public <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
+	public final <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
 	{
 		return recipeSerializer(registryName, self, recipeSerializerFactory);
+	}
+	// endregion
+
+	// region: Structure
+	public final <STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
+	{
+		return entry(registryName, callback -> new StructureBuilder<>(self, parent, registryName, callback, structureFactory, structureCodecSupplier, featureConfigSupplier));
+	}
+
+	public final <STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
+	{
+		return structure(registryName, self, structureFactory, structureCodecSupplier, featureConfigSupplier);
+	}
+
+	public final <STRUCTURE extends Structure<NoFeatureConfig>, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, NoFeatureConfig, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, NoFeatureConfig> structureFactory)
+	{
+		return structure(registryName, parent, structureFactory, () -> NoFeatureConfig.CODEC, () -> NoFeatureConfig.INSTANCE);
+	}
+
+	public final <STRUCTURE extends Structure<NoFeatureConfig>> StructureBuilder<REGISTRATOR, STRUCTURE, NoFeatureConfig, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, NoFeatureConfig> structureFactory)
+	{
+		return structure(registryName, self, structureFactory);
 	}
 	// endregion
 
@@ -1626,7 +1652,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	}
 	// endregion
 
-	public REGISTRATOR addSoundGenerator(NonnullConsumer<RegistrateSoundProvider> consumer)
+	public final REGISTRATOR addSoundGenerator(NonnullConsumer<RegistrateSoundProvider> consumer)
 	{
 		return addDataGenerator(SOUNDS_PROVIDER, consumer);
 	}

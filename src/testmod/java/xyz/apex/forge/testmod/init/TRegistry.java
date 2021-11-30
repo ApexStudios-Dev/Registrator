@@ -34,6 +34,8 @@ public final class TRegistry extends AbstractRegistrator<TRegistry>
 			TVillagerProfessions.bootstrap();
 			TPointOfInterestTypes.bootstrap();
 
+			TStructures.bootstrap();
+
 			bootstrap = true;
 		}
 	}
