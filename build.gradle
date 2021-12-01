@@ -21,7 +21,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.0.14'
+version = '1.0.15'
 group = 'xyz.apex.forge.utility.registrator'
 archivesBaseName = "Registrator-1.16.5"
 
@@ -191,9 +191,9 @@ dependencies {
 
 	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
 		// we have access to Apex's GH Packages pull from there
-		compileOnly 'xyz.apex.java.utility:javautilities:1.0.4.1-j8'
-		runtimeOnly 'xyz.apex.java.utility:javautilities:1.0.4.1-j8'
-		shade 'xyz.apex.java.utility:javautilities:1.0.4.1-j8'
+		compileOnly 'xyz.apex.java.utility:javautilities:1.0.5-j8'
+		runtimeOnly 'xyz.apex.java.utility:javautilities:1.0.5-j8'
+		shade 'xyz.apex.java.utility:javautilities:1.0.5-j8'
 	} else {
 		// no public location
 	}
@@ -237,7 +237,9 @@ jar {
 
 	from sourceSets.main.output.classesDirs
 	from sourceSets.main.output.resourcesDir
+}
 
+tasks.withType(Jar) {
 	manifest {
 		attributes([
 				'Specification-Title': 'Registrator',
