@@ -1,7 +1,6 @@
 package xyz.apex.forge.utility.registrator.factory;
 
 import net.minecraft.client.gui.IHasContainer;
-import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -37,8 +36,8 @@ public interface ContainerFactory<CONTAINER extends Container>
 	}
 
 	@FunctionalInterface
-	interface ScreenFactory<CONTAINER extends Container, SCREEN extends Screen & IHasContainer<CONTAINER>> extends ScreenManager.IScreenFactory<CONTAINER, SCREEN>
+	interface ScreenFactory<CONTAINER extends Container, SCREEN extends Screen & IHasContainer<CONTAINER>>
 	{
-		@Override SCREEN create(CONTAINER container, PlayerInventory playerInventory, ITextComponent titleComponent);
+		SCREEN create(CONTAINER container, PlayerInventory playerInventory, ITextComponent titleComponent);
 	}
 }

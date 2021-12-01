@@ -38,7 +38,7 @@ public final class ContainerBuilder<OWNER extends AbstractRegistrator<OWNER>, CO
 	private void registerScreenFactory(ContainerType<CONTAINER> containerType)
 	{
 		if(screenFactory != null)
-			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ScreenManager.register(containerType, screenFactory.get()));
+			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ScreenManager.register(containerType, screenFactory.get()::create));
 	}
 
 	@Override
