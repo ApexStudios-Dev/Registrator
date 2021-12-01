@@ -15,6 +15,7 @@
   "item.testmod.copper_pickaxe": "Copper Pickaxe",
   "item.testmod.copper_shovel": "Copper Shovel",
   "item.testmod.copper_sword": "Copper Sword",
+  "item.testmod.dummy": "Dummy",
   "item.testmod.test_entity_spawn_egg": "Test Entity Spawn Egg",
   "itemGroup.testmod": "Test Mod"
 }

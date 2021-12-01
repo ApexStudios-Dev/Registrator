@@ -12,6 +12,7 @@ import net.minecraft.entity.passive.PigEntity;
 import net.minecraft.item.*;
 import net.minecraftforge.common.Tags;
 
+import xyz.apex.forge.testmod.item.DummyContainerItem;
 import xyz.apex.forge.utility.registrator.builder.EntityBuilder;
 import xyz.apex.forge.utility.registrator.entry.BlockEntry;
 import xyz.apex.forge.utility.registrator.entry.EntityEntry;
@@ -23,6 +24,14 @@ import xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider;
 public final class TItems
 {
 	private static final TRegistry REGISTRY = TRegistry.getRegistry();
+
+	// region: Dummy
+	public static final ItemEntry<DummyContainerItem> DUMMY = REGISTRY
+			.item("dummy", DummyContainerItem::new)
+				.lang("Dummy")
+				.lang(RegistrateLangExtProvider.EN_GB, "Dummy")
+			.register();
+	// endregion
 
 	// region: Copper Pickaxe
 	public static final ItemEntry<PickaxeItem> COPPER_PICKAXE = REGISTRY

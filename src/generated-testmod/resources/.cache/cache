@@ -1,8 +1,8 @@
 efcfbfd4627a57fe0d42d0b8afe86fd8be55a0c6 assets/testmod/blockstates/copper_ore.json
 63f4e1e75fd2b64bbed53cde77ce17696cdc1df6 assets/testmod/blockstates/test_block.json
-7be629f1ec644a407fa3b6b110c0b6d200cbda15 assets/testmod/lang/en_gb.json
-504fe742dbe8146640a783b2db35f61c4cf42a4d assets/testmod/lang/en_ud.json
-9078c3404460f3efd7211ad2cbbdca40c4bf6aa6 assets/testmod/lang/en_us.json
+eb10eea87e25e0416b81e8029b409c6120219ded assets/testmod/lang/en_gb.json
+affda16262aaf18e3afd96a2b499526e8651bed2 assets/testmod/lang/en_ud.json
+821f5aef0618c3ae650360ea18a8751cb4ffac54 assets/testmod/lang/en_us.json
 4e035673634be5a5729b2df5a679eb05be87ce90 assets/testmod/models/block/copper_ore.json
 5181e561c52800f4c004751df4e4efcbeb9d0872 assets/testmod/models/block/test_block.json
 7f6b4175a059e1c4ff7a04e564a07918c8b0c29b assets/testmod/models/item/copper_axe.json
@@ -18,6 +18,7 @@ d6e418047bb8bc7f462ea6a6456d779a7f9a06a9 assets/testmod/models/item/copper_ingot
 8b850ecae3edfcb6eea04be772c69f3988351499 assets/testmod/models/item/copper_pickaxe.json
 20104de89043dbef1b2903ee7cb419b38e775405 assets/testmod/models/item/copper_shovel.json
 8b8db2e9f03cb3992e6f7f1c19f9e993536cb7b7 assets/testmod/models/item/copper_sword.json
+e7bae9f79e20a1096519fd3c2e9ce4023dbe800e assets/testmod/models/item/dummy.json
 09616b61199a71f1a2b5c36a67d11cf5c3544e60 assets/testmod/models/item/test_block.json
 98167609bf3898587f7565736a6fc24a7966cacd assets/testmod/models/item/test_entity_spawn_egg.json
 97b7c6015fc13df5d596ac1b8f7d2063cb12982c assets/testmod/sounds.json
