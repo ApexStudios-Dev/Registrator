@@ -28,7 +28,7 @@ public final class TRegistry extends AbstractRegistrator<TRegistry>
 			TItems.bootstrap();
 			TBlocks.bootstrap();
 			TBlockEntityTypes.bootstrap();
-
+			TContainers.bootstrap();
 			TEntityTypes.bootstrap();
 			TTags.bootstrap();
 			TVillagerProfessions.bootstrap();
