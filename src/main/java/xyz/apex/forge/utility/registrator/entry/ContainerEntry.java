@@ -14,6 +14,8 @@ import xyz.apex.forge.utility.registrator.entry.similar.ContainerTypeLike;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("unused")
 public final class ContainerEntry<CONTAINER extends Container> extends RegistryEntry<ContainerType<CONTAINER>> implements ContainerTypeLike, IContainerProvider, NonnullSupplier<ContainerType<CONTAINER>>
 {
@@ -28,7 +30,7 @@ public final class ContainerEntry<CONTAINER extends Container> extends RegistryE
 		return get();
 	}
 
-	public CONTAINER create(int windowId, PlayerInventory playerInventory, PacketBuffer extraData)
+	public CONTAINER create(int windowId, PlayerInventory playerInventory, @Nullable PacketBuffer extraData)
 	{
 		return asContainerType().create(windowId, playerInventory, extraData);
 	}
@@ -36,12 +38,12 @@ public final class ContainerEntry<CONTAINER extends Container> extends RegistryE
 	// wrapper for lambda method references
 	public CONTAINER create(int windowId, PlayerInventory playerInventory, PlayerEntity player)
 	{
-		return create(windowId, playerInventory);
+		return create(windowId, playerInventory, (PacketBuffer) null);
 	}
 
 	public CONTAINER create(int windowId, PlayerInventory playerInventory)
 	{
-		return asContainerType().create(windowId, playerInventory);
+		return create(windowId, playerInventory, (PacketBuffer) null);
 	}
 
 	public INamedContainerProvider asNamedProvider(ITextComponent titleComponent)
