@@ -130,6 +130,8 @@ This will add Registrator as a dependency on CurseForge. When users download you
 
 | Registrator Version | CurseForge File ID |
 |:---:|:---:|
+| <b><i>1.0.15</i></b> | [3543223](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543223) |
+| <b><i>1.0.14</i></b> | [3543214](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543214) |
 | <b><i>1.0.13</i></b> | [3541415](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541415) |
 | <b><i>1.0.12</i></b> | [3541261](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541261) |
 | <b><i>1.0.11</i></b> | [3541252](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541252) |
