@@ -12,13 +12,10 @@ import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
 import net.minecraft.util.ResourceLocation;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Objects;
 
 @SuppressWarnings({ "unused", "RedundantThrows", "UnstableApiUsage" })
 public abstract class TemplatePoolProvider implements IDataProvider
@@ -74,20 +71,7 @@ public abstract class TemplatePoolProvider implements IDataProvider
 			ResourceLocation poolName = builder.getPoolName();
 			Path poolPath = dataPath.resolve(Paths.get(poolName.getNamespace(), "worldgen", "template_pool", poolName.getPath() + ".json"));
 			JsonObject serialized = builder.serialize();
-			String toWrite = GSON.toJson(serialized);
-			String hashed = SHA1.hashUnencodedChars(toWrite).toString();
-
-			if(!Files.exists(poolPath) || !Objects.equals(cache.getHash(poolPath), hashed))
-			{
-				Files.createDirectories(poolPath.getParent());
-
-				try(BufferedWriter writer = Files.newBufferedWriter(poolPath))
-				{
-					writer.write(toWrite);
-				}
-
-				cache.putNew(poolPath, hashed);
-			}
+			IDataProvider.save(GSON, cache, serialized, poolPath);
 		}
 		catch(IOException e)
 		{
