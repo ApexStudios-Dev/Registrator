@@ -59,7 +59,7 @@ public final class BlockEntityBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 	@Override
 	protected @NonnullType TileEntityType<BLOCK_ENTITY> createEntry()
 	{
-		NonnullSupplier<TileEntityType<BLOCK_ENTITY>> supplier = asSupplier();
+		NonnullSupplier<TileEntityType<BLOCK_ENTITY>> supplier = toSupplier();
 		Block[] validBlocks = this.validBlocks.stream().map(NonnullSupplier::get).toArray(Block[]::new);
 		TileEntityType.Builder<BLOCK_ENTITY> builder = TileEntityType.Builder.of(() -> blockEntityFactory.create(supplier.get()), validBlocks);
 		return builder.build(Util.fetchChoiceType(TypeReferences.BLOCK_ENTITY, getRegistryNameFull()));

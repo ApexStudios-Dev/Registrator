@@ -192,7 +192,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 
 	public <ITEM extends ForgeSpawnEggItem<ENTITY>> ItemBuilder<OWNER, ITEM, EntityBuilder<OWNER, ENTITY, PARENT>> spawnEgg(int backgroundColor, int highlightColor, SpawnEggItemFactory<ENTITY, ITEM> itemFactory)
 	{
-		return owner.spawnEggItem(getRegistryName() + SPAWN_EGG_SUFFIX, this, asSupplier(), backgroundColor, highlightColor, itemFactory);
+		return owner.spawnEggItem(getRegistryName() + SPAWN_EGG_SUFFIX, this, toSupplier(), backgroundColor, highlightColor, itemFactory);
 	}
 
 	public ItemBuilder<OWNER, ForgeSpawnEggItem<ENTITY>, EntityBuilder<OWNER, ENTITY, PARENT>> spawnEgg(int backgroundColor, int highlightColor)

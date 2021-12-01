@@ -11,6 +11,7 @@ import com.tterrag.registrate.providers.RegistrateTagsProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
+import com.tterrag.registrate.util.nullness.NonNullSupplier;
 
 import net.minecraft.tags.ITag;
 import net.minecraftforge.fml.RegistryObject;
@@ -19,7 +20,10 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.LazyRegistryEntry;
 import xyz.apex.forge.utility.registrator.entry.RegistryEntry;
-import xyz.apex.java.utility.nullness.*;
+import xyz.apex.java.utility.nullness.NonnullBiConsumer;
+import xyz.apex.java.utility.nullness.NonnullConsumer;
+import xyz.apex.java.utility.nullness.NonnullFunction;
+import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 public abstract class LegacyRegistratorBuilder<
 		OWNER extends AbstractRegistrator<OWNER>,
@@ -75,7 +79,7 @@ public abstract class LegacyRegistratorBuilder<
 
 	public final <PROVIDER extends RegistrateProvider> BUILDER setDataGenerator(ProviderType<? extends PROVIDER> providerType, NonnullBiConsumer<DataGenContext<BASE, TYPE>, PROVIDER> consumer)
 	{
-		return setData(providerType, consumer);
+		return setData(providerType, consumer::accept);
 	}
 
 	public final <PROVIDER extends RegistrateProvider> BUILDER clearDataGenerator(ProviderType<? extends PROVIDER> providerType)
@@ -83,14 +87,14 @@ public abstract class LegacyRegistratorBuilder<
 		return setDataGenerator(providerType, NonnullBiConsumer.noop());
 	}
 
-	public final <PROVIDER extends RegistrateProvider> BUILDER addMiscDataGenerator(ProviderType<? extends PROVIDER> providerType, NonnullConsumer<? extends PROVIDER> consumer)
+	public final <PROVIDER extends RegistrateProvider> BUILDER addMiscDataGenerator(ProviderType<? extends PROVIDER> providerType, NonnullConsumer<? super PROVIDER> consumer)
 	{
-		return addMiscData(providerType, consumer);
+		return addMiscData(providerType, consumer::accept);
 	}
 
 	public final <OWNER_T extends AbstractRegistrator<OWNER_T>, BASE_T extends IForgeRegistryEntry<BASE_T>, TYPE_T extends BASE_T, PARENT_T, BUILDER_T extends LegacyRegistratorBuilder<OWNER_T, BASE_T, TYPE_T, PARENT_T, BUILDER_T, ENTRY_T>, ENTRY_T extends RegistryEntry<TYPE_T>> BUILDER_T transformer(NonnullFunction<BUILDER, BUILDER_T> transformer)
 	{
-		return transform(transformer);
+		return transform(transformer::apply);
 	}
 
 	public final BUILDER lang(String languageKey, NonnullFunction<TYPE, String> translationKeyProvider, String localizedValue)
@@ -131,8 +135,14 @@ public abstract class LegacyRegistratorBuilder<
 		return super.getRegistryType();
 	}
 
+	@Deprecated
 	@Override
-	public final NonnullSupplier<TYPE> asSupplier()
+	public final NonNullSupplier<TYPE> asSupplier()
+	{
+		return safeSupplier;
+	}
+
+	public final NonnullSupplier<TYPE> toSupplier()
 	{
 		return safeSupplier;
 	}

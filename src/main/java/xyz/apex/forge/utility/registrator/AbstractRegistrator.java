@@ -78,7 +78,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
-@SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode" })
+@SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode", "NullableProblems" })
 public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrator<REGISTRATOR>>
 {
 	public static final String REGISTRATOR_ID = "registrator";
@@ -887,7 +887,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		if(model.isPresent())
 			provider.withExistingParent(ctx.getName(), model.get());
 		else
-			provider.blockItem(block);
+			provider.blockItem(block::get);
 	}
 	// endregion
 
@@ -1554,9 +1554,9 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return backend.getDataProvider(providerType);
 	}
 
-	public final <PROVIDER extends RegistrateProvider> REGISTRATOR addDataGenerator(ProviderType<? extends PROVIDER> providerType, NonnullConsumer<? extends PROVIDER> consumer)
+	public final <PROVIDER extends RegistrateProvider> REGISTRATOR addDataGenerator(ProviderType<? extends PROVIDER> providerType, NonnullConsumer<? super PROVIDER> consumer)
 	{
-		backend.addDataGenerator(providerType, consumer);
+		backend.addDataGenerator(providerType, consumer::accept);
 		return self;
 	}
 
@@ -1593,13 +1593,13 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	public final REGISTRATOR itemGroup(NonnullSupplier<? extends ItemGroup> itemGroup)
 	{
-		backend.itemGroup(itemGroup);
+		backend.itemGroup(itemGroup::get);
 		return self;
 	}
 
 	public final REGISTRATOR itemGroup(NonnullSupplier<? extends ItemGroup> itemGroup, String localizedName)
 	{
-		backend.itemGroup(itemGroup, localizedName);
+		backend.itemGroup(itemGroup::get, localizedName);
 		return self;
 	}
 
@@ -1615,7 +1615,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	public final <BASE extends IForgeRegistryEntry<BASE>, TYPE extends BASE, PARENT, BACKEND_BUILDER extends Builder<BASE, TYPE, PARENT, BACKEND_BUILDER>>  BACKEND_BUILDER entry(String registryName, NonnullFunction<BuilderCallback, BACKEND_BUILDER> backendBuilderFactory)
 	{
-		return backend.entry(registryName, backendBuilderFactory);
+		return backend.entry(registryName, backendBuilderFactory::apply);
 	}
 
 	@Beta

@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.tterrag.registrate.builders.BuilderCallback;
-import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
-import com.tterrag.registrate.util.nullness.NonnullType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import net.minecraft.block.Block;
@@ -25,6 +23,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.VillagerProfessionEntry;
 import xyz.apex.java.utility.nullness.NonnullBiConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
+import xyz.apex.java.utility.nullness.NonnullType;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -319,7 +318,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 			this.profession = profession;
 		}
 
-		void onEvent(WandererTradesEvent event, NonNullBiConsumer<VillagerProfession, WandererTradesRegistrar> consumer)
+		void onEvent(WandererTradesEvent event, NonnullBiConsumer<VillagerProfession, WandererTradesRegistrar> consumer)
 		{
 			consumer.accept(profession, this);
 

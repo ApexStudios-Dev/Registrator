@@ -1,5 +1,6 @@
 package xyz.apex.forge.utility.registrator.entry;
 
+import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import org.apache.commons.lang3.Validate;
 
 import xyz.apex.java.utility.Lazy;
@@ -8,7 +9,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({ "NullableProblems", "unchecked" })
-public final class LazyRegistryEntry<T> implements Lazy<T>, NonnullSupplier<T>
+public final class LazyRegistryEntry<T> implements Lazy<T>, NonnullSupplier<T>, NonNullSupplier<T>
 {
 	@Nullable private NonnullSupplier<? extends RegistryEntry<? extends T>> supplier;
 	@Nullable private RegistryEntry<? extends T> value;

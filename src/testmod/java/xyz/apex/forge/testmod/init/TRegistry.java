@@ -14,7 +14,7 @@ public final class TRegistry extends AbstractRegistrator<TRegistry>
 	{
 		super(TestMod.ID);
 
-		skipErrors().itemGroup(() -> RegistratorItemGroup.create(this), "Test Mod");
+		skipErrors(false).itemGroup(() -> RegistratorItemGroup.create(this), "Test Mod");
 	}
 
 	public static void bootstrap()

@@ -21,7 +21,7 @@ apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.0.13'
+version = '1.0.14'
 group = 'xyz.apex.forge.utility.registrator'
 archivesBaseName = "Registrator-1.16.5"
 
@@ -151,7 +151,28 @@ sourceSets.testmod.resources {
 }
 
 repositories {
+	mavenLocal()
 	maven { url "http://maven.tterrag.com/" }
+
+	// GitHub Packages require read access
+	if(project.hasProperty('apex_git_package_token')) {
+		maven {
+			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
+			credentials {
+				username = 'Apex-GitHub-PackagesToken'
+				password = project.getProperty('apex_git_package_token')
+			}
+		}
+	} else if(System.getenv('GITHUB_TOKEN') != null) {
+		// github workflows have a different set of credentials
+		maven {
+			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
+			credentials {
+				username = System.getenv('GITHUB_ACTOR')
+				password = System.getenv('GITHUB_TOKEN')
+			}
+		}
+	}
 }
 
 dependencies {
@@ -162,6 +183,20 @@ dependencies {
 	compileOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
 	runtimeOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
 	shade 'com.tterrag.registrate:Registrate:MC1.16.5-1.0.10'
+
+	if(project.hasProperty('apex_local_deps') && project.getProperty('apex_local_deps')) {
+		// runtimeOnly fg.deobf('xyz.apex.forge:devworld:1.16.5-2.0.0')
+		runtimeOnly fg.deobf('xyz.apex.forge:smoothboot:1.16.5-1.0.0')
+	}
+
+	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
+		// we have access to Apex's GH Packages pull from there
+		compileOnly 'xyz.apex.java.utility:javautilities:1.0.4.1-j8'
+		runtimeOnly 'xyz.apex.java.utility:javautilities:1.0.4.1-j8'
+		shade 'xyz.apex.java.utility:javautilities:1.0.4.1-j8'
+	} else {
+		// no public location
+	}
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

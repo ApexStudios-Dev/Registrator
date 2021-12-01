@@ -91,7 +91,7 @@ public final class StructureBuilder<
 
 		if(terraformTerrain)
 		{
-			List<Structure<?>> noiseAffectingFeatures = Apex.copyIfImmutableList(Structure.NOISE_AFFECTING_FEATURES);
+			List<Structure<?>> noiseAffectingFeatures = Apex.makeMutableList(Structure.NOISE_AFFECTING_FEATURES);
 			noiseAffectingFeatures.add(structure);
 			Structure.NOISE_AFFECTING_FEATURES = noiseAffectingFeatures;
 		}
@@ -100,14 +100,14 @@ public final class StructureBuilder<
 
 		if(separationSettings != null)
 		{
-			Map<Structure<?>, StructureSeparationSettings> defaults = Apex.copyIfImmutableMap(DimensionStructuresSettings.DEFAULTS);
+			Map<Structure<?>, StructureSeparationSettings> defaults = Apex.makeMutableMap(DimensionStructuresSettings.DEFAULTS);
 			defaults.put(structure, separationSettings);
 			DimensionStructuresSettings.DEFAULTS = ImmutableMap.copyOf(defaults);
 
 			for(Map.Entry<RegistryKey<DimensionSettings>, DimensionSettings> entry : WorldGenRegistries.NOISE_GENERATOR_SETTINGS.entrySet())
 			{
 				DimensionStructuresSettings dimensionSettings = entry.getValue().structureSettings();
-				Map<Structure<?>, StructureSeparationSettings> structureSettingsMap = Apex.copyIfImmutableMap(dimensionSettings.structureConfig());
+				Map<Structure<?>, StructureSeparationSettings> structureSettingsMap = Apex.makeMutableMap(dimensionSettings.structureConfig());
 				structureSettingsMap.put(structure, separationSettings);
 				dimensionSettings.structureConfig = structureSettingsMap;
 			}
@@ -141,7 +141,7 @@ public final class StructureBuilder<
 
 			DimensionStructuresSettings dimensionStructuresSettings = generator.getSettings();
 			Map<Structure<?>, StructureSeparationSettings> structureSeparationSettingsMap = dimensionStructuresSettings.structureConfig();
-			dimensionStructuresSettings.structureConfig = Apex.copyIfImmutableMap(structureSeparationSettingsMap);
+			dimensionStructuresSettings.structureConfig = Apex.makeMutableMap(structureSeparationSettingsMap);
 
 			if(canDimensionGenerateStructure.apply(level))
 				structureSeparationSettingsMap.putIfAbsent(structure, DimensionStructuresSettings.DEFAULTS.get(structure));

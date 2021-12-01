@@ -292,7 +292,7 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public <ITEM extends BlockItem> ItemBuilder<OWNER, ITEM, BlockBuilder<OWNER, BLOCK, PARENT>> item(BlockItemFactory<BLOCK, ITEM> blockItemFactory)
 	{
-		return owner.blockItem(getName(), this, asSupplier(), blockItemFactory);
+		return owner.blockItem(getName(), this, toSupplier(), blockItemFactory);
 	}
 
 	public <BLOCK_ENTITY extends TileEntity> BlockBuilder<OWNER, BLOCK, PARENT> simpleBlockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
