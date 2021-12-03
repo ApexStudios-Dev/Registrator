@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLootTables;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -1518,6 +1519,28 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public final <STRUCTURE extends Structure<NoFeatureConfig>> StructureBuilder<REGISTRATOR, STRUCTURE, NoFeatureConfig, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, NoFeatureConfig> structureFactory)
 	{
 		return structure(registryName, self, structureFactory);
+	}
+	// endregion
+
+	// region: Enchantment
+	public final <ENCHANTMENT extends Enchantment, PARENT> EnchantmentBuilder<REGISTRATOR, ENCHANTMENT, PARENT> enchantment(String registryName, PARENT parent, EnchantmentType enchantmentType, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
+	{
+		return entry(registryName, callback -> new EnchantmentBuilder<>(self, parent, registryName, callback, enchantmentType, enchantmentFactory));
+	}
+
+	public final <ENCHANTMENT extends Enchantment> EnchantmentBuilder<REGISTRATOR, ENCHANTMENT, REGISTRATOR> enchantment(String registryName, EnchantmentType enchantmentType, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
+	{
+		return enchantment(registryName, self, enchantmentType, enchantmentFactory);
+	}
+
+	public final <PARENT> EnchantmentBuilder<REGISTRATOR, Enchantment, PARENT> enchantment(String registryName, PARENT parent, EnchantmentType enchantmentType)
+	{
+		return enchantment(registryName, parent, enchantmentType, EnchantmentFactory.DEFAULT);
+	}
+
+	public final EnchantmentBuilder<REGISTRATOR, Enchantment, REGISTRATOR> enchantment(String registryName, EnchantmentType enchantmentType)
+	{
+		return enchantment(registryName, self, enchantmentType, EnchantmentFactory.DEFAULT);
 	}
 	// endregion
 

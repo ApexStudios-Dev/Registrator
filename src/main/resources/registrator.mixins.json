@@ -8,6 +8,7 @@
 		"BlockEntityTypeMixin",
 		"BlockMixin",
 		"ContainerTypeMixin",
+		"EnchantmentMixin",
 		"EntityTypeMixin",
 		"IRecipeSerializerMixin",
 		"IRecipeTypeMixin",

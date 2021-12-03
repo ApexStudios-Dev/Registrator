@@ -33,6 +33,7 @@ public final class TRegistry extends AbstractRegistrator<TRegistry>
 			TTags.bootstrap();
 			TVillagerProfessions.bootstrap();
 			TPointOfInterestTypes.bootstrap();
+			TEnchantments.bootstrap();
 
 			TStructures.bootstrap();
 

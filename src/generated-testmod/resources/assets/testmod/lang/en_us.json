@@ -2,6 +2,7 @@
   "block.testmod.copper_block": "Copper Block",
   "block.testmod.copper_ore": "Copper Ore",
   "block.testmod.test_block": "Test Block",
+  "enchantment.testmod.insta_kill": "Insta-Kill",
   "entity.testmod.test_entity": "Test Entity",
   "item.testmod.copper_axe": "Copper Axe",
   "item.testmod.copper_boots": "Copper Boots",
