@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "testmod:block/exposed_cut_copper",
-    "top": "testmod:block/exposed_cut_copper",
-    "side": "testmod:block/exposed_cut_copper"
-  }
-}

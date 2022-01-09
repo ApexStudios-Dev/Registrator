@@ -1,27 +1,27 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="${forge_version_range}"
 license="MPL 2.0"
 
 [[mods]]
-modId="registrator"
-version="${file.jarVersion}"
-displayName="Registrator"
-credits="Apex - Programming, TTerrag - Registrate"
-updateJSONURL="https://raw.githubusercontent.com/ApexModder/Version/master/registrator.json"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/registrator"
-authors="Apex, TTerrag"
-description="Auto-Magic Registration System built ontop of Registrate."
+	modId="${mod_id}"
+	version="${mod_version}"
+	displayName="${mod_name}"
+	updateJSONURL="https://raw.githubusercontent.com/ApexModder/Version/master/registrator.json"
+	displayURL="https://www.curseforge.com/minecraft/mc-mods/registrator"
+	# logoFile=""
+	credits="Apex - Programming, TTerrag - Registrate"
+	authors="${mod_authors}"
+	description="Auto-Magic Registration System built ontop of Registrate."
 
-[[dependencies.registrator]]
-    modId="forge"
-    mandatory=true
-    versionRange="[36,)"
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies.registrator]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.16.5,1.17]"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${mod_id}]]
+	modId="forge"
+	mandatory=true
+	versionRange="${forge_version_range}"
+	ordering="NONE"
+	side="BOTH"
+[[dependencies.${mod_id}]]
+	modId="minecraft"
+	mandatory=true
+	versionRange="${minecraft_version_range}"
+	ordering="NONE"
+	side="BOTH"

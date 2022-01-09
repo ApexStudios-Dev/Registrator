@@ -1,76 +1,57 @@
 buildscript {
 	repositories {
-		maven { url = 'https://files.minecraftforge.net/maven' }
+		maven { url = 'https://maven.minecraftforge.net' }
+		maven { url = 'https://maven.parchmentmc.org' }
 		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forge_gradle_version}", changing: true
+		classpath 'org.parchmentmc:librarian:1.+'
+		classpath "org.spongepowered:mixingradle:${mixin_gradle_version}"
 	}
 }
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '5.2.0'
-	id 'com.matthewprenger.cursegradle' version '1.4.0'
+	id 'com.github.johnrengelman.shadow' version "${gradle_shadow_version}"
+	id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
-apply plugin: 'org.spongepowered.mixin'
 
-version = '1.0.19'
-group = 'xyz.apex.forge.utility.registrator'
-archivesBaseName = "Registrator-1.16.5"
+version = "${minecraft_version}-${mod_version}"
+group = "${mod_base_package}.${mod_id}"
+archivesBaseName = "${mod_id}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
-sourceSets {
-	testmod {
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-
-		java {
-			srcDir 'src/testmod/java'
-		}
-
-		resources {
-			srcDir 'src/testmod/resources'
-		}
-	}
-}
-
 configurations {
-	testmodCompile.extendsFrom(compile)
-	testmodCompileOnly.extendsFrom(compileOnly)
-	testmodRuntimeOnly.extendsFrom(runtimeOnly)
-
 	shade
 }
 
 minecraft {
-	mappings channel: 'official', version: '1.16.5'
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	mappings channel: "${mappings_channel}", version: "${mappings_version}"
+	accessTransformer = file('src/main/resources/META-INF/accessTransformer.cfg')
 
 	runs {
 		client {
 			taskName 'Client'
 			workingDirectory project.file('run/client')
-			// property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			property 'mixin.env.disableRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-			args '-mixin.config=registrator.mixins.json'
 
 			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
 				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
 			}
 
 			mods {
-				Registrator {
+				"${mod_id}" {
 					source sourceSets.main
 				}
 			}
@@ -79,62 +60,29 @@ minecraft {
 		server {
 			taskName 'Server'
 			workingDirectory project.file('run/server')
+			// property 'forge.logging.markers', 'REGISTRIES'
+			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			property 'mixin.env.disableRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-			args 'nogui', '-mixin.config=registrator.mixins.json'
+			args 'nogui'
 
 			mods {
-				Registrator {
+				"${mod_id}" {
 					source sourceSets.main
-				}
-			}
-		}
-
-		testClient {
-			parent runs.client
-			taskName 'Client-TestMod'
-			ideaModule "${project.name}.testmod"
-			args '-mixin.config=registrator.mixins.json'
-
-			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
-				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
-			}
-
-			mods {
-				TestMod {
-					source sourceSets.testmod
-				}
-			}
-		}
-
-		testServer {
-			parent runs.server
-			taskName 'Server-TestMod'
-			ideaModule "${project.name}.testmod"
-			args 'nogui', '-mixin.config=registrator.mixins.json'
-
-			mods {
-				TestMod {
-					source sourceSets.testmod
 				}
 			}
 		}
 
 		data {
-			taskName 'Data-TestMod'
-			workingDirectory project.file('run/data')
-			ideaModule "${project.name}.testmod"
-			property 'mixin.env.disableRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-			args '-mixin.config=registrator.mixins.json', '--mod', 'testmod', '--client', '--server', '--output', file('src/generated-testmod/resources'), '--existing', file('src/testmod/resources'), '--existing-mod', 'registrator'
+			taskName 'Data'
+			workingDirectory project.file('run/client')
+			// property 'forge.logging.markers', 'REGISTRIES'
+			// property 'forge.logging.console.level', 'debug'
+			property 'fml.earlyprogresswindow', 'false'
+			args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
 			mods {
-				Registrator {
+				"${mod_id}" {
 					source sourceSets.main
-				}
-				TestMod {
-					source sourceSets.testmod
 				}
 			}
 		}
@@ -142,17 +90,21 @@ minecraft {
 }
 
 mixin {
-	add sourceSets.main, 'registrator.refmap.json'
-	defaultObfuscationEnv 'searge'
+	add sourceSets.main, "${mod_id}.refmap.json"
+	config "${mod_id}.mixins.json"
+
+	debug = true
+	debug.export = true
+	hotSwap = true
 }
 
-sourceSets.testmod.resources {
-	srcDir 'src/generated-testmod/resources'
+sourceSets.main.resources {
+	srcDir 'src/generated/resources'
 }
 
 repositories {
 	mavenLocal()
-	maven { url "http://maven.tterrag.com/" }
+	maven { url 'https://maven.tterrag.com/' }
 
 	// GitHub Packages require read access
 	if(project.hasProperty('apex_git_package_token')) {
@@ -176,36 +128,90 @@ repositories {
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.16.5-36.2.5'
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-	annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+	// Mixin AP
+	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
 
-	compileOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
-	runtimeOnly fg.deobf('com.tterrag.registrate:Registrate:MC1.16.5-1.0.10')
-	shade 'com.tterrag.registrate:Registrate:MC1.16.5-1.0.10'
+	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	shade "com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}"
 
 	if(project.hasProperty('apex_local_deps') && project.getProperty('apex_local_deps')) {
 		// runtimeOnly fg.deobf('xyz.apex.forge:devworld:1.16.5-2.0.0')
-		runtimeOnly fg.deobf('xyz.apex.forge:smoothboot:1.16.5-1.0.0')
+		runtimeOnly fg.deobf("xyz.apex.forge:smoothboot:${minecraft_version}-${smooth_boot_version}")
 	}
 
 	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
 		// we have access to Apex's GH Packages pull from there
-		compileOnly 'xyz.apex.java.utility:javautilities:1.0.6-j8'
-		runtimeOnly 'xyz.apex.java.utility:javautilities:1.0.6-j8'
-		shade 'xyz.apex.java.utility:javautilities:1.0.6-j8'
+		compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
+		runtimeOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
+		shade "xyz.apex.java.utility:javautilities:${javautilities_version}"
 	} else {
 		// no public location
 	}
 }
 
+def resourceTargets = [ 'META-INF/mods.toml', 'pack.mcmeta', "${mod_id}.mixins.json".toString() ]
+def intoTargets = [ "${rootDir}/out/production/resources/", "${rootDir}/out/production/${project.name}.main/", "${rootDir}/bin/main/" ]
+def replaceProperties = [
+	minecraft_version: minecraft_version,
+	minecraft_version_range: minecraft_version_range,
+	minecraft_version_short: minecraft_version_short,
+		
+	forge_version: forge_version,
+	forge_version_range: forge_version_range,
+	forge_gradle_version: forge_gradle_version,
+
+	mixin_gradle_version: mixin_gradle_version,
+	mixin_ap_version: mixin_ap_version,
+	
+	mappings_channel: mappings_channel,
+	mappings_version: mappings_version,
+	
+	mod_id: mod_id,
+	mod_name: mod_name,
+	mod_version: mod_version,
+	mod_base_package: mod_base_package,
+	mod_authors: mod_authors,
+
+	registrate_version: registrate_version,
+	registrate_package: registrate_package,
+
+	gradle_shadow_version: gradle_shadow_version,
+	smooth_boot_version: smooth_boot_version,
+	javautilities_version: javautilities_version
+]
+
+processResources {
+	inputs.properties replaceProperties
+	replaceProperties.put 'project', project
+
+	filesMatching(resourceTargets) {
+		expand replaceProperties
+	}
+
+	intoTargets.each { target ->
+		if(file(target).exists()) {
+			copy{
+				from(sourceSets.main.resources) {
+					include resourceTargets
+					expand replaceProperties
+				}
+
+				into target
+			}
+		}
+	}
+}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = 'sources'
+	classifier 'sources'
 	from sourceSets.main.allJava
 }
 
 task deobfJar(type: Jar) {
-	classifier = 'deobf'
+	classifier 'deobf'
 	from sourceSets.main.output
 }
 
@@ -214,10 +220,17 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 	from javadoc.destinationDir
 }
 
+jar {
+	classifier 'slim'
+
+	from sourceSets.main.output.classesDirs
+	from sourceSets.main.output.resourcesDir
+}
+
 shadowJar {
 	classifier ''
 	configurations = [ project.configurations.shade ]
-	relocate 'com.tterrag.registrate', 'xyz.apex.repack.com.tterrag.registrate'
+	relocate "${registrate_package}", "xyz.apex.repack.${registrate_package}"
 }
 
 artifacts {
@@ -228,30 +241,23 @@ artifacts {
 	archives shadowJar
 }
 
-reobf {
-	shadowJar { }
-}
-
-jar {
-	classifier 'slim'
-
-	from sourceSets.main.output.classesDirs
-	from sourceSets.main.output.resourcesDir
-}
-
 tasks.withType(Jar) {
 	manifest {
 		attributes([
-				'Specification-Title': 'Registrator',
-				'Specification-Vendor': 'Apex',
-				'Specification-Version': '1',
-				'Implementation-Title': 'Regsitrator',
+				'Specification-Title': "${mod_name}",
+				'Specification-Vendor': "${mod_authors}",
+				'Specification-Version': "${mod_version}",
+				'Implementation-Title': "${mod_name}",
 				'Implementation-Version': "${project.version}",
-				'Implementation-Vendor' : 'Apex',
+				'Implementation-Vendor' : "${mod_authors}",
 				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				'MixinConfigs': 'registrator.mixins.json'
+				'MixinConfigs': "${mod_id}.mixins.json"
 		])
 	}
+}
+
+reobf {
+	shadowJar { }
 }
 
 jar.finalizedBy('reobfJar')
@@ -260,10 +266,9 @@ publishing {
 	if(System.getenv('GITHUB_TOKEN') != null) {
 		publications {
 			gpr(MavenPublication) {
-				// GitHub Packages **require** names to be in lowercase
-				groupId = 'xyz.apex.forge.utility'
-				artifactId = 'registrator-1.16.5'
-				version = "${project.version}"
+				groupId = "${mod_base_package}"
+				artifactId = "${mod_id}"
+				version = "${minecraft_version}-${mod_version}"
 
 				artifact jar
 				artifact sourcesJar
@@ -292,9 +297,9 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 		apiKey = project.getProperty('apex_curse_gradle_token')
 
 		project {
-			id = '550146'
+			id = "${mod_curseforge_id}"
 			releaseType = 'release'
-			addGameVersion '1.16.5'
+			addGameVersion "${minecraft_version}"
 
 			mainArtifact shadowJar
 			addArtifact jar
@@ -308,9 +313,9 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 		apiKey = System.getenv('CURSEFORGE_TOKEN')
 
 		project {
-			id = '550146'
+			id = "${mod_curseforge_id}"
 			releaseType = 'release'
-			addGameVersion '1.16.5'
+			addGameVersion "${minecraft_version}"
 
 			mainArtifact shadowJar
 			addArtifact jar

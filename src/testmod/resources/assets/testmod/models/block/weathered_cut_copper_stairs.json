@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "testmod:block/weathered_cut_copper",
-    "top": "testmod:block/weathered_cut_copper",
-    "side": "testmod:block/weathered_cut_copper"
-  }
-}
