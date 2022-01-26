@@ -46,6 +46,10 @@ jobs:
       #   if: steps.cache-setup.outputs.cache-hit != 'true'
       #   run: ./gradlew hideOfficialWarningUntilChanged
 
+      # TODO: Uncomment when this task runs and uses ATs correctly in workflows
+      # Generate Minecraft Assets & Data files
+      # - run: ./gradlew Data # `Data` should match the `runData` gradle task name
+
       # Build package
       - run: ./gradlew build
         env:
