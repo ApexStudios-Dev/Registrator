@@ -128,8 +128,10 @@ This will add Registrator as a dependency on CurseForge. When users download you
 <details>
 <summary><b><i>1.16.5</i></b></summary>
 
-| Registrator Version | CurseForge File ID |
-|:---:|:---:|
+| Registrator Version  | CurseForge File ID |
+|:--------------------:|:---:|
+| <b><i>1.0.21</i></b> | [3547961](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3624977) |
+| <b><i>1.0.20</i></b> | [3547961](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3624959) |
 | <b><i>1.0.19</i></b> | [3547961](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3547961) |
 | <b><i>1.0.18</i></b> | [3543275](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543275) |
 | <b><i>1.0.17</i></b> | [3543253](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543253) |
@@ -140,15 +142,15 @@ This will add Registrator as a dependency on CurseForge. When users download you
 | <b><i>1.0.12</i></b> | [3541261](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541261) |
 | <b><i>1.0.11</i></b> | [3541252](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541252) |
 | <b><i>1.0.10</i></b> | [3541180](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541180) |
-| <b><i>1.0.9</i></b> | [3541175](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541175) |
-| <b><i>1.0.8</i></b> | [3541170](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541170) |
-| <b><i>1.0.7</i></b> | [3539396](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539396) |
-| <b><i>1.0.6</i></b> | [3539331](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539331) |
-| <b><i>1.0.5</i></b> | [3538337](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3538337) |
-| <b><i>1.0.4</i></b> | [3537821](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537821) |
-| <b><i>1.0.3</i></b> | [3537477](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537477) |
-| <b><i>1.0.2</i></b> | [3537398](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537398) |
-| <b><i>1.0.1</i></b> | [3537338](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537338) |
+| <b><i>1.0.9</i></b>  | [3541175](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541175) |
+| <b><i>1.0.8</i></b>  | [3541170](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541170) |
+| <b><i>1.0.7</i></b>  | [3539396](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539396) |
+| <b><i>1.0.6</i></b>  | [3539331](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539331) |
+| <b><i>1.0.5</i></b>  | [3538337](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3538337) |
+| <b><i>1.0.4</i></b>  | [3537821](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537821) |
+| <b><i>1.0.3</i></b>  | [3537477](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537477) |
+| <b><i>1.0.2</i></b>  | [3537398](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537398) |
+| <b><i>1.0.1</i></b>  | [3537338](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537338) |
 
 </details>
 
