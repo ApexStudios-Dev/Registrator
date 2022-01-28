@@ -1,4 +1,10 @@
-# Registrator [![release](https://github.com/ApexModder/Registrator/actions/workflows/release.yml/badge.svg)](https://github.com/ApexModder/Registrator/actions/workflows/release.yml) ![license](https://img.shields.io/github/license/ApexModder/Registrator) ![last commit](https://img.shields.io/github/last-commit/ApexModder/Registrator/master) ![release](https://img.shields.io/github/v/release/ApexModder/Registrator)
+# Registrator
+[![release](https://github.com/ApexModder/Registrator/actions/workflows/release.yml/badge.svg)](https://github.com/ApexModder/Registrator/actions/workflows/release.yml)
+![license](https://img.shields.io/github/license/ApexModder/Registrator)
+![last commit](https://img.shields.io/github/last-commit/ApexModder/Registrator/master)
+![release](https://img.shields.io/github/v/release/ApexModder/Registrator)
+![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)
+
 An Auto-Magic registration system built ontop of [**Registrate (_1.16.5-1.0.10_)**](https://github.com/tterrag1098/Registrate/tree/1.16).
 
 This project makes use of my [**Java-Utilities**](https://github.com/ApexModder/JavaUtilities) library.
