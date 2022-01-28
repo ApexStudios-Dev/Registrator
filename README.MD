@@ -1,9 +1,9 @@
 # Registrator
 [![release](https://github.com/ApexModder/Registrator/actions/workflows/release.yml/badge.svg)](https://github.com/ApexModder/Registrator/actions/workflows/release.yml)
-![license](https://img.shields.io/github/license/ApexModder/Registrator)
-![last commit](https://img.shields.io/github/last-commit/ApexModder/Registrator/master)
-![release](https://img.shields.io/github/v/release/ApexModder/Registrator)
-![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)
+[![license](https://img.shields.io/github/license/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/blob/master/LICENSE)
+[![last commit](https://img.shields.io/github/last-commit/ApexModder/Registrator/master)](https://github.com/ApexModder/Registrator/)
+[![release](https://img.shields.io/github/v/release/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/releases)
+[![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)](https://www.curseforge.com/minecraft/mc-mods/registrator)
 
 An Auto-Magic registration system built ontop of [**Registrate (_1.16.5-1.0.10_)**](https://github.com/tterrag1098/Registrate/tree/1.16).
 
