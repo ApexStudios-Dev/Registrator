@@ -3,7 +3,6 @@ package xyz.apex.forge.utility.registrator;
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
-import com.mojang.serialization.Codec;
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.Builder;
 import com.tterrag.registrate.builders.BuilderCallback;
@@ -40,9 +39,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -68,7 +64,6 @@ import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
 import xyz.apex.forge.utility.registrator.provider.BlockListReporter;
 import xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider;
 import xyz.apex.forge.utility.registrator.provider.RegistrateSoundProvider;
-import xyz.apex.forge.utility.registrator.provider.RegistrateTemplatePoolProvider;
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullFunction;
@@ -82,7 +77,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-@SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode", "NullableProblems" })
+@SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode" })
 public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrator<REGISTRATOR>>
 {
 	public static final String REGISTRATOR_ID = "registrator";
@@ -107,7 +102,6 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// region: ProviderTypes
 	public static final ProviderType<RegistrateLangExtProvider> LANG_EXT_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":lang_ext", (owner, event) -> new RegistrateLangExtProvider(owner, event.getGenerator()));
 	public static final ProviderType<RegistrateSoundProvider> SOUNDS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":sounds", (owner, event) -> new RegistrateSoundProvider(owner, event.getGenerator(), event.getExistingFileHelper()));
-	public static final ProviderType<RegistrateTemplatePoolProvider> TEMPLATE_POOL_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":template_pools", (owner, event) -> new RegistrateTemplatePoolProvider(owner, event.getGenerator()));
 
 	// region: Tags
 	public static final ProviderType<RegistrateTagsProvider<Potion>> POTION_TYPE_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/potion_type", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "potion_types", event.getGenerator(), Registry.POTION, event.getExistingFileHelper()));
@@ -1491,28 +1485,6 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public final <RECIPE_TYPE extends RecipeSerializer<RECIPE>, RECIPE extends Recipe<INVENTORY>, INVENTORY extends Container> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
 	{
 		return recipeSerializer(registryName, self, recipeSerializerFactory);
-	}
-	// endregion
-
-	// region: Structure
-	public final <STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
-	{
-		return entry(registryName, callback -> new StructureBuilder<>(self, parent, registryName, callback, structureFactory, structureCodecSupplier, featureConfigSupplier));
-	}
-
-	public final <STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
-	{
-		return structure(registryName, self, structureFactory, structureCodecSupplier, featureConfigSupplier);
-	}
-
-	public final <STRUCTURE extends StructureFeature<NoneFeatureConfiguration>, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, NoneFeatureConfiguration, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, NoneFeatureConfiguration> structureFactory)
-	{
-		return structure(registryName, parent, structureFactory, () -> NoneFeatureConfiguration.CODEC, () -> NoneFeatureConfiguration.INSTANCE);
-	}
-
-	public final <STRUCTURE extends StructureFeature<NoneFeatureConfiguration>> StructureBuilder<REGISTRATOR, STRUCTURE, NoneFeatureConfiguration, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, NoneFeatureConfiguration> structureFactory)
-	{
-		return structure(registryName, self, structureFactory);
 	}
 	// endregion
 

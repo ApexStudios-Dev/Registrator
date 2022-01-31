@@ -25,6 +25,7 @@ import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullFunction;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
+@SuppressWarnings({ "unchecked", "DeprecatedIsStillUsed" })
 public abstract class LegacyRegistratorBuilder<
 		OWNER extends AbstractRegistrator<OWNER>,
 		BASE extends IForgeRegistryEntry<BASE>,

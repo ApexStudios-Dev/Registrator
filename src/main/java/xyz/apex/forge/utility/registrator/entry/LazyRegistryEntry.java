@@ -8,7 +8,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
-@SuppressWarnings({ "NullableProblems", "unchecked" })
+@SuppressWarnings("unchecked")
 public final class LazyRegistryEntry<T> implements Lazy<T>, NonnullSupplier<T>, NonNullSupplier<T>
 {
 	@Nullable private NonnullSupplier<? extends RegistryEntry<? extends T>> supplier;
