@@ -2,8 +2,8 @@ package xyz.apex.forge.utility.registrator.builder;
 
 import com.tterrag.registrate.builders.BuilderCallback;
 
-import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.RegistryEntry;

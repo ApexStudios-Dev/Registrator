@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.fml.DistExecutor;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
@@ -44,6 +44,6 @@ public final class MenuBuilder<OWNER extends AbstractRegistrator<OWNER>, MENU ex
 	protected MenuType<MENU> createEntry()
 	{
 		var supplier = asSupplier();
-		return IForgeContainerType.create((windowId, playerInventory, buffer) -> menuFactory.create(supplier.get(), windowId, playerInventory, buffer));
+		return IForgeMenuType.create((windowId, playerInventory, buffer) -> menuFactory.create(supplier.get(), windowId, playerInventory, buffer));
 	}
 }

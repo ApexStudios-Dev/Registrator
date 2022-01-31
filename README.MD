@@ -5,11 +5,11 @@
 [![release](https://img.shields.io/github/v/release/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/releases)
 [![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)](https://www.curseforge.com/minecraft/mc-mods/registrator)
 
-An Auto-Magic registration system built ontop of [**Registrate (_1.17.1-1.0.14_)**](https://github.com/tterrag1098/Registrate/tree/1.17).
+An Auto-Magic registration system built ontop of [**Registrate (_1.18-1.0.21_)**](https://github.com/tterrag1098/Registrate/tree/1.18).
 
 This project makes use of my [**Java-Utilities**](https://github.com/ApexModder/JavaUtilities) library.
 
-[**Registrate**](https://github.com/tterrag1098/Registrate/tree/1.17) will be shaded into the Jar file when built, under the package `xyz.apex.repack.<registrate>`<br>
+[**Registrate**](https://github.com/tterrag1098/Registrate/tree/1.18) will be shaded into the Jar file when built, under the package `xyz.apex.repack.<registrate>`<br>
 Although Registrate will be shaded & accessible via `AbstractRegistrator#backend`, you should never have to use it outside more advanced use cases.
 
 This project makes use of both mixins & an access transformer.<br>
@@ -130,8 +130,8 @@ This will add Registrator as a dependency on CurseForge. When users download you
 <details>
 <summary><b>CurseForge Versions</b></summary>
 
-| Registrator Version |                                CurseForge File ID                                 |
-|:-------------------:|:---------------------------------------------------------------------------------:|
-| <b><i>2.0.0</i></b> | [3631321](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3631321) |
+| Registrator Version | CurseForge File ID |
+|:-------------------:|:------------------:|
+| <b><i>3.0.0</i></b> |    Not Released    |
 
 </details>

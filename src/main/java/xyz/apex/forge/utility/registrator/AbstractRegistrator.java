@@ -1580,15 +1580,15 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return skipErrors(true);
 	}
 
-	public final REGISTRATOR itemGroup(NonnullSupplier<? extends CreativeModeTab> itemGroup)
+	public final REGISTRATOR creativeModeTab(NonnullSupplier<? extends CreativeModeTab> itemGroup)
 	{
-		backend.itemGroup(itemGroup::get);
+		backend.creativeModeTab(itemGroup::get);
 		return self;
 	}
 
-	public final REGISTRATOR itemGroup(NonnullSupplier<? extends CreativeModeTab> itemGroup, String localizedName)
+	public final REGISTRATOR creativeModeTab(NonnullSupplier<? extends CreativeModeTab> itemGroup, String localizedName)
 	{
-		backend.itemGroup(itemGroup::get, localizedName);
+		backend.creativeModeTab(itemGroup::get, localizedName);
 		return self;
 	}
 

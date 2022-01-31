@@ -20,7 +20,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fmllegacy.network.FMLPlayMessages;
+import net.minecraftforge.network.PlayMessages;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.EntityEntry;
@@ -159,7 +159,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 		return properties(properties -> properties.setShouldReceiveVelocityUpdates(shouldReceiveVelocityUpdates));
 	}
 
-	public EntityBuilder<OWNER, ENTITY, PARENT> setCustomClientFactory(NonnullBiFunction<FMLPlayMessages.SpawnEntity, Level, ENTITY> customClientFactory)
+	public EntityBuilder<OWNER, ENTITY, PARENT> setCustomClientFactory(NonnullBiFunction<PlayMessages.SpawnEntity, Level, ENTITY> customClientFactory)
 	{
 		return properties(properties -> properties.setCustomClientFactory(customClientFactory));
 	}
