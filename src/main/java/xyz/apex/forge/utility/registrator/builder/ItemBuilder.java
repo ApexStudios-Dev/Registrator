@@ -49,7 +49,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 		// apply registrate defaults
 		defaultModel().defaultLang();
 
-		NonNullLazyValue<? extends CreativeModeTab> currentGroup = ObfuscationReflectionHelper.getPrivateValue(AbstractRegistrate.class, owner.backend, "currentGroup");
+		NonNullLazyValue<? extends CreativeModeTab> currentGroup = ObfuscationReflectionHelper.getPrivateValue(AbstractRegistrate.class, owner.backend, "currentTab");
 
 		if(currentGroup != null)
 			tab(currentGroup::get);
