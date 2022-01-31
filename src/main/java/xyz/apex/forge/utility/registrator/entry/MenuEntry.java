@@ -20,30 +20,30 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class ContainerEntry<CONTAINER extends AbstractContainerMenu> extends RegistryEntry<MenuType<CONTAINER>> implements MenuConstructor, NonnullSupplier<MenuType<CONTAINER>>
+public final class MenuEntry<MENU extends AbstractContainerMenu> extends RegistryEntry<MenuType<MENU>> implements MenuConstructor, NonnullSupplier<MenuType<MENU>>
 {
-	public ContainerEntry(AbstractRegistrator<?> registrator, RegistryObject<MenuType<CONTAINER>> delegate)
+	public MenuEntry(AbstractRegistrator<?> registrator, RegistryObject<MenuType<MENU>> delegate)
 	{
 		super(registrator, delegate);
 	}
 
-	public MenuType<CONTAINER> asContainerType()
+	public MenuType<MENU> asMenuType()
 	{
 		return get();
 	}
 
-	public CONTAINER create(int windowId, Inventory playerInventory, @Nullable FriendlyByteBuf extraData)
+	public MENU create(int windowId, Inventory playerInventory, @Nullable FriendlyByteBuf extraData)
 	{
-		return asContainerType().create(windowId, playerInventory, extraData);
+		return asMenuType().create(windowId, playerInventory, extraData);
 	}
 
 	// wrapper for lambda method references
-	public CONTAINER create(int windowId, Inventory playerInventory, Player player)
+	public MENU create(int windowId, Inventory playerInventory, Player player)
 	{
 		return create(windowId, playerInventory, (FriendlyByteBuf) null);
 	}
 
-	public CONTAINER create(int windowId, Inventory playerInventory)
+	public MENU create(int windowId, Inventory playerInventory)
 	{
 		return create(windowId, playerInventory, (FriendlyByteBuf) null);
 	}
@@ -53,14 +53,14 @@ public final class ContainerEntry<CONTAINER extends AbstractContainerMenu> exten
 		return new SimpleMenuProvider(this, titleComponent);
 	}
 
-	public void open(ServerPlayer player, MenuProvider containerProvider, NonnullConsumer<FriendlyByteBuf> extraData)
+	public void open(ServerPlayer player, MenuProvider menuProvider, NonnullConsumer<FriendlyByteBuf> extraData)
 	{
-		NetworkHooks.openGui(player, containerProvider, extraData);
+		NetworkHooks.openGui(player, menuProvider, extraData);
 	}
 
-	public void open(ServerPlayer player, MenuProvider containerProvider)
+	public void open(ServerPlayer player, MenuProvider menuProvider)
 	{
-		open(player, containerProvider, NonnullConsumer.noop());
+		open(player, menuProvider, NonnullConsumer.noop());
 	}
 
 	public void open(ServerPlayer player, Component titleComponent, NonnullConsumer<FriendlyByteBuf> extraData)
@@ -79,13 +79,13 @@ public final class ContainerEntry<CONTAINER extends AbstractContainerMenu> exten
 		return create(windowId, playerInventory, player);
 	}
 
-	public static <CONTAINER extends AbstractContainerMenu> ContainerEntry<CONTAINER> cast(RegistryEntry<MenuType<CONTAINER>> registryEntry)
+	public static <MENU extends AbstractContainerMenu> MenuEntry<MENU> cast(RegistryEntry<MenuType<MENU>> registryEntry)
 	{
-		return cast(ContainerEntry.class, registryEntry);
+		return cast(MenuEntry.class, registryEntry);
 	}
 
-	public static <CONTAINER extends AbstractContainerMenu> ContainerEntry<CONTAINER> cast(com.tterrag.registrate.util.entry.RegistryEntry<MenuType<CONTAINER>> registryEntry)
+	public static <MENU extends AbstractContainerMenu> MenuEntry<MENU> cast(com.tterrag.registrate.util.entry.RegistryEntry<MenuType<MENU>> registryEntry)
 	{
-		return cast(ContainerEntry.class, registryEntry);
+		return cast(MenuEntry.class, registryEntry);
 	}
 }

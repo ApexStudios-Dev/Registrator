@@ -6,7 +6,7 @@ import net.minecraftforge.fmllegacy.RegistryObject;
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
-public final class ItemEntry<ITEM extends Item> extends ItemProviderEntry<ITEM> implements NonnullSupplier<ITEM>
+public final class ItemEntry<ITEM extends Item> extends ItemLikeEntry<ITEM> implements NonnullSupplier<ITEM>
 {
 	public ItemEntry(AbstractRegistrator<?> registrator, RegistryObject<ITEM> delegate)
 	{

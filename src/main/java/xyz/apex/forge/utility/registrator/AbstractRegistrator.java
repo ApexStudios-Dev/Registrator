@@ -1384,25 +1384,25 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	}
 	// endregion
 
-	// region: ContainerType
-	public final <CONTAINER extends AbstractContainerMenu, SCREEN extends Screen & MenuAccess<CONTAINER>, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
+	// region: MenuType
+	public final <MENU extends AbstractContainerMenu, SCREEN extends Screen & MenuAccess<MENU>, PARENT> MenuBuilder<REGISTRATOR, MENU, SCREEN, PARENT> container(String registryName, PARENT parent, MenuFactory<MENU> menuFactory, @Nullable NonnullSupplier<MenuFactory.ScreenFactory<MENU, SCREEN>> screenFactory)
 	{
-		return entry(registryName, callback -> new ContainerBuilder<>(self, parent, registryName, callback, containerFactory, screenFactory));
+		return entry(registryName, callback -> new MenuBuilder<>(self, parent, registryName, callback, menuFactory, screenFactory));
 	}
 
-	public final <CONTAINER extends AbstractContainerMenu, SCREEN extends Screen & MenuAccess<CONTAINER>> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
+	public final <MENU extends AbstractContainerMenu, SCREEN extends Screen & MenuAccess<MENU>> MenuBuilder<REGISTRATOR, MENU, SCREEN, REGISTRATOR> container(String registryName, MenuFactory<MENU> menuFactory, @Nullable NonnullSupplier<MenuFactory.ScreenFactory<MENU, SCREEN>> screenFactory)
 	{
-		return container(registryName, self, containerFactory, screenFactory);
+		return container(registryName, self, menuFactory, screenFactory);
 	}
 
-	public final <CONTAINER extends AbstractContainerMenu, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, ?, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory)
+	public final <MENU extends AbstractContainerMenu, PARENT> MenuBuilder<REGISTRATOR, MENU, ?, PARENT> container(String registryName, PARENT parent, MenuFactory<MENU> menuFactory)
 	{
-		return container(registryName, parent, containerFactory, null);
+		return container(registryName, parent, menuFactory, null);
 	}
 
-	public final <CONTAINER extends AbstractContainerMenu> ContainerBuilder<REGISTRATOR, CONTAINER, ?, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory)
+	public final <MENU extends AbstractContainerMenu> MenuBuilder<REGISTRATOR, MENU, ?, REGISTRATOR> container(String registryName, MenuFactory<MENU> menuFactory)
 	{
-		return container(registryName, self, containerFactory);
+		return container(registryName, self, menuFactory);
 	}
 	// endregion
 

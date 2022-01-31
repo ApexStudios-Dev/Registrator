@@ -9,7 +9,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public final class BlockEntry<BLOCK extends Block> extends ItemProviderEntry<BLOCK> implements NonnullSupplier<BLOCK>
+public final class BlockEntry<BLOCK extends Block> extends ItemLikeEntry<BLOCK> implements NonnullSupplier<BLOCK>
 {
 	public BlockEntry(AbstractRegistrator<?> registrator, RegistryObject<BLOCK> delegate)
 	{

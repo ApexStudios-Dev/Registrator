@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.ItemProviderEntry;
+import xyz.apex.forge.utility.registrator.entry.ItemLikeEntry;
 import xyz.apex.java.utility.Lazy;
 
 import javax.annotation.Nullable;
@@ -58,7 +58,7 @@ public class RegistratorItemGroup extends CreativeModeTab implements Lazy<ItemSt
 	{
 		for(var registryEntry : registrator.getAll(Item.class))
 		{
-			if(registryEntry instanceof ItemProviderEntry provider)
+			if(registryEntry instanceof ItemLikeEntry provider)
 				allIcons.add(provider.asItemStack());
 			else if(registryEntry instanceof com.tterrag.registrate.util.entry.ItemProviderEntry provider)
 				allIcons.add(provider.asStack());
