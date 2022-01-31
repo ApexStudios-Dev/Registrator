@@ -14,7 +14,6 @@ Although Registrate will be shaded & accessible via `AbstractRegistrator#backend
 
 This project makes use of both mixins & an access transformer.<br>
 The access transformer is used to make various elements across Minecraft public-ly visible for better regitration of various objects.<br>
-Mixins are used to implement the various `<Object>Like` interfaces (under `xyz.apex.forge.utility.registrator.entry.similar`) onto the correct object types.
 
 <details>
 <summary><b>Registrator vs Registrate</b></summary>

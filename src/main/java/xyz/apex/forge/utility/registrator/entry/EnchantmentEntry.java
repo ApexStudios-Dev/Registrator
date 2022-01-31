@@ -11,18 +11,16 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.EnchantmentLike;
 
 import java.util.Map;
 
-public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends RegistryEntry<ENCHANTMENT> implements EnchantmentLike
+public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends RegistryEntry<ENCHANTMENT>
 {
 	public EnchantmentEntry(AbstractRegistrator<?> registrator, RegistryObject<ENCHANTMENT> delegate)
 	{
 		super(registrator, delegate);
 	}
 
-	@Override
 	public ENCHANTMENT asEnchantment()
 	{
 		return get();
@@ -36,11 +34,6 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 	public boolean isEnchantment(Enchantment enchantment)
 	{
 		return asEnchantment() == enchantment;
-	}
-
-	public boolean isEnchantment(EnchantmentLike enchantment)
-	{
-		return isEnchantment(enchantment.asEnchantment());
 	}
 
 	public Map<EquipmentSlot, ItemStack> getSlotItems(LivingEntity entity)
@@ -86,11 +79,6 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 	public boolean isCompatibleWith(Enchantment enchantment)
 	{
 		return asEnchantment().isCompatibleWith(enchantment);
-	}
-
-	public boolean isCompatibleWith(EnchantmentLike enchantment)
-	{
-		return isCompatibleWith(enchantment.asEnchantment());
 	}
 
 	public Component getFullName(int level)

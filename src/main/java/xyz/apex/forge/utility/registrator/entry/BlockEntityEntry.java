@@ -10,15 +10,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.BlockEntityTypeLike;
-import xyz.apex.forge.utility.registrator.entry.similar.BlockLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends RegistryEntry<BlockEntityType<BLOCK_ENTITY>> implements BlockEntityTypeLike, NonnullSupplier<BlockEntityType<BLOCK_ENTITY>>
+public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends RegistryEntry<BlockEntityType<BLOCK_ENTITY>> implements NonnullSupplier<BlockEntityType<BLOCK_ENTITY>>
 {
 	public BlockEntityEntry(AbstractRegistrator<?> registrator, RegistryObject<BlockEntityType<BLOCK_ENTITY>> delegate)
 	{
@@ -62,12 +60,6 @@ public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends Re
 		return asBlockEntityType().validBlocks.contains(block);
 	}
 
-	public boolean isValidBlock(BlockLike block)
-	{
-		return isValidBlock(block.asBlock());
-	}
-
-	@Override
 	public BlockEntityType<BLOCK_ENTITY> asBlockEntityType()
 	{
 		return get();

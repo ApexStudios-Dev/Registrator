@@ -6,11 +6,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.BlockLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public final class BlockEntry<BLOCK extends Block> extends ItemProviderEntry<BLOCK> implements BlockLike, NonnullSupplier<BLOCK>
+public final class BlockEntry<BLOCK extends Block> extends ItemProviderEntry<BLOCK> implements NonnullSupplier<BLOCK>
 {
 	public BlockEntry(AbstractRegistrator<?> registrator, RegistryObject<BLOCK> delegate)
 	{
@@ -37,12 +36,6 @@ public final class BlockEntry<BLOCK extends Block> extends ItemProviderEntry<BLO
 		return asBlock() == block;
 	}
 
-	public boolean isBlock(BlockLike block)
-	{
-		return isBlock(block.asBlock());
-	}
-
-	@Override
 	public BLOCK asBlock()
 	{
 		return get();

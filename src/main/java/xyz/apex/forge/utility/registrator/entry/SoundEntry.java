@@ -10,13 +10,12 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.SoundLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class SoundEntry extends RegistryEntry<SoundEvent> implements SoundLike, NonnullSupplier<SoundEvent>
+public final class SoundEntry extends RegistryEntry<SoundEvent> implements NonnullSupplier<SoundEvent>
 {
 	public SoundEntry(AbstractRegistrator<?> owner, RegistryObject<SoundEvent> delegate)
 	{
@@ -158,7 +157,6 @@ public final class SoundEntry extends RegistryEntry<SoundEvent> implements Sound
 		play(entity, 1F);
 	}
 
-	@Override
 	public SoundEvent asSoundEvent()
 	{
 		return get();

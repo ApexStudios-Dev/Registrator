@@ -6,11 +6,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.RecipeSerializerLike;
-import xyz.apex.forge.utility.registrator.entry.similar.RecipeTypeLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
-public final class RecipeSerializerEntry<RECIPE_TYPE extends RecipeSerializer<RECIPE>, RECIPE extends Recipe<?>> extends RegistryEntry<RECIPE_TYPE> implements RecipeSerializerLike, RecipeTypeLike, NonnullSupplier<RECIPE_TYPE>
+public final class RecipeSerializerEntry<RECIPE_TYPE extends RecipeSerializer<RECIPE>, RECIPE extends Recipe<?>> extends RegistryEntry<RECIPE_TYPE> implements NonnullSupplier<RECIPE_TYPE>
 {
 	private final RecipeType<RECIPE> recipeType;
 
@@ -21,13 +19,11 @@ public final class RecipeSerializerEntry<RECIPE_TYPE extends RecipeSerializer<RE
 		recipeType = RecipeType.register(delegate.getId().toString());
 	}
 
-	@Override
 	public RecipeSerializer<RECIPE> asRecipeSerializer()
 	{
 		return get();
 	}
 
-	@Override
 	public RecipeType<RECIPE> asRecipeType()
 	{
 		return recipeType;

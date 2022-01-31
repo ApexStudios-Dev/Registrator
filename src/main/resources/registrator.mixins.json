@@ -3,21 +3,7 @@
 	"package": "${project.group}.mixin",
 	"compatibilityLevel": "JAVA_16",
 	"refmap": "${mod_id}.refmap.json",
-	"mixins": [
-		"BlockEntityTypeMixin",
-		"BlockMixin",
-		"ContainerTypeMixin",
-		"EnchantmentMixin",
-		"EntityTypeMixin",
-		"IRecipeSerializerMixin",
-		"IRecipeTypeMixin",
-		"ItemMixin",
-		"PaintingTypeMixin",
-		"PointOfInterestTypeMixin",
-		"SoundEventMixin",
-		"StructureMixin",
-		"VillagerProfessionMixin"
-	],
+	"mixins": [ ],
 	"client": [ ],
 	"server": [ ],
 	"minVersion": "0.8.4"

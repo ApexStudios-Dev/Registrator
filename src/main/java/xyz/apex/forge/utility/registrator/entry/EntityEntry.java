@@ -13,13 +13,12 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.EntityTypeLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<EntityType<ENTITY>> implements EntityTypeLike, NonnullSupplier<EntityType<ENTITY>>
+public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<EntityType<ENTITY>> implements NonnullSupplier<EntityType<ENTITY>>
 {
 	public EntityEntry(AbstractRegistrator<?> registrator, RegistryObject<EntityType<ENTITY>> delegate)
 	{
@@ -85,7 +84,6 @@ public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<Enti
 		return asEntityType().getDimensions();
 	}
 
-	@Override
 	public EntityType<ENTITY> asEntityType()
 	{
 		return get();

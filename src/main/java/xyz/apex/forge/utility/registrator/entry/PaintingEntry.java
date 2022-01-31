@@ -4,18 +4,16 @@ import net.minecraft.world.entity.decoration.Motive;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.PaintingLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public final class PaintingEntry extends RegistryEntry<Motive> implements PaintingLike, NonnullSupplier<Motive>
+public final class PaintingEntry extends RegistryEntry<Motive> implements NonnullSupplier<Motive>
 {
 	public PaintingEntry(AbstractRegistrator<?> owner, RegistryObject<Motive> delegate)
 	{
 		super(owner, delegate);
 	}
 
-	@Override
 	public Motive asPaintingType()
 	{
 		return get();

@@ -10,20 +10,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.VillagerProfessionLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class VillagerProfessionEntry extends RegistryEntry<VillagerProfession> implements VillagerProfessionLike, NonnullSupplier<VillagerProfession>
+public final class VillagerProfessionEntry extends RegistryEntry<VillagerProfession> implements NonnullSupplier<VillagerProfession>
 {
 	public VillagerProfessionEntry(AbstractRegistrator<?> owner, RegistryObject<VillagerProfession> delegate)
 	{
 		super(owner, delegate);
 	}
 
-	@Override
 	public VillagerProfession asVillagerProfession()
 	{
 		return get();

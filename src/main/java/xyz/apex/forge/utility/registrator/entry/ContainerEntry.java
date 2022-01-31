@@ -14,21 +14,19 @@ import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.ContainerTypeLike;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class ContainerEntry<CONTAINER extends AbstractContainerMenu> extends RegistryEntry<MenuType<CONTAINER>> implements ContainerTypeLike, MenuConstructor, NonnullSupplier<MenuType<CONTAINER>>
+public final class ContainerEntry<CONTAINER extends AbstractContainerMenu> extends RegistryEntry<MenuType<CONTAINER>> implements MenuConstructor, NonnullSupplier<MenuType<CONTAINER>>
 {
 	public ContainerEntry(AbstractRegistrator<?> registrator, RegistryObject<MenuType<CONTAINER>> delegate)
 	{
 		super(registrator, delegate);
 	}
 
-	@Override
 	public MenuType<CONTAINER> asContainerType()
 	{
 		return get();

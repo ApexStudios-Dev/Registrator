@@ -49,11 +49,6 @@ public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super
 		return isItem(item.asItem());
 	}
 
-	public final boolean isItem(xyz.apex.forge.utility.registrator.entry.similar.ItemLike item)
-	{
-		return isItem(item.asItem());
-	}
-
 	@Override
 	public Item asItem()
 	{
