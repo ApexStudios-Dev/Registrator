@@ -1,10 +1,10 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.world.item.crafting.RecipeType;
 
 @SuppressWarnings("unused")
 @FunctionalInterface
 public interface RecipeTypeLike
 {
-	IRecipeType<?> asRecipeType();
+	RecipeType<?> asRecipeType();
 }

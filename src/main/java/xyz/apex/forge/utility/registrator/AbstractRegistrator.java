@@ -11,48 +11,48 @@ import com.tterrag.registrate.providers.*;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import org.apache.commons.lang3.tuple.Triple;
 
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.client.gui.IHasContainer;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.Util;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.loot.EntityLootTables;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.*;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.potion.Potion;
+import net.minecraft.data.loot.EntityLoot;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.*;
-import net.minecraft.tileentity.BannerPattern;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BannerPattern;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.common.ForgeTagHandler;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -76,7 +76,10 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode", "NullableProblems" })
@@ -88,26 +91,17 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	// region: Reflected Constants
 	// public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityPredicate.Builder.entity().flags(EntityFlagsPredicate.Builder.flags().setOnFire(true).build());
-	public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityLootTables.ENTITY_ON_FIRE;
+	public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityLoot.ENTITY_ON_FIRE;
 
-	// public static final TagRegistry<Block> BLOCK_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(BlockTags.class, null, "field_199899_c");
-	// public static final TagRegistry<Item> ITEM_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(ItemTags.class, null, "field_199906_c");
-	// public static final TagRegistry<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(EntityTypeTags.class, null, "field_219766_c");
-	// public static final TagRegistry<Fluid> FLUID_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(FluidTags.class, null, "field_206961_c");
+	// public static final StaticTagHelper<Block> BLOCK_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(BlockTags.class, null, "field_199899_c");
+	// public static final StaticTagHelper<Item> ITEM_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(ItemTags.class, null, "field_199906_c");
+	// public static final StaticTagHelper<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(EntityTypeTags.class, null, "field_219766_c");
+	// public static final StaticTagHelper<Fluid> FLUID_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(FluidTags.class, null, "field_206961_c");
 
-	public static final TagRegistry<Block> BLOCK_TAG_REGISTRY = BlockTags.HELPER;
-	public static final TagRegistry<Item> ITEM_TAG_REGISTRY = ItemTags.HELPER;
-	public static final TagRegistry<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = EntityTypeTags.HELPER;
-	public static final TagRegistry<Fluid> FLUID_TAG_REGISTRY = FluidTags.HELPER;
-
-	public static final Set<Material> AXE_DIGGABLE_MATERIALS = AxeItem.DIGGABLE_MATERIALS;
-	public static final Set<Block> AXE_DIGGABLE_BLOCKS = AxeItem.OTHER_DIGGABLE_BLOCKS;
-	public static final Map<Block, Block> AXE_STRIPABLES = AxeItem.STRIPABLES;
-	public static final Set<Block> HOE_DIGGABLE_BLOCKS = HoeItem.DIGGABLES;
-	public static final Map<Block, BlockState> HOE_TILLABLES = HoeItem.TILLABLES;
-	public static final Set<Block> PICKAXE_DIGGABLE_BLOCKS = PickaxeItem.DIGGABLES;
-	public static final Set<Block> SHOVEL_DIGGABLE_BLOCKS = ShovelItem.DIGGABLES;
-	public static final Map<Block, BlockState> SHOVEL_FLATTENABLES = ShovelItem.FLATTENABLES;
+	public static final StaticTagHelper<Block> BLOCK_TAG_REGISTRY = BlockTags.HELPER;
+	public static final StaticTagHelper<Item> ITEM_TAG_REGISTRY = ItemTags.HELPER;
+	public static final StaticTagHelper<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = EntityTypeTags.HELPER;
+	public static final StaticTagHelper<Fluid> FLUID_TAG_REGISTRY = FluidTags.HELPER;
 	// endregion
 
 	// region: ProviderTypes
@@ -118,7 +112,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// region: Tags
 	public static final ProviderType<RegistrateTagsProvider<Potion>> POTION_TYPE_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/potion_type", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "potion_types", event.getGenerator(), Registry.POTION, event.getExistingFileHelper()));
 	public static final ProviderType<RegistrateTagsProvider<Enchantment>> ENCHANTMENT_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/enchantment", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "enchantments", event.getGenerator(), Registry.ENCHANTMENT, event.getExistingFileHelper()));
-	public static final ProviderType<RegistrateTagsProvider<TileEntityType<?>>> BLOCK_ENTITY_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/block_entity_type", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "tile_entity_types", event.getGenerator(), Registry.BLOCK_ENTITY_TYPE, event.getExistingFileHelper()));
+	public static final ProviderType<RegistrateTagsProvider<BlockEntityType<?>>> BLOCK_ENTITY_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/block_entity_type", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "tile_entity_types", event.getGenerator(), Registry.BLOCK_ENTITY_TYPE, event.getExistingFileHelper()));
 	// endregion
 	// endregion
 
@@ -159,179 +153,179 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	// region: Tags
 	// region: Generic
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tag(TagRegistry<BASE> tagRegistry, String tagNamespace, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tag(StaticTagHelper<BASE> tagHelper, String tagNamespace, String tagPath)
 	{
-		return tagRegistry.bind(tagNamespace + ':' + tagPath);
+		return tagHelper.bind(tagNamespace + ':' + tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagForge(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagForge(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tag(tagRegistry, FORGE_ID, tagPath);
+		return tag(tagHelper, FORGE_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagVanilla(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagVanilla(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tag(tagRegistry, MINECRAFT_ID, tagPath);
+		return tag(tagHelper, MINECRAFT_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagRegistrator(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagRegistrator(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tag(tagRegistry, REGISTRATOR_ID, tagPath);
+		return tag(tagHelper, REGISTRATOR_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagModded(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagModded(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tag(tagRegistry, getModId(), tagPath);
+		return tag(tagHelper, getModId(), tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tag(IForgeRegistry<BASE> tagRegistry, String tagNamespace, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tag(IForgeRegistry<BASE> tagType, String tagNamespace, String tagPath)
 	{
-		return ForgeTagHandler.makeWrapperTag(tagRegistry, new ResourceLocation(tagNamespace, tagPath));
+		return ForgeTagHandler.makeWrapperTag(tagType, new ResourceLocation(tagNamespace, tagPath));
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagForge(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagForge(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tag(tagRegistry, FORGE_ID, tagPath);
+		return tag(tagType, FORGE_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagVanilla(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagVanilla(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tag(tagRegistry, MINECRAFT_ID, tagPath);
+		return tag(tagType, MINECRAFT_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagRegistrator(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagRegistrator(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tag(tagRegistry, REGISTRATOR_ID, tagPath);
+		return tag(tagType, REGISTRATOR_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> ITag.INamedTag<BASE> tagModded(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagModded(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tag(tagRegistry, getModId(), tagPath);
+		return tag(tagType, getModId(), tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(TagRegistry<BASE> tagRegistry, String tagNamespace, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(StaticTagHelper<BASE> tagHelper, String tagNamespace, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagRegistry.createOptional(new ResourceLocation(tagNamespace, tagPath), defaults);
+		return tagHelper.createOptional(new ResourceLocation(tagNamespace, tagPath), defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(TagRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, FORGE_ID, tagPath, defaults);
+		return tagOptional(tagHelper, FORGE_ID, tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(TagRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, MINECRAFT_ID, tagPath, defaults);
+		return tagOptional(tagHelper, MINECRAFT_ID, tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(TagRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, REGISTRATOR_ID, tagPath, defaults);
+		return tagOptional(tagHelper, REGISTRATOR_ID, tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(TagRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, getModId(), tagPath, defaults);
+		return tagOptional(tagHelper, getModId(), tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(TagRegistry<BASE> tagRegistry, String tagNamespace, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(StaticTagHelper<BASE> tagHelper, String tagNamespace, String tagPath)
 	{
-		return tagOptional(tagRegistry, tagNamespace, tagPath, null);
+		return tagOptional(tagHelper, tagNamespace, tagPath, null);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tagOptional(tagRegistry, FORGE_ID, tagPath);
+		return tagOptional(tagHelper, FORGE_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tagOptional(tagRegistry, MINECRAFT_ID, tagPath);
+		return tagOptional(tagHelper, MINECRAFT_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tagOptional(tagRegistry, REGISTRATOR_ID, tagPath);
+		return tagOptional(tagHelper, REGISTRATOR_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(TagRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(StaticTagHelper<BASE> tagHelper, String tagPath)
 	{
-		return tagOptional(tagRegistry, getModId(), tagPath);
+		return tagOptional(tagHelper, getModId(), tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(IForgeRegistry<BASE> tagRegistry, String tagNamespace, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(IForgeRegistry<BASE> tagType, String tagNamespace, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return ForgeTagHandler.createOptionalTag(tagRegistry, new ResourceLocation(tagNamespace, tagPath), defaults);
+		return ForgeTagHandler.createOptionalTag(tagType, new ResourceLocation(tagNamespace, tagPath), defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(IForgeRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, FORGE_ID, tagPath, defaults);
+		return tagOptional(tagType, FORGE_ID, tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(IForgeRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, MINECRAFT_ID, tagPath, defaults);
+		return tagOptional(tagType, MINECRAFT_ID, tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(IForgeRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, REGISTRATOR_ID, tagPath, defaults);
+		return tagOptional(tagType, REGISTRATOR_ID, tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(IForgeRegistry<BASE> tagRegistry, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
 	{
-		return tagOptional(tagRegistry, getModId(), tagPath, defaults);
+		return tagOptional(tagType, getModId(), tagPath, defaults);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(IForgeRegistry<BASE> tagRegistry, String tagNamespace, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(IForgeRegistry<BASE> tagType, String tagNamespace, String tagPath)
 	{
-		return tagOptional(tagRegistry, tagNamespace, tagPath, null);
+		return tagOptional(tagType, tagNamespace, tagPath, null);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tagOptional(tagRegistry, FORGE_ID, tagPath);
+		return tagOptional(tagType, FORGE_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tagOptional(tagRegistry, MINECRAFT_ID, tagPath);
+		return tagOptional(tagType, MINECRAFT_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tagOptional(tagRegistry, REGISTRATOR_ID, tagPath);
+		return tagOptional(tagType, REGISTRATOR_ID, tagPath);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(IForgeRegistry<BASE> tagRegistry, String tagPath)
+	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(IForgeRegistry<BASE> tagType, String tagPath)
 	{
-		return tagOptional(tagRegistry, getModId(), tagPath);
+		return tagOptional(tagType, getModId(), tagPath);
 	}
 	// endregion
 
 	// region: Block
-	public final ITag.INamedTag<Block> blockTag(String tagNamespace, String tagPath)
+	public final Tag.Named<Block> blockTag(String tagNamespace, String tagPath)
 	{
 		return tag(BLOCK_TAG_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public final ITag.INamedTag<Block> blockTagForge(String tagPath)
+	public final Tag.Named<Block> blockTagForge(String tagPath)
 	{
 		return blockTag(FORGE_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Block> blockTagVanilla(String tagPath)
+	public final Tag.Named<Block> blockTagVanilla(String tagPath)
 	{
 		return blockTag(MINECRAFT_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Block> blockTagRegistrator(String tagPath)
+	public final Tag.Named<Block> blockTagRegistrator(String tagPath)
 	{
 		return blockTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Block> blockTagModded(String tagPath)
+	public final Tag.Named<Block> blockTagModded(String tagPath)
 	{
 		return blockTag(getModId(), tagPath);
 	}
@@ -388,27 +382,27 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: Item
-	public final ITag.INamedTag<Item> itemTag(String tagNamespace, String tagPath)
+	public final Tag.Named<Item> itemTag(String tagNamespace, String tagPath)
 	{
 		return tag(ITEM_TAG_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public final ITag.INamedTag<Item> itemTagForge(String tagPath)
+	public final Tag.Named<Item> itemTagForge(String tagPath)
 	{
 		return itemTag(FORGE_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Item> itemTagVanilla(String tagPath)
+	public final Tag.Named<Item> itemTagVanilla(String tagPath)
 	{
 		return itemTag(MINECRAFT_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Item> itemTagRegistrator(String tagPath)
+	public final Tag.Named<Item> itemTagRegistrator(String tagPath)
 	{
 		return itemTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Item> itemTagModded(String tagPath)
+	public final Tag.Named<Item> itemTagModded(String tagPath)
 	{
 		return itemTag(getModId(), tagPath);
 	}
@@ -465,27 +459,27 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: EntityType
-	public final ITag.INamedTag<EntityType<?>> entityTypeTag(String tagNamespace, String tagPath)
+	public final Tag.Named<EntityType<?>> entityTypeTag(String tagNamespace, String tagPath)
 	{
 		return tag(ENTITY_TYPE_TAG_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public final ITag.INamedTag<EntityType<?>> entityTypeTagForge(String tagPath)
+	public final Tag.Named<EntityType<?>> entityTypeTagForge(String tagPath)
 	{
 		return entityTypeTag(FORGE_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<EntityType<?>> entityTypeTagVanilla(String tagPath)
+	public final Tag.Named<EntityType<?>> entityTypeTagVanilla(String tagPath)
 	{
 		return entityTypeTag(MINECRAFT_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<EntityType<?>> entityTypeTagRegistrator(String tagPath)
+	public final Tag.Named<EntityType<?>> entityTypeTagRegistrator(String tagPath)
 	{
 		return entityTypeTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<EntityType<?>> entityTypeTagModded(String tagPath)
+	public final Tag.Named<EntityType<?>> entityTypeTagModded(String tagPath)
 	{
 		return entityTypeTag(getModId(), tagPath);
 	}
@@ -542,27 +536,27 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: Fluid
-	public final ITag.INamedTag<Fluid> fluidTag(String tagNamespace, String tagPath)
+	public final Tag.Named<Fluid> fluidTag(String tagNamespace, String tagPath)
 	{
 		return tag(FLUID_TAG_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public final ITag.INamedTag<Fluid> fluidTagForge(String tagPath)
+	public final Tag.Named<Fluid> fluidTagForge(String tagPath)
 	{
 		return fluidTag(FORGE_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Fluid> fluidTagVanilla(String tagPath)
+	public final Tag.Named<Fluid> fluidTagVanilla(String tagPath)
 	{
 		return fluidTag(MINECRAFT_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Fluid> fluidTagRegistrator(String tagPath)
+	public final Tag.Named<Fluid> fluidTagRegistrator(String tagPath)
 	{
 		return fluidTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<Fluid> fluidTagModded(String tagPath)
+	public final Tag.Named<Fluid> fluidTagModded(String tagPath)
 	{
 		return fluidTag(getModId(), tagPath);
 	}
@@ -619,77 +613,77 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: BlockEntityType
-	public final ITag.INamedTag<TileEntityType<?>> blockEntityTypeTag(String tagNamespace, String tagPath)
+	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTag(String tagNamespace, String tagPath)
 	{
-		return tag(ForgeRegistries.TILE_ENTITIES, tagNamespace, tagPath);
+		return tag(ForgeRegistries.BLOCK_ENTITIES, tagNamespace, tagPath);
 	}
 
-	public final ITag.INamedTag<TileEntityType<?>> blockEntityTypeTagForge(String tagPath)
+	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagForge(String tagPath)
 	{
 		return blockEntityTypeTag(FORGE_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<TileEntityType<?>> blockEntityTypeTagVanilla(String tagPath)
+	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagVanilla(String tagPath)
 	{
 		return blockEntityTypeTag(MINECRAFT_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<TileEntityType<?>> blockEntityTypeTagRegistrator(String tagPath)
+	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagRegistrator(String tagPath)
 	{
 		return blockEntityTypeTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public final ITag.INamedTag<TileEntityType<?>> blockEntityTypeTagModded(String tagPath)
+	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagModded(String tagPath)
 	{
 		return blockEntityTypeTag(getModId(), tagPath);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<TileEntityType<?>>> defaults)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
 	{
-		return tagOptional(ForgeRegistries.TILE_ENTITIES, tagNamespace, tagPath, defaults);
+		return tagOptional(ForgeRegistries.BLOCK_ENTITIES, tagNamespace, tagPath, defaults);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalForge(String tagPath, @Nullable Set<Supplier<TileEntityType<?>>> defaults)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalForge(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
 	{
 		return blockEntityTypeTagOptional(FORGE_ID, tagPath, defaults);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<TileEntityType<?>>> defaults)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
 	{
 		return blockEntityTypeTagOptional(MINECRAFT_ID, tagPath, defaults);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<TileEntityType<?>>> defaults)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
 	{
 		return blockEntityTypeTagOptional(REGISTRATOR_ID, tagPath, defaults);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalModded(String tagPath, @Nullable Set<Supplier<TileEntityType<?>>> defaults)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalModded(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
 	{
 		return blockEntityTypeTagOptional(getModId(), tagPath, defaults);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptional(String tagNamespace, String tagPath)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptional(String tagNamespace, String tagPath)
 	{
 		return blockEntityTypeTagOptional(tagNamespace, tagPath, null);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalForge(String tagPath)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalForge(String tagPath)
 	{
 		return blockEntityTypeTagOptional(FORGE_ID, tagPath);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalVanilla(String tagPath)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalVanilla(String tagPath)
 	{
 		return blockEntityTypeTagOptional(MINECRAFT_ID, tagPath);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalRegistrator(String tagPath)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalRegistrator(String tagPath)
 	{
 		return blockEntityTypeTagOptional(REGISTRATOR_ID, tagPath);
 	}
 
-	public final Tags.IOptionalNamedTag<TileEntityType<?>> blockEntityTypeTagOptionalModded(String tagPath)
+	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalModded(String tagPath)
 	{
 		return blockEntityTypeTagOptional(getModId(), tagPath);
 	}
@@ -697,7 +691,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: Block
-	protected final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> blockEntry(String registryName, PARENT parent, BlockFactory<BLOCK> blockFactory, NonnullSupplier<AbstractBlock.Properties> initialProperties)
+	protected final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> blockEntry(String registryName, PARENT parent, BlockFactory<BLOCK> blockFactory, NonnullSupplier<BlockBehaviour.Properties> initialProperties)
 	{
 		return entry(registryName, callback -> new BlockBuilder<>(self, parent, registryName, callback, blockFactory, initialProperties));
 	}
@@ -709,27 +703,27 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	public final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> block(String registryName, PARENT parent, Material material, BlockFactory<BLOCK> blockFactory)
 	{
-		return blockEntry(registryName, parent, blockFactory, () -> AbstractBlock.Properties.of(material));
+		return blockEntry(registryName, parent, blockFactory, () -> BlockBehaviour.Properties.of(material));
 	}
 
 	public final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> block(String registryName, PARENT parent, Material material, DyeColor materialColor, BlockFactory<BLOCK> blockFactory)
 	{
-		return blockEntry(registryName, parent, blockFactory, () -> AbstractBlock.Properties.of(material, materialColor));
+		return blockEntry(registryName, parent, blockFactory, () -> BlockBehaviour.Properties.of(material, materialColor));
 	}
 
 	public final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> block(String registryName, PARENT parent, Material material, MaterialColor materialColor, BlockFactory<BLOCK> blockFactory)
 	{
-		return blockEntry(registryName, parent, blockFactory, () -> AbstractBlock.Properties.of(material, materialColor));
+		return blockEntry(registryName, parent, blockFactory, () -> BlockBehaviour.Properties.of(material, materialColor));
 	}
 
 	public final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> block(String registryName, PARENT parent, Material material, NonnullFunction<BlockState, MaterialColor> materialColorFactory, BlockFactory<BLOCK> blockFactory)
 	{
-		return blockEntry(registryName, parent, blockFactory, () -> AbstractBlock.Properties.of(material, materialColorFactory));
+		return blockEntry(registryName, parent, blockFactory, () -> BlockBehaviour.Properties.of(material, materialColorFactory));
 	}
 
-	public final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> block(String registryName, PARENT parent, NonnullSupplier<AbstractBlock> blockProperties, BlockFactory<BLOCK> blockFactory)
+	public final <BLOCK extends Block, PARENT> BlockBuilder<REGISTRATOR, BLOCK, PARENT> block(String registryName, PARENT parent, NonnullSupplier<BlockBehaviour> blockProperties, BlockFactory<BLOCK> blockFactory)
 	{
-		return blockEntry(registryName, parent, blockFactory, () -> AbstractBlock.Properties.copy(blockProperties.get()));
+		return blockEntry(registryName, parent, blockFactory, () -> BlockBehaviour.Properties.copy(blockProperties.get()));
 	}
 
 	public final <PARENT> BlockBuilder<REGISTRATOR, Block, PARENT> block(String registryName, PARENT parent)
@@ -757,7 +751,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return block(registryName, parent, material, materialColorFactory, BlockFactory.DEFAULT);
 	}
 
-	public final <PARENT> BlockBuilder<REGISTRATOR, Block, PARENT> block(String registryName, PARENT parent, NonnullSupplier<AbstractBlock> blockProperties)
+	public final <PARENT> BlockBuilder<REGISTRATOR, Block, PARENT> block(String registryName, PARENT parent, NonnullSupplier<BlockBehaviour> blockProperties)
 	{
 		return block(registryName, parent, blockProperties, BlockFactory.DEFAULT);
 	}
@@ -787,7 +781,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return block(registryName, self, material, materialColorFactory, blockFactory);
 	}
 
-	public final <BLOCK extends Block> BlockBuilder<REGISTRATOR, BLOCK, REGISTRATOR> block(String registryName, NonnullSupplier<AbstractBlock> blockProperties, BlockFactory<BLOCK> blockFactory)
+	public final <BLOCK extends Block> BlockBuilder<REGISTRATOR, BLOCK, REGISTRATOR> block(String registryName, NonnullSupplier<BlockBehaviour> blockProperties, BlockFactory<BLOCK> blockFactory)
 	{
 		return block(registryName, self, blockProperties, blockFactory);
 	}
@@ -817,7 +811,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return block(registryName, self, material, materialColorFactory, BlockFactory.DEFAULT);
 	}
 
-	public final BlockBuilder<REGISTRATOR, Block, REGISTRATOR> block(String registryName, NonnullSupplier<AbstractBlock> blockProperties)
+	public final BlockBuilder<REGISTRATOR, Block, REGISTRATOR> block(String registryName, NonnullSupplier<BlockBehaviour> blockProperties)
 	{
 		return block(registryName, self, blockProperties, BlockFactory.DEFAULT);
 	}
@@ -876,7 +870,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	private <BLOCK extends Block, ITEM extends BlockItem> void blockItemModel(DataGenContext<Item, ITEM> ctx, RegistrateItemModelProvider provider, NonnullSupplier<BLOCK> block)
 	{
-		Optional<String> model = getDataProvider(ProviderType.BLOCKSTATE)
+		var model = getDataProvider(ProviderType.BLOCKSTATE)
 				.flatMap(p -> p.getExistingVariantBuilder(block.get()))
 				.map(builder -> builder.getModels().get(builder.partialState()))
 				.map(BlockStateProvider.ConfiguredModelList::toJSON)
@@ -914,175 +908,175 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	}
 	// endregion
 
-	// region: MusicDiscItem
-	public final <ITEM extends MusicDiscItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> musicDiscItem(String registryName, PARENT parent, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent, MusicDiscItemFactory<ITEM> musicDiscItemFactory)
+	// region: RecordItem
+	public final <ITEM extends RecordItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> musicDiscItem(String registryName, PARENT parent, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent, RecordItemFactory<ITEM> recordItemFactory)
 	{
-		return item(registryName, parent, properties -> musicDiscItemFactory.create(comparatorValue, soundEvent, properties));
+		return item(registryName, parent, properties -> recordItemFactory.create(comparatorValue, soundEvent, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, MusicDiscItem, PARENT> musicDiscItem(String registryName, PARENT parent, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent)
+	public final <PARENT> ItemBuilder<REGISTRATOR, RecordItem, PARENT> musicDiscItem(String registryName, PARENT parent, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent)
 	{
-		return musicDiscItem(registryName, parent, comparatorValue, soundEvent, MusicDiscItemFactory.DEFAULT);
+		return musicDiscItem(registryName, parent, comparatorValue, soundEvent, RecordItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends MusicDiscItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> musicDiscItem(String registryName, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent, MusicDiscItemFactory<ITEM> musicDiscItemFactory)
+	public final <ITEM extends RecordItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> musicDiscItem(String registryName, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent, RecordItemFactory<ITEM> recordItemFactory)
 	{
-		return musicDiscItem(registryName, self, comparatorValue, soundEvent, musicDiscItemFactory);
+		return musicDiscItem(registryName, self, comparatorValue, soundEvent, recordItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, MusicDiscItem, REGISTRATOR> musicDiscItem(String registryName, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent)
+	public final ItemBuilder<REGISTRATOR, RecordItem, REGISTRATOR> musicDiscItem(String registryName, int comparatorValue, NonnullSupplier<SoundEvent> soundEvent)
 	{
-		return musicDiscItem(registryName, self, comparatorValue, soundEvent, MusicDiscItemFactory.DEFAULT);
+		return musicDiscItem(registryName, self, comparatorValue, soundEvent, RecordItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: TieredItem
-	public final <ITEM extends TieredItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> tieredItem(String registryName, PARENT parent, IItemTier itemTier, TieredItemFactory<ITEM> tieredItemFactory)
+	public final <ITEM extends TieredItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> tieredItem(String registryName, PARENT parent, Tier itemTier, TieredItemFactory<ITEM> tieredItemFactory)
 	{
 		return item(registryName, parent, properties -> tieredItemFactory.create(itemTier, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, TieredItem, PARENT> tieredItem(String registryName, PARENT parent, IItemTier itemTier)
+	public final <PARENT> ItemBuilder<REGISTRATOR, TieredItem, PARENT> tieredItem(String registryName, PARENT parent, Tier itemTier)
 	{
 		return tieredItem(registryName, parent, itemTier, TieredItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends TieredItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> tieredItem(String registryName, IItemTier itemTier, TieredItemFactory<ITEM> tieredItemFactory)
+	public final <ITEM extends TieredItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> tieredItem(String registryName, Tier itemTier, TieredItemFactory<ITEM> tieredItemFactory)
 	{
 		return tieredItem(registryName, self, itemTier, tieredItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, TieredItem, REGISTRATOR> tieredItem(String registryName, IItemTier itemTier)
+	public final ItemBuilder<REGISTRATOR, TieredItem, REGISTRATOR> tieredItem(String registryName, Tier itemTier)
 	{
 		return tieredItem(registryName, self, itemTier, TieredItemFactory.DEFAULT);
 	}
 
 	// region: SwordItem
-	public final <ITEM extends SwordItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> swordItem(String registryName, PARENT parent, IItemTier itemTier, int attackDamage, float attackSpeed, SwordItemFactory<ITEM> swordItemFactory)
+	public final <ITEM extends SwordItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> swordItem(String registryName, PARENT parent, Tier itemTier, int attackDamage, float attackSpeed, SwordItemFactory<ITEM> swordItemFactory)
 	{
 		return item(registryName, parent, properties -> swordItemFactory.create(itemTier, attackDamage, attackSpeed, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, SwordItem, PARENT> swordItem(String registryName, PARENT parent, IItemTier itemTier, int attackDamage, float attackSpeed)
+	public final <PARENT> ItemBuilder<REGISTRATOR, SwordItem, PARENT> swordItem(String registryName, PARENT parent, Tier itemTier, int attackDamage, float attackSpeed)
 	{
 		return swordItem(registryName, parent, itemTier, attackDamage, attackSpeed, SwordItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends SwordItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> swordItem(String registryName, IItemTier itemTier, int attackDamage, float attackSpeed, SwordItemFactory<ITEM> swordItemFactory)
+	public final <ITEM extends SwordItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> swordItem(String registryName, Tier itemTier, int attackDamage, float attackSpeed, SwordItemFactory<ITEM> swordItemFactory)
 	{
 		return swordItem(registryName, self, itemTier, attackDamage, attackSpeed, swordItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, SwordItem, REGISTRATOR> swordItem(String registryName, IItemTier itemTier, int attackDamage, float attackSpeed)
+	public final ItemBuilder<REGISTRATOR, SwordItem, REGISTRATOR> swordItem(String registryName, Tier itemTier, int attackDamage, float attackSpeed)
 	{
 		return swordItem(registryName, self, itemTier, attackDamage, attackSpeed, SwordItemFactory.DEFAULT);
 	}
 	// endregion
 
-	// region: ToolItem
-	public final <ITEM extends ToolItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> toolItem(String registryName, PARENT parent, IItemTier itemTier, float attackDamage, float attackSpeed, Set<Block> diggables, ToolItemFactory<ITEM> toolItemFactory)
+	// region: DiggerItem
+	public final <ITEM extends DiggerItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> diggerItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables, DiggerItemFactory<ITEM> diggerItemFactory)
 	{
-		return item(registryName, parent, properties -> toolItemFactory.create(attackDamage, attackSpeed, itemTier, diggables, properties));
+		return item(registryName, parent, properties -> diggerItemFactory.create(attackDamage, attackSpeed, itemTier, diggables, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ToolItem, PARENT> toolItem(String registryName, PARENT parent, IItemTier itemTier, float attackDamage, float attackSpeed, Set<Block> diggables)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DiggerItem, PARENT> diggerItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables)
 	{
-		return toolItem(registryName, parent, itemTier, attackDamage, attackSpeed, diggables, ToolItemFactory.DEFAULT);
+		return diggerItem(registryName, parent, itemTier, attackDamage, attackSpeed, diggables, DiggerItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ToolItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> toolItem(String registryName, IItemTier itemTier, float attackDamage, float attackSpeed, Set<Block> diggables, ToolItemFactory<ITEM> toolItemFactory)
+	public final <ITEM extends DiggerItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> diggerItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables, DiggerItemFactory<ITEM> diggerItemFactory)
 	{
-		return toolItem(registryName, self, itemTier, attackDamage, attackSpeed, diggables, toolItemFactory);
+		return diggerItem(registryName, self, itemTier, attackDamage, attackSpeed, diggables, diggerItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ToolItem, REGISTRATOR> toolItem(String registryName, IItemTier itemTier, float attackDamage, float attackSpeed, Set<Block> diggables)
+	public final ItemBuilder<REGISTRATOR, DiggerItem, REGISTRATOR> diggerItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables)
 	{
-		return toolItem(registryName, self, itemTier, attackDamage, attackSpeed, diggables, ToolItemFactory.DEFAULT);
+		return diggerItem(registryName, self, itemTier, attackDamage, attackSpeed, diggables, DiggerItemFactory.DEFAULT);
 	}
 
 	// region: AxeItem
-	public final <ITEM extends AxeItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> axeItem(String registryName, PARENT parent, IItemTier itemTier, float attackDamage, float attackSpeed, AxeItemFactory<ITEM> axeItemFactory)
+	public final <ITEM extends AxeItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> axeItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, AxeItemFactory<ITEM> axeItemFactory)
 	{
 		return item(registryName, parent, properties -> axeItemFactory.create(itemTier, attackDamage, attackSpeed, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, AxeItem, PARENT> axeItem(String registryName, PARENT parent, IItemTier itemTier, float attackDamage, float attackSpeed)
+	public final <PARENT> ItemBuilder<REGISTRATOR, AxeItem, PARENT> axeItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed)
 	{
 		return axeItem(registryName, parent, itemTier, attackDamage, attackSpeed, AxeItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends AxeItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> axeItem(String registryName, IItemTier itemTier, float attackDamage, float attackSpeed, AxeItemFactory<ITEM> axeItemFactory)
+	public final <ITEM extends AxeItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> axeItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, AxeItemFactory<ITEM> axeItemFactory)
 	{
 		return axeItem(registryName, self, itemTier, attackDamage, attackSpeed, axeItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, AxeItem, REGISTRATOR> axeItem(String registryName, IItemTier itemTier, float attackDamage, float attackSpeed)
+	public final ItemBuilder<REGISTRATOR, AxeItem, REGISTRATOR> axeItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed)
 	{
 		return axeItem(registryName, self, itemTier, attackDamage, attackSpeed, AxeItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: HoeItem
-	public final <ITEM extends HoeItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> hoeItem(String registryName, PARENT parent, IItemTier itemTier, int attackDamage, float attackSpeed, HoeItemFactory<ITEM> hoeItemFactory)
+	public final <ITEM extends HoeItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> hoeItem(String registryName, PARENT parent, Tier itemTier, int attackDamage, float attackSpeed, HoeItemFactory<ITEM> hoeItemFactory)
 	{
 		return item(registryName, parent, properties -> hoeItemFactory.create(itemTier, attackDamage, attackSpeed, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, HoeItem, PARENT> hoeItem(String registryName, PARENT parent, IItemTier itemTier, int attackDamage, float attackSpeed)
+	public final <PARENT> ItemBuilder<REGISTRATOR, HoeItem, PARENT> hoeItem(String registryName, PARENT parent, Tier itemTier, int attackDamage, float attackSpeed)
 	{
 		return hoeItem(registryName, parent, itemTier, attackDamage, attackSpeed, HoeItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends HoeItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> hoeItem(String registryName, IItemTier itemTier, int attackDamage, float attackSpeed, HoeItemFactory<ITEM> hoeItemFactory)
+	public final <ITEM extends HoeItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> hoeItem(String registryName, Tier itemTier, int attackDamage, float attackSpeed, HoeItemFactory<ITEM> hoeItemFactory)
 	{
 		return hoeItem(registryName, self, itemTier, attackDamage, attackSpeed, hoeItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, HoeItem, REGISTRATOR> hoeItem(String registryName, IItemTier itemTier, int attackDamage, float attackSpeed)
+	public final ItemBuilder<REGISTRATOR, HoeItem, REGISTRATOR> hoeItem(String registryName, Tier itemTier, int attackDamage, float attackSpeed)
 	{
 		return hoeItem(registryName, self, itemTier, attackDamage, attackSpeed, HoeItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: PickaxeItem
-	public final <ITEM extends PickaxeItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> pickaxeItem(String registryName, PARENT parent, IItemTier itemTier, int attackDamage, float attackSpeed, PickaxeItemFactory<ITEM> pickaxeItemFactory)
+	public final <ITEM extends PickaxeItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> pickaxeItem(String registryName, PARENT parent, Tier itemTier, int attackDamage, float attackSpeed, PickaxeItemFactory<ITEM> pickaxeItemFactory)
 	{
 		return item(registryName, parent, properties -> pickaxeItemFactory.create(itemTier, attackDamage, attackSpeed, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, PickaxeItem, PARENT> pickaxeItem(String registryName, PARENT parent, IItemTier itemTier, int attackDamage, float attackSpeed)
+	public final <PARENT> ItemBuilder<REGISTRATOR, PickaxeItem, PARENT> pickaxeItem(String registryName, PARENT parent, Tier itemTier, int attackDamage, float attackSpeed)
 	{
 		return pickaxeItem(registryName, parent, itemTier, attackDamage, attackSpeed, PickaxeItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends PickaxeItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> pickaxeItem(String registryName, IItemTier itemTier, int attackDamage, float attackSpeed, PickaxeItemFactory<ITEM> pickaxeItemFactory)
+	public final <ITEM extends PickaxeItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> pickaxeItem(String registryName, Tier itemTier, int attackDamage, float attackSpeed, PickaxeItemFactory<ITEM> pickaxeItemFactory)
 	{
 		return pickaxeItem(registryName, self, itemTier, attackDamage, attackSpeed, pickaxeItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, PickaxeItem, REGISTRATOR> pickaxeItem(String registryName, IItemTier itemTier, int attackDamage, float attackSpeed)
+	public final ItemBuilder<REGISTRATOR, PickaxeItem, REGISTRATOR> pickaxeItem(String registryName, Tier itemTier, int attackDamage, float attackSpeed)
 	{
 		return pickaxeItem(registryName, self, itemTier, attackDamage, attackSpeed, PickaxeItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: ShovelItem
-	public final <ITEM extends ShovelItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> shovelItem(String registryName, PARENT parent, IItemTier itemTier, float attackDamage, float attackSpeed, ShovelItemFactory<ITEM> shovelItemFactory)
+	public final <ITEM extends ShovelItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> shovelItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, ShovelItemFactory<ITEM> shovelItemFactory)
 	{
 		return item(registryName, parent, properties -> shovelItemFactory.create(itemTier, attackDamage, attackSpeed, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ShovelItem, PARENT> shovelItem(String registryName, PARENT parent, IItemTier itemTier, float attackDamage, float attackSpeed)
+	public final <PARENT> ItemBuilder<REGISTRATOR, ShovelItem, PARENT> shovelItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed)
 	{
 		return shovelItem(registryName, parent, itemTier, attackDamage, attackSpeed, ShovelItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ShovelItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> shovelItem(String registryName, IItemTier itemTier, float attackDamage, float attackSpeed, ShovelItemFactory<ITEM> shovelItemFactory)
+	public final <ITEM extends ShovelItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> shovelItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, ShovelItemFactory<ITEM> shovelItemFactory)
 	{
 		return shovelItem(registryName, self, itemTier, attackDamage, attackSpeed, shovelItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ShovelItem, REGISTRATOR> shovelItem(String registryName, IItemTier itemTier, float attackDamage, float attackSpeed)
+	public final ItemBuilder<REGISTRATOR, ShovelItem, REGISTRATOR> shovelItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed)
 	{
 		return shovelItem(registryName, self, itemTier, attackDamage, attackSpeed, ShovelItemFactory.DEFAULT);
 	}
@@ -1140,218 +1134,218 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: ArmorItem
-	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> armor(String registryName, PARENT parent, IArmorMaterial armorMaterial, EquipmentSlotType slotType, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> armor(String registryName, PARENT parent, ArmorMaterial armorMaterial, EquipmentSlot slotType, ArmorItemFactory<ITEM> armorItemFactory)
 	{
 		return item(registryName, parent, properties -> armorItemFactory.create(armorMaterial, slotType, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> armor(String registryName, PARENT parent, IArmorMaterial armorMaterial, EquipmentSlotType slotType)
+	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> armor(String registryName, PARENT parent, ArmorMaterial armorMaterial, EquipmentSlot slotType)
 	{
 		return armor(registryName, parent, armorMaterial, slotType, ArmorItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> armor(String registryName, IArmorMaterial armorMaterial, EquipmentSlotType slotType, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> armor(String registryName, ArmorMaterial armorMaterial, EquipmentSlot slotType, ArmorItemFactory<ITEM> armorItemFactory)
 	{
 		return armor(registryName, self, armorMaterial, slotType, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> armor(String registryName, IArmorMaterial armorMaterial, EquipmentSlotType slotType)
+	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> armor(String registryName, ArmorMaterial armorMaterial, EquipmentSlot slotType)
 	{
 		return armor(registryName, self, armorMaterial, slotType, ArmorItemFactory.DEFAULT);
 	}
 
 	// region: Helmet
-	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> helmetArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> helmetArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
-		return armor(registryName, parent, armorMaterial, EquipmentSlotType.HEAD, armorItemFactory);
+		return armor(registryName, parent, armorMaterial, EquipmentSlot.HEAD, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> helmetArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> helmetArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return helmetArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> helmetArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> helmetArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
 		return helmetArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> helmetArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> helmetArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return helmetArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: Chestplate
-	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> chestplateArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> chestplateArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
-		return armor(registryName, parent, armorMaterial, EquipmentSlotType.CHEST, armorItemFactory);
+		return armor(registryName, parent, armorMaterial, EquipmentSlot.CHEST, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> chestplateArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> chestplateArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return chestplateArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> chestplateArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> chestplateArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
 		return chestplateArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> chestplateArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> chestplateArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return chestplateArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: Leggings
-	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> leggingsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> leggingsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
-		return armor(registryName, parent, armorMaterial, EquipmentSlotType.LEGS, armorItemFactory);
+		return armor(registryName, parent, armorMaterial, EquipmentSlot.LEGS, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> leggingsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> leggingsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return leggingsArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> leggingsArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> leggingsArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
 		return leggingsArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> leggingsArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> leggingsArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return leggingsArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: Boots
-	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> bootsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> bootsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
-		return armor(registryName, parent, armorMaterial, EquipmentSlotType.FEET, armorItemFactory);
+		return armor(registryName, parent, armorMaterial, EquipmentSlot.FEET, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> bootsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, ArmorItem, PARENT> bootsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return bootsArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> bootsArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
+	public final <ITEM extends ArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> bootsArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory<ITEM> armorItemFactory)
 	{
 		return bootsArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> bootsArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, ArmorItem, REGISTRATOR> bootsArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return bootsArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DEFAULT);
 	}
 	// endregion
 
 	// region: DyeableArmorItem
-	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableArmor(String registryName, PARENT parent, IArmorMaterial armorMaterial, EquipmentSlotType slotType, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableArmor(String registryName, PARENT parent, ArmorMaterial armorMaterial, EquipmentSlot slotType, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
 		return item(registryName, parent, properties -> armorItemFactory.create(armorMaterial, slotType, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableArmor(String registryName, PARENT parent, IArmorMaterial armorMaterial, EquipmentSlotType slotType)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableArmor(String registryName, PARENT parent, ArmorMaterial armorMaterial, EquipmentSlot slotType)
 	{
 		return armor(registryName, parent, armorMaterial, slotType, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 
-	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableArmor(String registryName, IArmorMaterial armorMaterial, EquipmentSlotType slotType, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableArmor(String registryName, ArmorMaterial armorMaterial, EquipmentSlot slotType, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
 		return dyeableArmor(registryName, self, armorMaterial, slotType, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableArmor(String registryName, IArmorMaterial armorMaterial, EquipmentSlotType slotType)
+	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableArmor(String registryName, ArmorMaterial armorMaterial, EquipmentSlot slotType)
 	{
 		return armor(registryName, self, armorMaterial, slotType, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 
 	// region: Helmet
-	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableHelmetArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableHelmetArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
-		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlotType.HEAD, armorItemFactory);
+		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlot.HEAD, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableHelmetArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableHelmetArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return dyeableHelmetArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 
-	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableHelmetArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableHelmetArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
 		return dyeableHelmetArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableHelmetArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableHelmetArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return dyeableHelmetArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 	// endregion
 
 	// region: Chestplate
-	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableChestplateArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableChestplateArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
-		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlotType.CHEST, armorItemFactory);
+		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlot.CHEST, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableChestplateArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableChestplateArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return dyeableChestplateArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 
-	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableChestplateArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableChestplateArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
 		return dyeableChestplateArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableChestplateArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableChestplateArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return dyeableChestplateArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 	// endregion
 
 	// region: Leggings
-	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableLeggingsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableLeggingsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
-		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlotType.LEGS, armorItemFactory);
+		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlot.LEGS, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableLeggingsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableLeggingsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return dyeableLeggingsArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 
-	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableLeggingsArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableLeggingsArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
 		return dyeableLeggingsArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableLeggingsArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableLeggingsArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return dyeableLeggingsArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 	// endregion
 
 	// region: Boots
-	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableBootsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> dyeableBootsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
-		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlotType.FEET, armorItemFactory);
+		return dyeableArmor(registryName, parent, armorMaterial, EquipmentSlot.FEET, armorItemFactory);
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableBootsArmorItem(String registryName, PARENT parent, IArmorMaterial armorMaterial)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DyeableArmorItem, PARENT> dyeableBootsArmorItem(String registryName, PARENT parent, ArmorMaterial armorMaterial)
 	{
 		return dyeableBootsArmorItem(registryName, parent, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
 
-	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableBootsArmorItem(String registryName, IArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
+	public final <ITEM extends DyeableArmorItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> dyeableBootsArmorItem(String registryName, ArmorMaterial armorMaterial, ArmorItemFactory.DyeableFactory<ITEM> armorItemFactory)
 	{
 		return dyeableBootsArmorItem(registryName, self, armorMaterial, armorItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableBootsArmorItem(String registryName, IArmorMaterial armorMaterial)
+	public final ItemBuilder<REGISTRATOR, DyeableArmorItem, REGISTRATOR> dyeableBootsArmorItem(String registryName, ArmorMaterial armorMaterial)
 	{
 		return dyeableBootsArmorItem(registryName, self, armorMaterial, ArmorItemFactory.DYEABLE_DEFAULT);
 	}
@@ -1385,34 +1379,34 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: BlockEntityType
-	public final <BLOCK_ENTITY extends TileEntity, PARENT> BlockEntityBuilder<REGISTRATOR, BLOCK_ENTITY, PARENT> blockEntity(String registryName, PARENT parent, BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
+	public final <BLOCK_ENTITY extends BlockEntity, PARENT> BlockEntityBuilder<REGISTRATOR, BLOCK_ENTITY, PARENT> blockEntity(String registryName, PARENT parent, BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
 		return entry(registryName, callback -> new BlockEntityBuilder<>(self, parent, registryName, callback, blockEntityFactory));
 	}
 
-	public final <BLOCK_ENTITY extends TileEntity> BlockEntityBuilder<REGISTRATOR, BLOCK_ENTITY, REGISTRATOR> blockEntity(String registryName, BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
+	public final <BLOCK_ENTITY extends BlockEntity> BlockEntityBuilder<REGISTRATOR, BLOCK_ENTITY, REGISTRATOR> blockEntity(String registryName, BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
 		return blockEntity(registryName, self, blockEntityFactory);
 	}
 	// endregion
 
 	// region: ContainerType
-	public final <CONTAINER extends Container, SCREEN extends Screen & IHasContainer<CONTAINER>, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
+	public final <CONTAINER extends AbstractContainerMenu, SCREEN extends Screen & MenuAccess<CONTAINER>, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
 	{
 		return entry(registryName, callback -> new ContainerBuilder<>(self, parent, registryName, callback, containerFactory, screenFactory));
 	}
 
-	public final <CONTAINER extends Container, SCREEN extends Screen & IHasContainer<CONTAINER>> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
+	public final <CONTAINER extends AbstractContainerMenu, SCREEN extends Screen & MenuAccess<CONTAINER>> ContainerBuilder<REGISTRATOR, CONTAINER, SCREEN, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory, @Nullable NonnullSupplier<ContainerFactory.ScreenFactory<CONTAINER, SCREEN>> screenFactory)
 	{
 		return container(registryName, self, containerFactory, screenFactory);
 	}
 
-	public final <CONTAINER extends Container, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, ?, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory)
+	public final <CONTAINER extends AbstractContainerMenu, PARENT> ContainerBuilder<REGISTRATOR, CONTAINER, ?, PARENT> container(String registryName, PARENT parent, ContainerFactory<CONTAINER> containerFactory)
 	{
 		return container(registryName, parent, containerFactory, null);
 	}
 
-	public final <CONTAINER extends Container> ContainerBuilder<REGISTRATOR, CONTAINER, ?, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory)
+	public final <CONTAINER extends AbstractContainerMenu> ContainerBuilder<REGISTRATOR, CONTAINER, ?, REGISTRATOR> container(String registryName, ContainerFactory<CONTAINER> containerFactory)
 	{
 		return container(registryName, self, containerFactory);
 	}
@@ -1431,14 +1425,14 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: Entity
-	public final <ENTITY extends Entity, PARENT> EntityBuilder<REGISTRATOR, ENTITY, PARENT> entity(String registryName, PARENT parent, EntityClassification entityClassification, EntityFactory<ENTITY> entityFactory)
+	public final <ENTITY extends Entity, PARENT> EntityBuilder<REGISTRATOR, ENTITY, PARENT> entity(String registryName, PARENT parent, MobCategory mobCategory, EntityFactory<ENTITY> entityFactory)
 	{
-		return entry(registryName, callback -> new EntityBuilder<>(self, parent, registryName, callback, entityClassification, entityFactory));
+		return entry(registryName, callback -> new EntityBuilder<>(self, parent, registryName, callback, mobCategory, entityFactory));
 	}
 
-	public final <ENTITY extends Entity> EntityBuilder<REGISTRATOR, ENTITY, REGISTRATOR> entity(String registryName, EntityClassification entityClassification, EntityFactory<ENTITY> entityFactory)
+	public final <ENTITY extends Entity> EntityBuilder<REGISTRATOR, ENTITY, REGISTRATOR> entity(String registryName, MobCategory mobCategory, EntityFactory<ENTITY> entityFactory)
 	{
-		return entity(registryName, self, entityClassification, entityFactory);
+		return entity(registryName, self, mobCategory, entityFactory);
 	}
 	// endregion
 
@@ -1489,58 +1483,58 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: RecipeSerializer
-	public final <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory, PARENT> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, PARENT parent, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
+	public final <RECIPE_TYPE extends RecipeSerializer<RECIPE>, RECIPE extends Recipe<INVENTORY>, INVENTORY extends Container, PARENT> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, PARENT parent, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
 	{
 		return entry(registryName, callback -> new RecipeSerializerBuilder<>(self, parent, registryName, callback, recipeSerializerFactory)).register();
 	}
 
-	public final <RECIPE_TYPE extends IRecipeSerializer<RECIPE>, RECIPE extends IRecipe<INVENTORY>, INVENTORY extends IInventory> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
+	public final <RECIPE_TYPE extends RecipeSerializer<RECIPE>, RECIPE extends Recipe<INVENTORY>, INVENTORY extends Container> RecipeSerializerEntry<RECIPE_TYPE, RECIPE> recipeSerializer(String registryName, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
 	{
 		return recipeSerializer(registryName, self, recipeSerializerFactory);
 	}
 	// endregion
 
 	// region: Structure
-	public final <STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
+	public final <STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
 	{
 		return entry(registryName, callback -> new StructureBuilder<>(self, parent, registryName, callback, structureFactory, structureCodecSupplier, featureConfigSupplier));
 	}
 
-	public final <STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
+	public final <STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration> StructureBuilder<REGISTRATOR, STRUCTURE, FEATURE_CONFIG, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, FEATURE_CONFIG> structureFactory, NonnullSupplier<Codec<FEATURE_CONFIG>> structureCodecSupplier, NonnullSupplier<FEATURE_CONFIG> featureConfigSupplier)
 	{
 		return structure(registryName, self, structureFactory, structureCodecSupplier, featureConfigSupplier);
 	}
 
-	public final <STRUCTURE extends Structure<NoFeatureConfig>, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, NoFeatureConfig, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, NoFeatureConfig> structureFactory)
+	public final <STRUCTURE extends StructureFeature<NoneFeatureConfiguration>, PARENT> StructureBuilder<REGISTRATOR, STRUCTURE, NoneFeatureConfiguration, PARENT> structure(String registryName, PARENT parent, StructureFactory<STRUCTURE, NoneFeatureConfiguration> structureFactory)
 	{
-		return structure(registryName, parent, structureFactory, () -> NoFeatureConfig.CODEC, () -> NoFeatureConfig.INSTANCE);
+		return structure(registryName, parent, structureFactory, () -> NoneFeatureConfiguration.CODEC, () -> NoneFeatureConfiguration.INSTANCE);
 	}
 
-	public final <STRUCTURE extends Structure<NoFeatureConfig>> StructureBuilder<REGISTRATOR, STRUCTURE, NoFeatureConfig, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, NoFeatureConfig> structureFactory)
+	public final <STRUCTURE extends StructureFeature<NoneFeatureConfiguration>> StructureBuilder<REGISTRATOR, STRUCTURE, NoneFeatureConfiguration, REGISTRATOR> structure(String registryName, StructureFactory<STRUCTURE, NoneFeatureConfiguration> structureFactory)
 	{
 		return structure(registryName, self, structureFactory);
 	}
 	// endregion
 
 	// region: Enchantment
-	public final <ENCHANTMENT extends Enchantment, PARENT> EnchantmentBuilder<REGISTRATOR, ENCHANTMENT, PARENT> enchantment(String registryName, PARENT parent, EnchantmentType enchantmentType, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
+	public final <ENCHANTMENT extends Enchantment, PARENT> EnchantmentBuilder<REGISTRATOR, ENCHANTMENT, PARENT> enchantment(String registryName, PARENT parent, EnchantmentCategory enchantmentCategory, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
 	{
-		return entry(registryName, callback -> new EnchantmentBuilder<>(self, parent, registryName, callback, enchantmentType, enchantmentFactory));
+		return entry(registryName, callback -> new EnchantmentBuilder<>(self, parent, registryName, callback, enchantmentCategory, enchantmentFactory));
 	}
 
-	public final <ENCHANTMENT extends Enchantment> EnchantmentBuilder<REGISTRATOR, ENCHANTMENT, REGISTRATOR> enchantment(String registryName, EnchantmentType enchantmentType, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
+	public final <ENCHANTMENT extends Enchantment> EnchantmentBuilder<REGISTRATOR, ENCHANTMENT, REGISTRATOR> enchantment(String registryName, EnchantmentCategory enchantmentCategory, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
 	{
-		return enchantment(registryName, self, enchantmentType, enchantmentFactory);
+		return enchantment(registryName, self, enchantmentCategory, enchantmentFactory);
 	}
 
-	public final <PARENT> EnchantmentBuilder<REGISTRATOR, Enchantment, PARENT> enchantment(String registryName, PARENT parent, EnchantmentType enchantmentType)
+	public final <PARENT> EnchantmentBuilder<REGISTRATOR, Enchantment, PARENT> enchantment(String registryName, PARENT parent, EnchantmentCategory enchantmentCategory)
 	{
-		return enchantment(registryName, parent, enchantmentType, EnchantmentFactory.DEFAULT);
+		return enchantment(registryName, parent, enchantmentCategory, EnchantmentFactory.DEFAULT);
 	}
 
-	public final EnchantmentBuilder<REGISTRATOR, Enchantment, REGISTRATOR> enchantment(String registryName, EnchantmentType enchantmentType)
+	public final EnchantmentBuilder<REGISTRATOR, Enchantment, REGISTRATOR> enchantment(String registryName, EnchantmentCategory enchantmentCategory)
 	{
-		return enchantment(registryName, self, enchantmentType, EnchantmentFactory.DEFAULT);
+		return enchantment(registryName, self, enchantmentCategory, EnchantmentFactory.DEFAULT);
 	}
 	// endregion
 
@@ -1583,22 +1577,22 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return self;
 	}
 
-	public final TranslationTextComponent addLang(String translationKey, String localizedValue)
+	public final TranslatableComponent addLang(String translationKey, String localizedValue)
 	{
 		return backend.addLang(translationKey, localizedValue);
 	}
 
-	public final TranslationTextComponent addLang(String type, ResourceLocation id, String localizedValue)
+	public final TranslatableComponent addLang(String type, ResourceLocation id, String localizedValue)
 	{
 		return backend.addLang(type, id, localizedValue);
 	}
 
-	public final TranslationTextComponent addLang(String type, ResourceLocation id, String suffix, String localizedValue)
+	public final TranslatableComponent addLang(String type, ResourceLocation id, String suffix, String localizedValue)
 	{
 		return backend.addLang(type, id, suffix, localizedValue);
 	}
 
-	public final TranslationTextComponent addRawLang(String translationKey, String localizedValue)
+	public final TranslatableComponent addRawLang(String translationKey, String localizedValue)
 	{
 		return backend.addLang(translationKey, localizedValue);
 	}
@@ -1614,13 +1608,13 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return skipErrors(true);
 	}
 
-	public final REGISTRATOR itemGroup(NonnullSupplier<? extends ItemGroup> itemGroup)
+	public final REGISTRATOR itemGroup(NonnullSupplier<? extends CreativeModeTab> itemGroup)
 	{
 		backend.itemGroup(itemGroup::get);
 		return self;
 	}
 
-	public final REGISTRATOR itemGroup(NonnullSupplier<? extends ItemGroup> itemGroup, String localizedName)
+	public final REGISTRATOR itemGroup(NonnullSupplier<? extends CreativeModeTab> itemGroup, String localizedName)
 	{
 		backend.itemGroup(itemGroup::get, localizedName);
 		return self;
@@ -1649,29 +1643,29 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: Translation
-	public final TranslationTextComponent addLang(String languageKey, String translationKey, String localizedValue)
+	public final TranslatableComponent addLang(String languageKey, String translationKey, String localizedValue)
 	{
-		String prefixedKey = getModId() + '.' + translationKey;
+		var prefixedKey = getModId() + '.' + translationKey;
 		addDataGenerator(LANG_EXT_PROVIDER, provider -> provider.add(languageKey, prefixedKey, localizedValue));
-		return new TranslationTextComponent(prefixedKey);
+		return new TranslatableComponent(prefixedKey);
 	}
 
-	public final TranslationTextComponent addLang(String languageKey, String type, ResourceLocation id, String localizedValue)
+	public final TranslatableComponent addLang(String languageKey, String type, ResourceLocation id, String localizedValue)
 	{
 		return addRawLang(languageKey, Util.makeDescriptionId(type, id), localizedValue);
 	}
 
-	public final TranslationTextComponent addLang(String languageKey, String type, ResourceLocation id, String suffix, String localizedValue)
+	public final TranslatableComponent addLang(String languageKey, String type, ResourceLocation id, String suffix, String localizedValue)
 	{
 		return addRawLang(languageKey, Util.makeDescriptionId(type, id) + '.' + suffix, localizedValue);
 	}
 
-	public final TranslationTextComponent addRawLang(String languageKey, String translationKey, String localizedValue)
+	public final TranslatableComponent addRawLang(String languageKey, String translationKey, String localizedValue)
 	{
 		if(backend.isDataGenerationEnabled())
 			backend.extraLang.get().add(Triple.of(languageKey, translationKey, localizedValue));
 
-		return new TranslationTextComponent(translationKey);
+		return new TranslatableComponent(translationKey);
 	}
 	// endregion
 
@@ -1725,7 +1719,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 		private List<Triple<String, String, String>> getExtraLang()
 		{
-			List<Triple<String, String, String>> translations = Lists.newArrayList();
+			var translations = Lists.<Triple<String, String, String>>newArrayList();
 			addDataGenerator(LANG_EXT_PROVIDER, provider -> translations.forEach(t -> provider.add(t.getLeft(), t.getMiddle(), t.getRight())));
 			return translations;
 		}

@@ -1,14 +1,13 @@
 package xyz.apex.forge.utility.registrator.helper;
 
 import com.google.common.collect.Sets;
-import com.tterrag.registrate.util.entry.RegistryEntry;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.ItemProviderEntry;
@@ -20,7 +19,7 @@ import java.util.Set;
 import java.util.Stack;
 
 @SuppressWarnings({ "deprecation", "UnusedReturnValue" })
-public class RegistratorItemGroup extends ItemGroup implements Lazy<ItemStack>
+public class RegistratorItemGroup extends CreativeModeTab implements Lazy<ItemStack>
 {
 	protected final AbstractRegistrator<?> registrator;
 	private int cycleTime = 0;
@@ -57,12 +56,12 @@ public class RegistratorItemGroup extends ItemGroup implements Lazy<ItemStack>
 
 	private void initialize()
 	{
-		for(RegistryEntry<?> registryEntry : registrator.getAll(Item.class))
+		for(var registryEntry : registrator.getAll(Item.class))
 		{
-			if(registryEntry instanceof ItemProviderEntry)
-				allIcons.add(((ItemProviderEntry<?>) registryEntry).asItemStack());
-			else if(registryEntry instanceof com.tterrag.registrate.util.entry.ItemProviderEntry)
-				allIcons.add(((com.tterrag.registrate.util.entry.ItemProviderEntry<?>) registryEntry).asStack());
+			if(registryEntry instanceof ItemProviderEntry provider)
+				allIcons.add(provider.asItemStack());
+			else if(registryEntry instanceof com.tterrag.registrate.util.entry.ItemProviderEntry provider)
+				allIcons.add(provider.asStack());
 		}
 
 		invalidate();
@@ -77,7 +76,7 @@ public class RegistratorItemGroup extends ItemGroup implements Lazy<ItemStack>
 		{
 			cycleTime = 0;
 
-			ItemStack iconItemStack = icons.pop();
+			var iconItemStack = icons.pop();
 			setIconItemStack(this, iconItemStack);
 
 			if(icons.isEmpty())
@@ -100,37 +99,37 @@ public class RegistratorItemGroup extends ItemGroup implements Lazy<ItemStack>
 		return registrator.idString(labelSuffix).replace(':', '.');
 	}
 
-	public static ItemGroup create(AbstractRegistrator<?> registrator, String labelSuffix, int maxCycleTime)
+	public static CreativeModeTab create(AbstractRegistrator<?> registrator, String labelSuffix, int maxCycleTime)
 	{
 		return new RegistratorItemGroup(registrator, labelSuffix, maxCycleTime);
 	}
 
-	public static ItemGroup create(AbstractRegistrator<?> registrator, String labelSuffix)
+	public static CreativeModeTab create(AbstractRegistrator<?> registrator, String labelSuffix)
 	{
 		return create(registrator, labelSuffix, 75);
 	}
 
-	public static ItemGroup create(AbstractRegistrator<?> registrator, int maxCycleTime)
+	public static CreativeModeTab create(AbstractRegistrator<?> registrator, int maxCycleTime)
 	{
 		return new RegistratorItemGroup(registrator, null, maxCycleTime);
 	}
 
-	public static ItemGroup create(AbstractRegistrator<?> registrator)
+	public static CreativeModeTab create(AbstractRegistrator<?> registrator)
 	{
 		return create(registrator, 75);
 	}
 
-	public static ItemStack getIconItemStack(ItemGroup itemGroup)
+	public static ItemStack getIconItemStack(CreativeModeTab itemGroup)
 	{
-		// ItemStack iconItemStack = ObfuscationReflectionHelper.getPrivateValue(ItemGroup.class, itemGroup, "field_151245_t");
-		ItemStack iconItemStack = itemGroup.iconItemStack;
+		// var iconItemStack = ObfuscationReflectionHelper.getPrivateValue(ItemGroup.class, itemGroup, "field_151245_t");
+		var iconItemStack = itemGroup.iconItemStack;
 		Validate.notNull(iconItemStack);
 		return iconItemStack;
 	}
 
-	public static ItemStack setIconItemStack(ItemGroup itemGroup, ItemStack iconItemStack)
+	public static ItemStack setIconItemStack(CreativeModeTab itemGroup, ItemStack iconItemStack)
 	{
-		ItemStack oldItemIconStack = getIconItemStack(itemGroup);
+		var oldItemIconStack = getIconItemStack(itemGroup);
 		// ObfuscationReflectionHelper.setPrivateValue(ItemGroup.class, itemGroup, iconItemStack, "field_151245_t");
 		itemGroup.iconItemStack = iconItemStack;
 		return oldItemIconStack;

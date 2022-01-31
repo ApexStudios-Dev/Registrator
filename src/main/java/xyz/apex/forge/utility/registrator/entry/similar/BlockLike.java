@@ -1,7 +1,7 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 @FunctionalInterface
 public interface BlockLike extends ItemLike

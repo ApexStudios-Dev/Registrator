@@ -2,16 +2,16 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.village.PointOfInterestType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 
 import xyz.apex.forge.utility.registrator.entry.similar.PointOfInterestLike;
 
-@Mixin(PointOfInterestType.class)
+@Mixin(PoiType.class)
 public class PointOfInterestTypeMixin implements PointOfInterestLike
 {
 	@Override
-	public PointOfInterestType asPointOfInterestType()
+	public PoiType asPointOfInterestType()
 	{
-		return (PointOfInterestType) (Object) this;
+		return (PoiType) (Object) this;
 	}
 }

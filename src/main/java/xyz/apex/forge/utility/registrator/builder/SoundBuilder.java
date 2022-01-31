@@ -3,8 +3,8 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.common.data.SoundDefinition;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;

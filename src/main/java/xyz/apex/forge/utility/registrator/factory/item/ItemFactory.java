@@ -1,6 +1,6 @@
 package xyz.apex.forge.utility.registrator.factory.item;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 @FunctionalInterface
 public interface ItemFactory<ITEM extends Item>

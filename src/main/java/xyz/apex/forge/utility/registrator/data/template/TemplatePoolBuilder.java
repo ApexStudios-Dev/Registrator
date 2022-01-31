@@ -6,15 +6,15 @@ import com.google.gson.JsonObject;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import org.apache.commons.lang3.Validate;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.feature.jigsaw.IJigsawDeserializer;
-import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.template.ProcessorLists;
-import net.minecraft.world.gen.feature.template.StructureProcessorList;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.ProcessorLists;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.structures.StructurePoolElementType;
+import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -40,7 +40,7 @@ public final class TemplatePoolBuilder
 
 	public ElementBuilder element()
 	{
-		ElementBuilder element = new ElementBuilder(this);
+		var element = new ElementBuilder(this);
 		elements.add(element);
 		return element;
 	}
@@ -82,11 +82,11 @@ public final class TemplatePoolBuilder
 
 	public JsonObject serialize()
 	{
-		JsonObject json = new JsonObject();
+		var json = new JsonObject();
 		json.addProperty("name", getPoolName().toString());
 		json.addProperty("fallback", getFallbackPoolName().toString());
 
-		JsonArray elementsJson = new JsonArray();
+		var elementsJson = new JsonArray();
 		elements.stream().map(ElementBuilder::serialize).forEach(elementsJson::add);
 		json.add("elements", elementsJson);
 
@@ -102,10 +102,10 @@ public final class TemplatePoolBuilder
 	{
 		private final TemplatePoolBuilder poolBuilder;
 		private int weight = 100;
-		private Supplier<Structure<?>> structureSupplier = () -> null;
+		private Supplier<StructureFeature<?>> structureSupplier = () -> null;
 		private NonNullSupplier<StructureProcessorList> processorSupplier = () -> ProcessorLists.EMPTY;
-		private JigsawPattern.PlacementBehaviour projection = JigsawPattern.PlacementBehaviour.RIGID;
-		private NonNullSupplier<IJigsawDeserializer<?>> elementTypeSupplier = () -> IJigsawDeserializer.SINGLE;
+		private StructureTemplatePool.Projection projection = StructureTemplatePool.Projection.RIGID;
+		private NonNullSupplier<StructurePoolElementType<?>> elementTypeSupplier = () -> StructurePoolElementType.SINGLE;
 
 		private ElementBuilder(TemplatePoolBuilder poolBuilder)
 		{
@@ -118,7 +118,7 @@ public final class TemplatePoolBuilder
 			return this;
 		}
 
-		public ElementBuilder location(NonNullSupplier<Structure<?>> structureSupplier)
+		public ElementBuilder location(NonNullSupplier<StructureFeature<?>> structureSupplier)
 		{
 			this.structureSupplier = structureSupplier;
 			return this;
@@ -130,13 +130,13 @@ public final class TemplatePoolBuilder
 			return this;
 		}
 
-		public ElementBuilder projection(JigsawPattern.PlacementBehaviour projection)
+		public ElementBuilder projection(StructureTemplatePool.Projection projection)
 		{
 			this.projection = projection;
 			return this;
 		}
 
-		public ElementBuilder elementType(NonNullSupplier<IJigsawDeserializer<?>> elementTypeSupplier)
+		public ElementBuilder elementType(NonNullSupplier<StructurePoolElementType<?>> elementTypeSupplier)
 		{
 			this.elementTypeSupplier = elementTypeSupplier;
 			return this;
@@ -144,10 +144,10 @@ public final class TemplatePoolBuilder
 
 		public int getWeight()
 		{
-			return MathHelper.clamp(weight, 0, 100);
+			return Mth.clamp(weight, 0, 100);
 		}
 
-		public Structure<?> getStructure()
+		public StructureFeature<?> getStructure()
 		{
 			return Validate.notNull(structureSupplier.get());
 		}
@@ -164,10 +164,10 @@ public final class TemplatePoolBuilder
 
 		public ResourceLocation getProcessorName()
 		{
-			return Validate.notNull(WorldGenRegistries.PROCESSOR_LIST.getKey(getProcessor()));
+			return Validate.notNull(BuiltinRegistries.PROCESSOR_LIST.getKey(getProcessor()));
 		}
 
-		public JigsawPattern.PlacementBehaviour getProjection()
+		public StructureTemplatePool.Projection getProjection()
 		{
 			return projection;
 		}
@@ -177,7 +177,7 @@ public final class TemplatePoolBuilder
 			return getProjection().getSerializedName();
 		}
 
-		public IJigsawDeserializer<?> getElementType()
+		public StructurePoolElementType<?> getElementType()
 		{
 			return elementTypeSupplier.get();
 		}
@@ -189,13 +189,13 @@ public final class TemplatePoolBuilder
 
 		public JsonObject serialize()
 		{
-			JsonObject element = new JsonObject();
+			var element = new JsonObject();
 			element.addProperty("location", getStructureName().toString());
 			element.addProperty("processors", getProcessorName().toString());
 			element.addProperty("projection", getProjectionName());
 			element.addProperty("element_type", getElementTypeName().toString());
 
-			JsonObject json = new JsonObject();
+			var json = new JsonObject();
 			json.addProperty("weight", getWeight());
 			json.add("element", element);
 			return json;

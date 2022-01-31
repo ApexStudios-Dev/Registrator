@@ -7,30 +7,27 @@ import com.tterrag.registrate.providers.loot.RegistrateLootTableProvider;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.Registry;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.network.FMLPlayMessages;
+import net.minecraftforge.fmllegacy.network.FMLPlayMessages;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.EntityEntry;
 import xyz.apex.forge.utility.registrator.factory.EntityFactory;
 import xyz.apex.forge.utility.registrator.factory.item.SpawnEggItemFactory;
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
-import xyz.apex.java.utility.nullness.NonnullBiConsumer;
-import xyz.apex.java.utility.nullness.NonnullBiFunction;
-import xyz.apex.java.utility.nullness.NonnullSupplier;
-import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
+import xyz.apex.java.utility.nullness.*;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -41,20 +38,20 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 {
 	public static final String SPAWN_EGG_SUFFIX = "_spawn_egg";
 
-	private final EntityClassification entityClassification;
+	private final MobCategory mobCategory;
 	private final EntityFactory<ENTITY> entityFactory;
 	private NonnullUnaryOperator<EntityType.Builder<ENTITY>> propertiesModifier = NonnullUnaryOperator.identity();
-	@Nullable private NonnullSupplier<IRenderFactory<? super ENTITY>> renderer = null;
-	@Nullable private NonnullSupplier<AttributeModifierMap.MutableAttribute> attributes = null;
-	@Nullable private EntitySpawnPlacementRegistry.PlacementType placementType = null;
-	@Nullable private Heightmap.Type heightMapType = null;
-	@Nullable private EntitySpawnPlacementRegistry.IPlacementPredicate<ENTITY> placementPredicate;
+	@Nullable private NonnullSupplier<NonnullFunction<EntityRendererProvider.Context, EntityRenderer<? super ENTITY>>> renderer = null;
+	@Nullable private NonnullSupplier<AttributeSupplier.Builder> attributes = null;
+	@Nullable private SpawnPlacements.Type placementType = null;
+	@Nullable private Heightmap.Types heightMapType = null;
+	@Nullable private SpawnPlacements.SpawnPredicate<ENTITY> placementPredicate;
 
-	public EntityBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, EntityClassification entityClassification, EntityFactory<ENTITY> entityFactory)
+	public EntityBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, MobCategory mobCategory, EntityFactory<ENTITY> entityFactory)
 	{
 		super(owner, parent, registryName, callback, EntityType.class, EntityEntry::new, EntityEntry::cast);
 
-		this.entityClassification = entityClassification;
+		this.mobCategory = mobCategory;
 		this.entityFactory = entityFactory;
 		onRegister(this::onRegister);
 
@@ -66,10 +63,10 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	{
 		if(renderer != null)
 		{
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> OneTimeEventReceiver.addModListener(FMLClientSetupEvent.class, event -> {
+			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> OneTimeEventReceiver.addModListener(EntityRenderersEvent.RegisterRenderers.class, event -> {
 				try
 				{
-					RenderingRegistry.registerEntityRenderingHandler(entityType, renderer.get());
+					event.registerEntityRenderer(entityType, renderer.get()::apply);
 				}
 				catch(Exception e)
 				{
@@ -88,7 +85,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	@Override
 	protected @NonnullType EntityType<ENTITY> createEntry()
 	{
-		EntityType.Builder<ENTITY> builder = EntityType.Builder.of(entityFactory::create, entityClassification);
+		var builder = EntityType.Builder.of(entityFactory::create, mobCategory);
 		builder = propertiesModifier.apply(builder);
 		return builder.build(getRegistryNameFull());
 	}
@@ -162,19 +159,19 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 		return properties(properties -> properties.setShouldReceiveVelocityUpdates(shouldReceiveVelocityUpdates));
 	}
 
-	public EntityBuilder<OWNER, ENTITY, PARENT> setCustomClientFactory(NonnullBiFunction<FMLPlayMessages.SpawnEntity, World, ENTITY> customClientFactory)
+	public EntityBuilder<OWNER, ENTITY, PARENT> setCustomClientFactory(NonnullBiFunction<FMLPlayMessages.SpawnEntity, Level, ENTITY> customClientFactory)
 	{
 		return properties(properties -> properties.setCustomClientFactory(customClientFactory));
 	}
 	// endregion
 
-	public EntityBuilder<OWNER, ENTITY, PARENT> renderer(NonnullSupplier<IRenderFactory<? super ENTITY>> renderer)
+	public EntityBuilder<OWNER, ENTITY, PARENT> renderer(NonnullSupplier<NonnullFunction<EntityRendererProvider.Context, EntityRenderer<? super ENTITY>>> renderer)
 	{
 		this.renderer = renderer;
 		return this;
 	}
 
-	public EntityBuilder<OWNER, ENTITY, PARENT> attributes(NonnullSupplier<AttributeModifierMap.MutableAttribute> attributes)
+	public EntityBuilder<OWNER, ENTITY, PARENT> attributes(NonnullSupplier<AttributeSupplier.Builder> attributes)
 	{
 		this.attributes = attributes;
 		return this;
@@ -200,7 +197,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 		return spawnEgg(backgroundColor, highlightColor, SpawnEggItemFactory.forEntity());
 	}
 
-	public EntityBuilder<OWNER, ENTITY, PARENT> spawnPlacement(EntitySpawnPlacementRegistry.PlacementType placementType, Heightmap.Type heightmapType, EntitySpawnPlacementRegistry.IPlacementPredicate<ENTITY> placementPredicate)
+	public EntityBuilder<OWNER, ENTITY, PARENT> spawnPlacement(SpawnPlacements.Type placementType, Heightmap.Types heightmapType, SpawnPlacements.SpawnPredicate<ENTITY> placementPredicate)
 	{
 		this.placementType = placementType;
 		this.heightMapType = heightmapType;
@@ -229,20 +226,20 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	}
 
 	@SafeVarargs
-	public final EntityBuilder<OWNER, ENTITY, PARENT> tag(ITag.INamedTag<EntityType<?>>... tags)
+	public final EntityBuilder<OWNER, ENTITY, PARENT> tag(Tag.Named<EntityType<?>>... tags)
 	{
 		return tag(ProviderType.ENTITY_TAGS, tags);
 	}
 
 	@SafeVarargs
-	public final EntityBuilder<OWNER, ENTITY, PARENT> removeTag(ITag.INamedTag<EntityType<?>>... tags)
+	public final EntityBuilder<OWNER, ENTITY, PARENT> removeTag(Tag.Named<EntityType<?>>... tags)
 	{
 		return removeTags(ProviderType.ENTITY_TAGS, tags);
 	}
 
-	public static <ENTITY extends Entity> void registerSpawnPlacement(EntityType<ENTITY> entityType, EntitySpawnPlacementRegistry.PlacementType placementType, Heightmap.Type heightMapType, EntitySpawnPlacementRegistry.IPlacementPredicate<ENTITY> placementPredicate)
+	public static <ENTITY extends Entity> void registerSpawnPlacement(EntityType<ENTITY> entityType, SpawnPlacements.Type placementType, Heightmap.Types heightMapType, SpawnPlacements.SpawnPredicate<ENTITY> placementPredicate)
 	{
-		EntitySpawnPlacementRegistry.Entry entitySpawnPlacementRegistryEntry = EntitySpawnPlacementRegistry.DATA_BY_TYPE.put(entityType, new EntitySpawnPlacementRegistry.Entry(heightMapType, placementType, placementPredicate));
+		var entitySpawnPlacementRegistryEntry = SpawnPlacements.DATA_BY_TYPE.put(entityType, new SpawnPlacements.Data(heightMapType, placementType, placementPredicate));
 
 		if(entitySpawnPlacementRegistryEntry != null)
 			throw new IllegalStateException("Duplicate registration for type " + Registry.ENTITY_TYPE.getKey(entityType));

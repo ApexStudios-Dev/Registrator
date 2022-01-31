@@ -1,8 +1,8 @@
 package xyz.apex.forge.utility.registrator.factory.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 @FunctionalInterface
 public interface BlockItemFactory<BLOCK extends Block, ITEM extends BlockItem>

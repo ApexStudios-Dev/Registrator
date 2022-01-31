@@ -1,13 +1,17 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.*;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraftforge.fmllegacy.RegistryObject;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.similar.ContainerTypeLike;
@@ -17,72 +21,72 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class ContainerEntry<CONTAINER extends Container> extends RegistryEntry<ContainerType<CONTAINER>> implements ContainerTypeLike, IContainerProvider, NonnullSupplier<ContainerType<CONTAINER>>
+public final class ContainerEntry<CONTAINER extends AbstractContainerMenu> extends RegistryEntry<MenuType<CONTAINER>> implements ContainerTypeLike, MenuConstructor, NonnullSupplier<MenuType<CONTAINER>>
 {
-	public ContainerEntry(AbstractRegistrator<?> registrator, RegistryObject<ContainerType<CONTAINER>> delegate)
+	public ContainerEntry(AbstractRegistrator<?> registrator, RegistryObject<MenuType<CONTAINER>> delegate)
 	{
 		super(registrator, delegate);
 	}
 
 	@Override
-	public ContainerType<CONTAINER> asContainerType()
+	public MenuType<CONTAINER> asContainerType()
 	{
 		return get();
 	}
 
-	public CONTAINER create(int windowId, PlayerInventory playerInventory, @Nullable PacketBuffer extraData)
+	public CONTAINER create(int windowId, Inventory playerInventory, @Nullable FriendlyByteBuf extraData)
 	{
 		return asContainerType().create(windowId, playerInventory, extraData);
 	}
 
 	// wrapper for lambda method references
-	public CONTAINER create(int windowId, PlayerInventory playerInventory, PlayerEntity player)
+	public CONTAINER create(int windowId, Inventory playerInventory, Player player)
 	{
-		return create(windowId, playerInventory, (PacketBuffer) null);
+		return create(windowId, playerInventory, (FriendlyByteBuf) null);
 	}
 
-	public CONTAINER create(int windowId, PlayerInventory playerInventory)
+	public CONTAINER create(int windowId, Inventory playerInventory)
 	{
-		return create(windowId, playerInventory, (PacketBuffer) null);
+		return create(windowId, playerInventory, (FriendlyByteBuf) null);
 	}
 
-	public INamedContainerProvider asNamedProvider(ITextComponent titleComponent)
+	public MenuProvider asNamedProvider(Component titleComponent)
 	{
-		return new SimpleNamedContainerProvider(this, titleComponent);
+		return new SimpleMenuProvider(this, titleComponent);
 	}
 
-	public void open(ServerPlayerEntity player, INamedContainerProvider containerProvider, NonnullConsumer<PacketBuffer> extraData)
+	public void open(ServerPlayer player, MenuProvider containerProvider, NonnullConsumer<FriendlyByteBuf> extraData)
 	{
 		NetworkHooks.openGui(player, containerProvider, extraData);
 	}
 
-	public void open(ServerPlayerEntity player, INamedContainerProvider containerProvider)
+	public void open(ServerPlayer player, MenuProvider containerProvider)
 	{
 		open(player, containerProvider, NonnullConsumer.noop());
 	}
 
-	public void open(ServerPlayerEntity player, ITextComponent titleComponent, NonnullConsumer<PacketBuffer> extraData)
+	public void open(ServerPlayer player, Component titleComponent, NonnullConsumer<FriendlyByteBuf> extraData)
 	{
 		open(player, asNamedProvider(titleComponent), extraData);
 	}
 
-	public void open(ServerPlayerEntity player, ITextComponent titleComponent)
+	public void open(ServerPlayer player, Component titleComponent)
 	{
 		open(player, asNamedProvider(titleComponent), NonnullConsumer.noop());
 	}
 
 	@Override
-	public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player)
+	public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player)
 	{
 		return create(windowId, playerInventory, player);
 	}
 
-	public static <CONTAINER extends Container> ContainerEntry<CONTAINER> cast(RegistryEntry<ContainerType<CONTAINER>> registryEntry)
+	public static <CONTAINER extends AbstractContainerMenu> ContainerEntry<CONTAINER> cast(RegistryEntry<MenuType<CONTAINER>> registryEntry)
 	{
 		return cast(ContainerEntry.class, registryEntry);
 	}
 
-	public static <CONTAINER extends Container> ContainerEntry<CONTAINER> cast(com.tterrag.registrate.util.entry.RegistryEntry<ContainerType<CONTAINER>> registryEntry)
+	public static <CONTAINER extends AbstractContainerMenu> ContainerEntry<CONTAINER> cast(com.tterrag.registrate.util.entry.RegistryEntry<MenuType<CONTAINER>> registryEntry)
 	{
 		return cast(ContainerEntry.class, registryEntry);
 	}

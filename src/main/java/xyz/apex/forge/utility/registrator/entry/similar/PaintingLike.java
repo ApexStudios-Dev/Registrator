@@ -1,9 +1,9 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.entity.item.PaintingType;
+import net.minecraft.world.entity.decoration.Motive;
 
 @FunctionalInterface
 public interface PaintingLike
 {
-	PaintingType asPaintingType();
+	Motive asPaintingType();
 }

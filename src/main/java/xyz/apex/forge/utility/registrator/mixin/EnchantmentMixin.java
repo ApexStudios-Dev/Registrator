@@ -2,7 +2,7 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 import xyz.apex.forge.utility.registrator.entry.similar.EnchantmentLike;
 

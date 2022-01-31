@@ -1,8 +1,8 @@
 package xyz.apex.forge.utility.registrator.factory.item;
 
-import net.minecraft.item.BannerPatternItem;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.BannerPattern;
+import net.minecraft.world.item.BannerPatternItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BannerPattern;
 
 @FunctionalInterface
 public interface BannerPatternItemFactory<ITEM extends BannerPatternItem>

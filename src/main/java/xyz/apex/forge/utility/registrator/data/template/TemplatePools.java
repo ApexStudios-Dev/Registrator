@@ -1,14 +1,13 @@
 package xyz.apex.forge.utility.registrator.data.template;
 
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class TemplatePools implements IStringSerializable, Comparable<TemplatePools>
+public final class TemplatePools implements Comparable<TemplatePools>
 {
 	public static final TemplatePools EMPTY = of("empty");
 
@@ -256,12 +255,6 @@ public final class TemplatePools implements IStringSerializable, Comparable<Temp
 	public ResourceLocation getPoolName()
 	{
 		return poolName;
-	}
-
-	@Override
-	public String getSerializedName()
-	{
-		return poolName.toString();
 	}
 	// endregion
 

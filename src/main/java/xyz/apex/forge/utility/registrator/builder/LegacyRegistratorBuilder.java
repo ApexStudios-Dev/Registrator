@@ -13,8 +13,8 @@ import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 
-import net.minecraft.tags.ITag;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.tags.Tag;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
@@ -61,7 +61,7 @@ public abstract class LegacyRegistratorBuilder<
 	}
 
 	@SafeVarargs
-	public final BUILDER removeTags(ProviderType<? extends RegistrateTagsProvider<BASE>> providerType, ITag.INamedTag<BASE>... tags)
+	public final BUILDER removeTags(ProviderType<? extends RegistrateTagsProvider<BASE>> providerType, Tag.Named<BASE>... tags)
 	{
 		return removeTag((ProviderType<RegistrateTagsProvider<BASE>>) providerType, tags);
 	}
@@ -187,12 +187,6 @@ public abstract class LegacyRegistratorBuilder<
 	public final BUILDER onRegister(NonNullConsumer<? super TYPE> callback)
 	{
 		return super.onRegister(callback);
-	}
-
-	@Override
-	public final <OR extends IForgeRegistryEntry<OR>> BUILDER onRegisterAfter(Class<? super OR> dependencyType, NonNullConsumer<? super TYPE> callback)
-	{
-		return super.onRegisterAfter(dependencyType, callback);
 	}
 
 	@Deprecated

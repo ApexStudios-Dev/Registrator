@@ -1,9 +1,9 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.tags.ITag;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.similar.BlockLike;
@@ -27,14 +27,14 @@ public final class BlockEntry<BLOCK extends Block> extends ItemProviderEntry<BLO
 		return isBlock(blockState.getBlock());
 	}
 
-	public boolean isInBlockTag(ITag<Block> tag)
+	public boolean isInBlockTag(Tag<Block> tag)
 	{
-		return asBlock().is(tag);
+		return tag.contains(asBlock());
 	}
 
 	public boolean isBlock(Block block)
 	{
-		return asBlock().is(block);
+		return asBlock() == block;
 	}
 
 	public boolean isBlock(BlockLike block)

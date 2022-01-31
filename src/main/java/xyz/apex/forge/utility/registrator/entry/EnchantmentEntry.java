@@ -1,14 +1,14 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.network.chat.Component;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.similar.EnchantmentLike;
@@ -28,9 +28,9 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 		return get();
 	}
 
-	public boolean isInEnchantmentTag(ITag<Enchantment> tag)
+	public boolean isInEnchantmentTag(Tag<Enchantment> tag)
 	{
-		return asEnchantment().isIn(tag);
+		return asEnchantment().is(tag);
 	}
 
 	public boolean isEnchantment(Enchantment enchantment)
@@ -43,7 +43,7 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 		return isEnchantment(enchantment.asEnchantment());
 	}
 
-	public Map<EquipmentSlotType, ItemStack> getSlotItems(LivingEntity entity)
+	public Map<EquipmentSlot, ItemStack> getSlotItems(LivingEntity entity)
 	{
 		return asEnchantment().getSlotItems(entity);
 	}
@@ -78,7 +78,7 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 		return asEnchantment().getDamageProtection(level, damageSource);
 	}
 
-	public float getDamageBonus(int level, CreatureAttribute creatureAttribute)
+	public float getDamageBonus(int level, MobType creatureAttribute)
 	{
 		return asEnchantment().getDamageBonus(level, creatureAttribute);
 	}
@@ -93,7 +93,7 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 		return isCompatibleWith(enchantment.asEnchantment());
 	}
 
-	public ITextComponent getFullName(int level)
+	public Component getFullName(int level)
 	{
 		return asEnchantment().getFullname(level);
 	}

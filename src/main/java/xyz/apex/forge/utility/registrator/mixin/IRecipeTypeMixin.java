@@ -2,16 +2,16 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import xyz.apex.forge.utility.registrator.entry.similar.RecipeTypeLike;
 
-@Mixin(IRecipeType.class)
+@Mixin(RecipeType.class)
 public interface IRecipeTypeMixin extends RecipeTypeLike
 {
 	@Override
-	default IRecipeType<?> asRecipeType()
+	default RecipeType<?> asRecipeType()
 	{
-		return (IRecipeType<?>) this;
+		return (RecipeType<?>) this;
 	}
 }

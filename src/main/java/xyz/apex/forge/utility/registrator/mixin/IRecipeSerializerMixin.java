@@ -2,16 +2,16 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import xyz.apex.forge.utility.registrator.entry.similar.RecipeSerializerLike;
 
-@Mixin(IRecipeSerializer.class)
+@Mixin(RecipeSerializer.class)
 public interface IRecipeSerializerMixin extends RecipeSerializerLike
 {
 	@Override
-	default IRecipeSerializer<?> asRecipeSerializer()
+	default RecipeSerializer<?> asRecipeSerializer()
 	{
-		return (IRecipeSerializer<?>) this;
+		return (RecipeSerializer<?>) this;
 	}
 }

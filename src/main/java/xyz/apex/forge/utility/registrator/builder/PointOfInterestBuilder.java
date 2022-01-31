@@ -3,10 +3,9 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.village.PointOfInterestType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.PointOfInterestEntry;
@@ -14,11 +13,10 @@ import xyz.apex.java.utility.nullness.NonnullBiPredicate;
 import xyz.apex.java.utility.nullness.NonnullPredicate;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("unused")
-public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, PointOfInterestType, PointOfInterestType, PARENT, PointOfInterestBuilder<OWNER, PARENT>, PointOfInterestEntry>
+public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, PoiType, PoiType, PARENT, PointOfInterestBuilder<OWNER, PARENT>, PointOfInterestEntry>
 {
 	private NonnullSupplier<? extends Block> block = () -> Blocks.AIR;
 	private int maxTickets = 1;
@@ -27,7 +25,7 @@ public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNE
 
 	public PointOfInterestBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
-		super(owner, parent, registryName, callback, PointOfInterestType.class, PointOfInterestEntry::new, PointOfInterestEntry::cast);
+		super(owner, parent, registryName, callback, PoiType.class, PointOfInterestEntry::new, PointOfInterestEntry::cast);
 	}
 
 	public PointOfInterestBuilder<OWNER, PARENT> matchingBlock(NonnullSupplier<? extends Block> block)
@@ -55,21 +53,21 @@ public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNE
 	}
 
 	@Override
-	protected @NonnullType PointOfInterestType createEntry()
+	protected @NonnullType PoiType createEntry()
 	{
-		AtomicReference<PointOfInterestType> result = new AtomicReference<>();
-		NonnullPredicate<PointOfInterestType> predicate = poiType -> this.predicate.apply(poiType, result.get());
-		Set<BlockState> matchingBlockStates = PointOfInterestType.getBlockStates(block.get());
-		String registryName = getRegistryNameFull();
-		PointOfInterestType poiType = new PointOfInterestType(registryName, matchingBlockStates, maxTickets, predicate, validRange);
+		var result = new AtomicReference<PoiType>();
+		NonnullPredicate<PoiType> predicate = poiType -> this.predicate.apply(poiType, result.get());
+		var matchingBlockStates = PoiType.getBlockStates(block.get());
+		var registryName = getRegistryNameFull();
+		var poiType = new PoiType(registryName, matchingBlockStates, maxTickets, predicate, validRange);
 		result.set(poiType);
 		return poiType;
 	}
 
 	@FunctionalInterface
-	public interface Predicate extends NonnullBiPredicate<PointOfInterestType, PointOfInterestType>
+	public interface Predicate extends NonnullBiPredicate<PoiType, PoiType>
 	{
 		@Override
-		boolean test(PointOfInterestType testType, PointOfInterestType yourType);
+		boolean test(PoiType testType, PoiType yourType);
 	}
 }

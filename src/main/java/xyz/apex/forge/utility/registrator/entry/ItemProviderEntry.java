@@ -1,18 +1,17 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.ItemLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super ITEM> & IItemProvider> extends RegistryEntry<ITEM> implements ItemLike, NonnullSupplier<ITEM>
+public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super ITEM> & ItemLike> extends RegistryEntry<ITEM> implements ItemLike, NonnullSupplier<ITEM>
 {
 	public ItemProviderEntry(AbstractRegistrator<?> registrator, RegistryObject<ITEM> delegate)
 	{
@@ -34,9 +33,9 @@ public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super
 		return isItem(stack.getItem());
 	}
 
-	public final boolean isInItemTag(ITag<Item> tag)
+	public final boolean isInItemTag(Tag<Item> tag)
 	{
-		return asItem().is(tag);
+		return tag.contains(asItem());
 	}
 
 	public final boolean isItem(Item item)
@@ -45,12 +44,12 @@ public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super
 	}
 
 	// vanilla wrapper
-	public final boolean isItem(IItemProvider item)
+	public final boolean isItem(ItemLike item)
 	{
 		return isItem(item.asItem());
 	}
 
-	public final boolean isItem(ItemLike item)
+	public final boolean isItem(xyz.apex.forge.utility.registrator.entry.similar.ItemLike item)
 	{
 		return isItem(item.asItem());
 	}

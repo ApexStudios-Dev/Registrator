@@ -5,11 +5,11 @@
 [![release](https://img.shields.io/github/v/release/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/releases)
 [![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)](https://www.curseforge.com/minecraft/mc-mods/registrator)
 
-An Auto-Magic registration system built ontop of [**Registrate (_1.16.5-1.0.10_)**](https://github.com/tterrag1098/Registrate/tree/1.16).
+An Auto-Magic registration system built ontop of [**Registrate (_1.17.1-1.0.14_)**](https://github.com/tterrag1098/Registrate/tree/1.17).
 
 This project makes use of my [**Java-Utilities**](https://github.com/ApexModder/JavaUtilities) library.
 
-[**Registrate**](https://github.com/tterrag1098/Registrate/tree/1.16) will be shaded into the Jar file when built, under the package `xyz.apex.repack.<registrate>`<br>
+[**Registrate**](https://github.com/tterrag1098/Registrate/tree/1.17) will be shaded into the Jar file when built, under the package `xyz.apex.repack.<registrate>`<br>
 Although Registrate will be shaded & accessible via `AbstractRegistrator#backend`, you should never have to use it outside more advanced use cases.
 
 This project makes use of both mixins & an access transformer.<br>
@@ -131,34 +131,8 @@ This will add Registrator as a dependency on CurseForge. When users download you
 <details>
 <summary><b>CurseForge Versions</b></summary>
 
-<details>
-<summary><b><i>1.16.5</i></b></summary>
-
-| Registrator Version  | CurseForge File ID |
-|:--------------------:|:---:|
-| <b><i>1.0.22</i></b> | [3629740](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3629740) |
-| <b><i>1.0.21</i></b> | [3624977](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3624977) |
-| <b><i>1.0.20</i></b> | [3624959](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3624959) |
-| <b><i>1.0.19</i></b> | [3547961](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3547961) |
-| <b><i>1.0.18</i></b> | [3543275](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543275) |
-| <b><i>1.0.17</i></b> | [3543253](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543253) |
-| <b><i>1.0.16</i></b> | [3543232](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543232) |
-| <b><i>1.0.15</i></b> | [3543223](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543223) |
-| <b><i>1.0.14</i></b> | [3543214](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543214) |
-| <b><i>1.0.13</i></b> | [3541415](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541415) |
-| <b><i>1.0.12</i></b> | [3541261](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541261) |
-| <b><i>1.0.11</i></b> | [3541252](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541252) |
-| <b><i>1.0.10</i></b> | [3541180](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541180) |
-| <b><i>1.0.9</i></b>  | [3541175](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541175) |
-| <b><i>1.0.8</i></b>  | [3541170](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541170) |
-| <b><i>1.0.7</i></b>  | [3539396](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539396) |
-| <b><i>1.0.6</i></b>  | [3539331](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539331) |
-| <b><i>1.0.5</i></b>  | [3538337](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3538337) |
-| <b><i>1.0.4</i></b>  | [3537821](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537821) |
-| <b><i>1.0.3</i></b>  | [3537477](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537477) |
-| <b><i>1.0.2</i></b>  | [3537398](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537398) |
-| <b><i>1.0.1</i></b>  | [3537338](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537338) |
-
-</details>
+| Registrator Version | CurseForge File ID |
+|:-------------------:|:------------------:|
+| <b><i>2.0.0</i></b> |    Not Released    |
 
 </details>

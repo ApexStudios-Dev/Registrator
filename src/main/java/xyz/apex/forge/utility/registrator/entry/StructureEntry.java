@@ -2,27 +2,29 @@ package xyz.apex.forge.utility.registrator.entry;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.biome.provider.BiomeProvider;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.structure.StructureStart;
-import net.minecraft.world.gen.feature.template.TemplateManager;
-import net.minecraft.world.gen.settings.StructureSeparationSettings;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.structures.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.data.template.TemplatePools;
@@ -30,9 +32,8 @@ import xyz.apex.forge.utility.registrator.entry.similar.StructureLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
-public final class StructureEntry<STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> extends RegistryEntry<STRUCTURE> implements StructureLike, NonnullSupplier<STRUCTURE>
+public final class StructureEntry<STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration> extends RegistryEntry<STRUCTURE> implements StructureLike, NonnullSupplier<STRUCTURE>
 {
 	private final TemplatePools templatePool;
 
@@ -49,49 +50,49 @@ public final class StructureEntry<STRUCTURE extends Structure<FEATURE_CONFIG>, F
 	}
 
 	@Nullable
-	public JigsawPattern getJigsawPattern(DynamicRegistries registries)
+	public StructureTemplatePool getJigsawPattern(RegistryAccess registries)
 	{
 		return registries.registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY).get(templatePool.getPoolName());
 	}
 
 	@Override
-	public Structure<?> asStructure()
+	public StructureFeature<?> asStructure()
 	{
 		return get();
 	}
 
-	public GenerationStage.Decoration step()
+	public GenerationStep.Decoration step()
 	{
 		return asStructure().step();
 	}
 
-	public Codec<StructureFeature<FEATURE_CONFIG, Structure<FEATURE_CONFIG>>> configuredFeatureCodec()
+	public Codec<ConfiguredStructureFeature<FEATURE_CONFIG, StructureFeature<FEATURE_CONFIG>>> configuredFeatureCodec()
 	{
 		return get().configuredStructureCodec();
 	}
 
-	public StructureFeature<FEATURE_CONFIG, ? extends Structure<FEATURE_CONFIG>> configured(FEATURE_CONFIG featureConfig)
+	public ConfiguredStructureFeature<FEATURE_CONFIG, ? extends StructureFeature<FEATURE_CONFIG>> configured(FEATURE_CONFIG featureConfig)
 	{
 		return get().configured(featureConfig);
 	}
 
 	@Nullable
-	public BlockPos getNearestGenerationFeature(IWorldReader level, StructureManager structureManager, BlockPos pos, int searchRadius, boolean skipKnownStructures, long seed, StructureSeparationSettings separationSettings)
+	public BlockPos getNearestGenerationFeature(LevelReader level, StructureFeatureManager structureManager, BlockPos pos, int searchRadius, boolean skipKnownStructures, long seed, StructureFeatureConfiguration separationSettings)
 	{
 		return asStructure().getNearestGeneratedFeature(level, structureManager, pos, searchRadius, skipKnownStructures, seed, separationSettings);
 	}
 
-	public ChunkPos getPotentialFeatureConfig(StructureSeparationSettings separationSettings, long seed, SharedSeedRandom rng, int x, int z)
+	public ChunkPos getPotentialFeatureConfig(StructureFeatureConfiguration separationSettings, long seed, WorldgenRandom rng, int x, int z)
 	{
 		return asStructure().getPotentialFeatureChunk(separationSettings, seed, rng, x, z);
 	}
 
-	public StructureStart<?> generate(DynamicRegistries registries, ChunkGenerator generator, BiomeProvider biomeProvider, TemplateManager templateManager, long seed, ChunkPos chunkPos, Biome biome, int references, SharedSeedRandom rng, StructureSeparationSettings separationSettings, FEATURE_CONFIG featureConfig)
+	public StructureStart<?> generate(RegistryAccess registries, ChunkGenerator generator, BiomeSource biomeProvider, StructureManager templateManager, long seed, ChunkPos chunkPos, Biome biome, int references, WorldgenRandom rng, StructureFeatureConfiguration separationSettings, FEATURE_CONFIG featureConfig, LevelHeightAccessor levelHeightAccessor)
 	{
-		return get().generate(registries, generator, biomeProvider, templateManager, seed, chunkPos, biome, references, rng, separationSettings, featureConfig);
+		return get().generate(registries, generator, biomeProvider, templateManager, seed, chunkPos, biome, references, rng, separationSettings, featureConfig, levelHeightAccessor);
 	}
 
-	public Structure.IStartFactory<?> getStartFactory()
+	public StructureFeature.StructureStartFactory<?> getStartFactory()
 	{
 		return asStructure().getStartFactory();
 	}
@@ -101,27 +102,27 @@ public final class StructureEntry<STRUCTURE extends Structure<FEATURE_CONFIG>, F
 		return asStructure().getFeatureName();
 	}
 
-	public List<MobSpawnInfo.Spawners> getSpecialEnemies()
+	public WeightedRandomList<MobSpawnSettings.SpawnerData> getSpecialEnemies()
 	{
 		return asStructure().getSpecialEnemies();
 	}
 
-	public List<MobSpawnInfo.Spawners> getSpecialAnimals()
+	public WeightedRandomList<MobSpawnSettings.SpawnerData> getSpecialAnimals()
 	{
 		return asStructure().getSpecialAnimals();
 	}
 
-	public List<MobSpawnInfo.Spawners> getSpawnList(EntityClassification entityClassification)
+	public WeightedRandomList<MobSpawnSettings.SpawnerData> getSpawnList(MobCategory mobCategory)
 	{
-		return asStructure().getSpawnList(entityClassification);
+		return asStructure().getSpawnList(mobCategory);
 	}
 
-	public static <STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> StructureEntry<STRUCTURE, FEATURE_CONFIG> cast(RegistryEntry<STRUCTURE> registryEntry)
+	public static <STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration> StructureEntry<STRUCTURE, FEATURE_CONFIG> cast(RegistryEntry<STRUCTURE> registryEntry)
 	{
 		return cast(StructureEntry.class, registryEntry);
 	}
 
-	public static <STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> StructureEntry<STRUCTURE, FEATURE_CONFIG> cast(com.tterrag.registrate.util.entry.RegistryEntry<STRUCTURE> registryEntry)
+	public static <STRUCTURE extends StructureFeature<FEATURE_CONFIG>, FEATURE_CONFIG extends FeatureConfiguration> StructureEntry<STRUCTURE, FEATURE_CONFIG> cast(com.tterrag.registrate.util.entry.RegistryEntry<STRUCTURE> registryEntry)
 	{
 		return cast(StructureEntry.class, registryEntry);
 	}

@@ -2,12 +2,12 @@ package xyz.apex.forge.utility.registrator.entry;
 
 import com.google.common.collect.ImmutableSet;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.merchant.villager.VillagerProfession;
-import net.minecraft.item.Item;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.village.PointOfInterestType;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.similar.VillagerProfessionLike;
@@ -34,7 +34,7 @@ public final class VillagerProfessionEntry extends RegistryEntry<VillagerProfess
 		return other != null && asVillagerProfession() == other;
 	}
 
-	public PointOfInterestType getJobPoiType()
+	public PoiType getJobPoiType()
 	{
 		return asVillagerProfession().getJobPoiType();
 	}

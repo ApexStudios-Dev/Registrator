@@ -2,7 +2,7 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 import xyz.apex.forge.utility.registrator.entry.similar.BlockLike;
 

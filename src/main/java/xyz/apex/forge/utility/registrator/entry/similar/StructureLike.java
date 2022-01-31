@@ -1,8 +1,8 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 
 public interface StructureLike
 {
-	Structure<?> asStructure();
+	StructureFeature<?> asStructure();
 }

@@ -1,9 +1,9 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.village.PointOfInterestType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 
 @FunctionalInterface
 public interface PointOfInterestLike
 {
-	PointOfInterestType asPointOfInterestType();
+	PoiType asPointOfInterestType();
 }

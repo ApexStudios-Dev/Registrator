@@ -1,12 +1,13 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.block.Block;
-import net.minecraft.tags.ITag;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.similar.BlockEntityTypeLike;
@@ -17,43 +18,48 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public final class BlockEntityEntry<BLOCK_ENTITY extends TileEntity> extends RegistryEntry<TileEntityType<BLOCK_ENTITY>> implements BlockEntityTypeLike, NonnullSupplier<TileEntityType<BLOCK_ENTITY>>
+public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends RegistryEntry<BlockEntityType<BLOCK_ENTITY>> implements BlockEntityTypeLike, NonnullSupplier<BlockEntityType<BLOCK_ENTITY>>
 {
-	public BlockEntityEntry(AbstractRegistrator<?> registrator, RegistryObject<TileEntityType<BLOCK_ENTITY>> delegate)
+	public BlockEntityEntry(AbstractRegistrator<?> registrator, RegistryObject<BlockEntityType<BLOCK_ENTITY>> delegate)
 	{
 		super(registrator, delegate);
 	}
 
-	public boolean isInBlockEntityTypeTag(ITag<TileEntityType<?>> tag)
+	public boolean isInBlockEntityTypeTag(Tag<BlockEntityType<?>> tag)
 	{
 		return asBlockEntityType().isIn(tag);
 	}
 
-	public boolean isBlockEntityType(TileEntityType<?> blockEntityType)
+	public boolean isBlockEntityType(BlockEntityType<?> blockEntityType)
 	{
 		return asBlockEntityType() == blockEntityType;
 	}
 
 	@Nullable
-	public BLOCK_ENTITY createBlockEntity()
+	public BLOCK_ENTITY createBlockEntity(BlockPos pos, BlockState blockState)
 	{
-		return asBlockEntityType().create();
+		return asBlockEntityType().create(pos, blockState);
 	}
 
 	@Nullable
-	public BLOCK_ENTITY getBlockEntity(IBlockReader level, BlockPos pos)
+	public BLOCK_ENTITY getBlockEntity(BlockGetter level, BlockPos pos)
 	{
 		return asBlockEntityType().getBlockEntity(level, pos);
 	}
 
-	public Optional<BLOCK_ENTITY> getBlockEntityOptional(IBlockReader level, BlockPos pos)
+	public Optional<BLOCK_ENTITY> getBlockEntityOptional(BlockGetter level, BlockPos pos)
 	{
 		return Optional.ofNullable(getBlockEntity(level, pos));
 	}
 
+	public boolean isValidBlockState(BlockState blockState)
+	{
+		return asBlockEntityType().isValid(blockState);
+	}
+
 	public boolean isValidBlock(Block block)
 	{
-		return asBlockEntityType().isValid(block);
+		return asBlockEntityType().validBlocks.contains(block);
 	}
 
 	public boolean isValidBlock(BlockLike block)
@@ -62,17 +68,17 @@ public final class BlockEntityEntry<BLOCK_ENTITY extends TileEntity> extends Reg
 	}
 
 	@Override
-	public TileEntityType<BLOCK_ENTITY> asBlockEntityType()
+	public BlockEntityType<BLOCK_ENTITY> asBlockEntityType()
 	{
 		return get();
 	}
 
-	public static <BLOCK_ENTITY extends TileEntity> BlockEntityEntry<BLOCK_ENTITY> cast(RegistryEntry<TileEntityType<BLOCK_ENTITY>> registryEntry)
+	public static <BLOCK_ENTITY extends BlockEntity> BlockEntityEntry<BLOCK_ENTITY> cast(RegistryEntry<BlockEntityType<BLOCK_ENTITY>> registryEntry)
 	{
 		return cast(BlockEntityEntry.class, registryEntry);
 	}
 
-	public static <BLOCK_ENTITY extends TileEntity> BlockEntityEntry<BLOCK_ENTITY> cast(com.tterrag.registrate.util.entry.RegistryEntry<TileEntityType<BLOCK_ENTITY>> registryEntry)
+	public static <BLOCK_ENTITY extends BlockEntity> BlockEntityEntry<BLOCK_ENTITY> cast(com.tterrag.registrate.util.entry.RegistryEntry<BlockEntityType<BLOCK_ENTITY>> registryEntry)
 	{
 		return cast(BlockEntityEntry.class, registryEntry);
 	}

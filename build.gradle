@@ -7,7 +7,7 @@ buildscript {
 	}
 	dependencies {
 		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forge_gradle_version}", changing: true
-		classpath 'org.parchmentmc:librarian:1.+'
+		classpath "org.parchmentmc:librarian:${librarian_version}"
 		classpath "org.spongepowered:mixingradle:${mixin_gradle_version}"
 	}
 }
@@ -28,7 +28,7 @@ version = "${minecraft_version}-${mod_version}"
 group = "${mod_base_package}.${mod_id}"
 archivesBaseName = "${mod_id}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 configurations {
 	shade
@@ -140,11 +140,6 @@ dependencies {
 	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
 	shade "com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}"
 
-	if(project.hasProperty('apex_local_deps') && project.getProperty('apex_local_deps')) {
-		// runtimeOnly fg.deobf('xyz.apex.forge:devworld:1.16.5-2.0.0')
-		runtimeOnly fg.deobf("xyz.apex.forge:smoothboot:${minecraft_version}-${smooth_boot_version}")
-	}
-
 	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
 		// we have access to Apex's GH Packages pull from there
 		compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
@@ -166,6 +161,8 @@ def replaceProperties = [
 	forge_version_range: forge_version_range,
 	forge_gradle_version: forge_gradle_version,
 
+	librarian_version: librarian_version,
+
 	mixin_gradle_version: mixin_gradle_version,
 	mixin_ap_version: mixin_ap_version,
 	
@@ -182,7 +179,6 @@ def replaceProperties = [
 	registrate_package: registrate_package,
 
 	gradle_shadow_version: gradle_shadow_version,
-	smooth_boot_version: smooth_boot_version,
 	javautilities_version: javautilities_version
 ]
 

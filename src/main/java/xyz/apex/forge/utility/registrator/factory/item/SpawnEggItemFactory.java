@@ -1,8 +1,8 @@
 package xyz.apex.forge.utility.registrator.factory.item;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
 import xyz.apex.java.utility.nullness.NonnullSupplier;

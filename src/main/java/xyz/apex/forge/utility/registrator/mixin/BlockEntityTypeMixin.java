@@ -2,16 +2,17 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import xyz.apex.forge.utility.registrator.entry.similar.BlockEntityTypeLike;
 
-@Mixin(TileEntityType.class)
+@Mixin(BlockEntity.class)
 public class BlockEntityTypeMixin implements BlockEntityTypeLike
 {
 	@Override
-	public TileEntityType<?> asBlockEntityType()
+	public BlockEntityType<?> asBlockEntityType()
 	{
-		return (TileEntityType<?>) (Object) this;
+		return (BlockEntityType<?>) (Object) this;
 	}
 }

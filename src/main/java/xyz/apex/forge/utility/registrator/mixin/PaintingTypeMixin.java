@@ -2,16 +2,16 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.entity.item.PaintingType;
+import net.minecraft.world.entity.decoration.Motive;
 
 import xyz.apex.forge.utility.registrator.entry.similar.PaintingLike;
 
-@Mixin(PaintingType.class)
+@Mixin(Motive.class)
 public class PaintingTypeMixin implements PaintingLike
 {
 	@Override
-	public PaintingType asPaintingType()
+	public Motive asPaintingType()
 	{
-		return (PaintingType) (Object) this;
+		return (Motive) (Object) this;
 	}
 }

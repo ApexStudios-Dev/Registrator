@@ -5,16 +5,16 @@ import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.providers.RegistrateProvider;
 import org.apache.commons.lang3.Validate;
 
-import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.fml.LogicalSide;
 
@@ -176,11 +176,11 @@ public final class RegistrateLangExtProvider implements RegistrateProvider
 	}
 
 	@Override
-	public void run(DirectoryCache cache) throws IOException
+	public void run(HashCache cache) throws IOException
 	{
 		owner.genData(AbstractRegistrator.LANG_EXT_PROVIDER, this);
 
-		for(TranslationMap translationMap : translationMap.values())
+		for(var translationMap : translationMap.values())
 		{
 			translationMap.run(cache);
 		}
@@ -224,7 +224,7 @@ public final class RegistrateLangExtProvider implements RegistrateProvider
 		translationMap(languageKey).add(enchantment, localizedValue);
 	}
 
-	public void add(String languageKey, Effect effect, String localizedValue)
+	public void add(String languageKey, MobEffect effect, String localizedValue)
 	{
 		translationMap(languageKey).add(effect, localizedValue);
 	}
@@ -254,7 +254,7 @@ public final class RegistrateLangExtProvider implements RegistrateProvider
 		translationMap(languageKey).addEnchantment(enchantment, localizedValue);
 	}
 
-	public void addEffect(String languageKey, Supplier<? extends Effect> effect, String localizedValue)
+	public void addEffect(String languageKey, Supplier<? extends MobEffect> effect, String localizedValue)
 	{
 		translationMap(languageKey).addEffect(effect, localizedValue);
 	}
@@ -276,22 +276,22 @@ public final class RegistrateLangExtProvider implements RegistrateProvider
 		translationMap(languageKey).addItemWithTooltip(item, localizedValue, localizedTooltips);
 	}
 
-	public void addTooltip(String languageKey, NonnullSupplier<? extends IItemProvider> item, String localizedTooltip)
+	public void addTooltip(String languageKey, NonnullSupplier<? extends ItemLike> item, String localizedTooltip)
 	{
 		translationMap(languageKey).addTooltip(item, localizedTooltip);
 	}
 
-	public void addTooltip(String languageKey, NonnullSupplier<? extends IItemProvider> item, List<@NonnullType String> localizedTooltips)
+	public void addTooltip(String languageKey, NonnullSupplier<? extends ItemLike> item, List<@NonnullType String> localizedTooltips)
 	{
 		translationMap(languageKey).addTooltip(item, localizedTooltips);
 	}
 
-	public void add(String languageKey, ItemGroup itemGroup, String localizedValue)
+	public void add(String languageKey, CreativeModeTab itemGroup, String localizedValue)
 	{
 		translationMap(languageKey).add(itemGroup, localizedValue);
 	}
 
-	public void addItemGroup(String languageKey, NonnullSupplier<? extends ItemGroup> itemGroup, String localizedValue)
+	public void addItemGroup(String languageKey, NonnullSupplier<? extends CreativeModeTab> itemGroup, String localizedValue)
 	{
 		translationMap(languageKey).addItemGroup(itemGroup, localizedValue);
 	}
@@ -322,25 +322,25 @@ public final class RegistrateLangExtProvider implements RegistrateProvider
 			addTooltip(item, localizedTooltips);
 		}
 
-		public void addTooltip(NonnullSupplier<? extends IItemProvider> item, String localizedTooltip)
+		public void addTooltip(NonnullSupplier<? extends ItemLike> item, String localizedTooltip)
 		{
 			add(item.get().asItem().getDescriptionId() + ".desc", localizedTooltip);
 		}
 
-		public void addTooltip(NonnullSupplier<? extends IItemProvider> item, List<@NonnullType String> localizedTooltips)
+		public void addTooltip(NonnullSupplier<? extends ItemLike> item, List<@NonnullType String> localizedTooltips)
 		{
 			String translationKey = item.get().asItem().getDescriptionId() + ".desc.";
 			IntStream.range(0, localizedTooltips.size()).forEach(i -> add(translationKey + i, localizedTooltips.get(i)));
 		}
 
-		public void add(ItemGroup itemGroup, String localizedValue)
+		public void add(CreativeModeTab itemGroup, String localizedValue)
 		{
 			// String langId = ObfuscationReflectionHelper.getPrivateValue(ItemGroup.class, itemGroup, "field_78034_o");
 			String langId = itemGroup.langId;
 			add("itemGroup." + langId, localizedValue);
 		}
 
-		public void addItemGroup(NonnullSupplier<? extends ItemGroup> itemGroup, String localizedValue)
+		public void addItemGroup(NonnullSupplier<? extends CreativeModeTab> itemGroup, String localizedValue)
 		{
 			add(itemGroup.get(), localizedValue);
 		}

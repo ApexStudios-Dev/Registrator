@@ -3,10 +3,10 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentType;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.EnchantmentEntry;
@@ -19,15 +19,15 @@ import java.util.Set;
 public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, ENCHANTMENT extends Enchantment, PARENT> extends RegistratorBuilder<OWNER, Enchantment, ENCHANTMENT, PARENT, EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT>, EnchantmentEntry<ENCHANTMENT>>
 {
 	private final EnchantmentFactory<ENCHANTMENT> enchantmentFactory;
-	private final Set<EquipmentSlotType> slotTypes = EnumSet.noneOf(EquipmentSlotType.class);
-	private final EnchantmentType enchantmentType;
+	private final Set<EquipmentSlot> slotTypes = EnumSet.noneOf(EquipmentSlot.class);
+	private final EnchantmentCategory enchantmentCategory;
 	private Enchantment.Rarity rarity = Enchantment.Rarity.COMMON;
 
-	public EnchantmentBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, EnchantmentType enchantmentType, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
+	public EnchantmentBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, EnchantmentCategory enchantmentCategory, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
 	{
 		super(owner, parent, registryName, callback, Enchantment.class, EnchantmentEntry::new, EnchantmentEntry::cast);
 
-		this.enchantmentType = enchantmentType;
+		this.enchantmentCategory = enchantmentCategory;
 		this.enchantmentFactory = enchantmentFactory;
 	}
 
@@ -37,13 +37,13 @@ public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 		return this;
 	}
 
-	public EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> slotType(EquipmentSlotType slotType)
+	public EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> slotType(EquipmentSlot slotType)
 	{
 		slotTypes.add(slotType);
 		return this;
 	}
 
-	public EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> slotTypes(EquipmentSlotType... slotTypes)
+	public EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> slotTypes(EquipmentSlot... slotTypes)
 	{
 		Collections.addAll(this.slotTypes, slotTypes);
 		return this;
@@ -51,7 +51,7 @@ public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 
 	public EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> armorSlotTypes()
 	{
-		return slotTypes(EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET);
+		return slotTypes(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
 	}
 
 	public EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> defaultLang()
@@ -65,13 +65,13 @@ public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 	}
 
 	@SafeVarargs
-	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> tag(ITag.INamedTag<Enchantment>... tags)
+	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> tag(Tag.Named<Enchantment>... tags)
 	{
 		return tag(AbstractRegistrator.ENCHANTMENT_TAGS_PROVIDER, tags);
 	}
 
 	@SafeVarargs
-	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> removeTag(ITag.INamedTag<Enchantment>... tags)
+	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> removeTag(Tag.Named<Enchantment>... tags)
 	{
 		return removeTags(AbstractRegistrator.ENCHANTMENT_TAGS_PROVIDER, tags);
 	}
@@ -84,7 +84,7 @@ public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 	@Override
 	protected @NonnullType ENCHANTMENT createEntry()
 	{
-		EquipmentSlotType[] slotTypes = this.slotTypes.toArray(new EquipmentSlotType[0]);
-		return enchantmentFactory.create(rarity, enchantmentType, slotTypes);
+		var slotTypes = this.slotTypes.toArray(new EquipmentSlot[0]);
+		return enchantmentFactory.create(rarity, enchantmentCategory, slotTypes);
 	}
 }

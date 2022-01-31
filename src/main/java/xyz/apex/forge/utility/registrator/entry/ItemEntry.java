@@ -1,7 +1,7 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.item.Item;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.Item;
+import net.minecraftforge.fmllegacy.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;

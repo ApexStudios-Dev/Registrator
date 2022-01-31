@@ -1,10 +1,10 @@
 package xyz.apex.forge.utility.registrator.factory.item;
 
-import net.minecraft.item.DyeableHorseArmorItem;
-import net.minecraft.item.HorseArmorItem;
-import net.minecraft.item.IDyeableArmorItem;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeableHorseArmorItem;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.HorseArmorItem;
+import net.minecraft.world.item.Item;
 
 @FunctionalInterface
 public interface HorseArmorItemFactory<ITEM extends HorseArmorItem>
@@ -14,7 +14,7 @@ public interface HorseArmorItemFactory<ITEM extends HorseArmorItem>
 
 	ITEM create(int protection, ResourceLocation texture, Item.Properties properties);
 
-	interface DyeableFactory<ITEM extends HorseArmorItem & IDyeableArmorItem> extends HorseArmorItemFactory<ITEM>
+	interface DyeableFactory<ITEM extends HorseArmorItem & DyeableLeatherItem> extends HorseArmorItemFactory<ITEM>
 	{
 	}
 }

@@ -1,6 +1,6 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.entity.merchant.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerProfession;
 
 @FunctionalInterface
 public interface VillagerProfessionLike

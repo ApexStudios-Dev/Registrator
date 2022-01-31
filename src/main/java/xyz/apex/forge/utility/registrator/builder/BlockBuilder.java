@@ -12,24 +12,23 @@ import com.tterrag.registrate.providers.loot.RegistrateLootTableProvider;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.DyeColor;
-import net.minecraft.tags.ITag;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.DistExecutor;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
@@ -50,12 +49,12 @@ import java.util.function.ToIntFunction;
 public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK extends Block, PARENT> extends RegistratorBuilder<OWNER, Block, BLOCK, PARENT, BlockBuilder<OWNER, BLOCK, PARENT>, BlockEntry<BLOCK>>
 {
 	private final BlockFactory<BLOCK> blockFactory;
-	private NonnullSupplier<AbstractBlock.Properties> initialProperties;
-	private NonnullUnaryOperator<AbstractBlock.Properties> propertiesModifier = NonnullUnaryOperator.identity();
+	private NonnullSupplier<BlockBehaviour.Properties> initialProperties;
+	private NonnullUnaryOperator<BlockBehaviour.Properties> propertiesModifier = NonnullUnaryOperator.identity();
 	private final List<NonnullSupplier<NonnullSupplier<RenderType>>> renderTypes = Lists.newArrayList();
-	@Nullable private NonnullSupplier<NonnullSupplier<IBlockColor>> colorHandler = null;
+	@Nullable private NonnullSupplier<NonnullSupplier<BlockColor>> colorHandler = null;
 
-	public BlockBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, BlockFactory<BLOCK> blockFactory, NonnullSupplier<AbstractBlock.Properties> initialProperties)
+	public BlockBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, BlockFactory<BLOCK> blockFactory, NonnullSupplier<BlockBehaviour.Properties> initialProperties)
 	{
 		super(owner, parent, registryName, callback, Block.class, BlockEntry::new, BlockEntry::cast);
 
@@ -87,25 +86,25 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 	{
 		if(renderTypes.size() == 1)
 		{
-			RenderType renderType = renderTypes.get(0).get().get();
-			RenderTypeLookup.setRenderLayer(block, renderType);
+			var renderType = renderTypes.get(0).get().get();
+			ItemBlockRenderTypes.setRenderLayer(block, renderType);
 		}
 		else if(renderTypes.size() > 1)
 		{
-			ImmutableSet<RenderType> renderTypes = this.renderTypes.stream().map(NonnullSupplier::get).map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
-			RenderTypeLookup.setRenderLayer(block, renderTypes::contains);
+			var renderTypes = this.renderTypes.stream().map(NonnullSupplier::get).map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
+			ItemBlockRenderTypes.setRenderLayer(block, renderTypes::contains);
 		}
 	}
 
 	@Override
 	protected @NonnullType BLOCK createEntry()
 	{
-		AbstractBlock.Properties properties = initialProperties.get();
+		var properties = initialProperties.get();
 		properties = propertiesModifier.apply(properties);
 		return blockFactory.create(properties);
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> properties(NonnullUnaryOperator<AbstractBlock.Properties> propertiesModifier)
+	public BlockBuilder<OWNER, BLOCK, PARENT> properties(NonnullUnaryOperator<BlockBehaviour.Properties> propertiesModifier)
 	{
 		this.propertiesModifier = this.propertiesModifier.andThen(propertiesModifier);
 		return this;
@@ -113,53 +112,43 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> initialProperties(Material material)
 	{
-		this.initialProperties = () -> AbstractBlock.Properties.of(material);
+		this.initialProperties = () -> BlockBehaviour.Properties.of(material);
 		return this;
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> initialProperties(Material material, DyeColor materialColor)
 	{
-		this.initialProperties = () -> AbstractBlock.Properties.of(material, materialColor);
+		this.initialProperties = () -> BlockBehaviour.Properties.of(material, materialColor);
 		return this;
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> initialProperties(Material material, MaterialColor materialColor)
 	{
-		this.initialProperties = () -> AbstractBlock.Properties.of(material, materialColor);
+		this.initialProperties = () -> BlockBehaviour.Properties.of(material, materialColor);
 		return this;
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> initialProperties(Material material, NonnullFunction<BlockState, MaterialColor> materialColorFactory)
 	{
-		this.initialProperties = () -> AbstractBlock.Properties.of(material, materialColorFactory);
+		this.initialProperties = () -> BlockBehaviour.Properties.of(material, materialColorFactory);
 		return this;
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> initialProperties(NonnullSupplier<? extends Block> block)
 	{
-		this.initialProperties = () -> AbstractBlock.Properties.copy(block.get());
+		this.initialProperties = () -> BlockBehaviour.Properties.copy(block.get());
 		return this;
 	}
 
 	// region: Properties Wrappers
 	public BlockBuilder<OWNER, BLOCK, PARENT> noCollission()
 	{
-		return properties(AbstractBlock.Properties::noCollission);
+		return properties(BlockBehaviour.Properties::noCollission);
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> noOcclusion()
 	{
-		return properties(AbstractBlock.Properties::noOcclusion);
-	}
-
-	public BlockBuilder<OWNER, BLOCK, PARENT> harvestLevel(int harvestLevel)
-	{
-		return properties(properties -> properties.harvestLevel(harvestLevel));
-	}
-
-	public BlockBuilder<OWNER, BLOCK, PARENT> harvestTool(ToolType harvestTool)
-	{
-		return properties(properties -> properties.harvestTool(harvestTool));
+		return properties(BlockBehaviour.Properties::noOcclusion);
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> friction(float friction)
@@ -194,7 +183,7 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> instabreak()
 	{
-		return properties(AbstractBlock.Properties::instabreak);
+		return properties(BlockBehaviour.Properties::instabreak);
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> strength(float strength)
@@ -204,17 +193,17 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> randomTicks()
 	{
-		return properties(AbstractBlock.Properties::randomTicks);
+		return properties(BlockBehaviour.Properties::randomTicks);
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> dynamicShape()
 	{
-		return properties(AbstractBlock.Properties::dynamicShape);
+		return properties(BlockBehaviour.Properties::dynamicShape);
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> noDrops()
 	{
-		return properties(AbstractBlock.Properties::noDrops);
+		return properties(BlockBehaviour.Properties::noDrops);
 	}
 
 	@Deprecated
@@ -230,42 +219,57 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> air()
 	{
-		return properties(AbstractBlock.Properties::air);
+		return properties(BlockBehaviour.Properties::air);
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> isValidSpawn(AbstractBlock.IExtendedPositionPredicate<EntityType<?>> extendedPositionPredicate)
+	public BlockBuilder<OWNER, BLOCK, PARENT> isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> extendedPositionPredicate)
 	{
 		return properties(properties -> properties.isValidSpawn(extendedPositionPredicate));
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> isRedstoneConductor(AbstractBlock.IPositionPredicate positionPredicate)
+	public BlockBuilder<OWNER, BLOCK, PARENT> isRedstoneConductor(BlockBehaviour.StatePredicate positionPredicate)
 	{
 		return properties(properties -> properties.isRedstoneConductor(positionPredicate));
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> isSuffocating(AbstractBlock.IPositionPredicate positionPredicate)
+	public BlockBuilder<OWNER, BLOCK, PARENT> isSuffocating(BlockBehaviour.StatePredicate positionPredicate)
 	{
 		return properties(properties -> properties.isSuffocating(positionPredicate));
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> isViewBlocking(AbstractBlock.IPositionPredicate positionPredicate)
+	public BlockBuilder<OWNER, BLOCK, PARENT> isViewBlocking(BlockBehaviour.StatePredicate positionPredicate)
 	{
 		return properties(properties -> properties.isViewBlocking(positionPredicate));
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> hasPostProcess(AbstractBlock.IPositionPredicate positionPredicate)
+	public BlockBuilder<OWNER, BLOCK, PARENT> hasPostProcess(BlockBehaviour.StatePredicate positionPredicate)
 	{
 		return properties(properties -> properties.hasPostProcess(positionPredicate));
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> emissiveRendering(AbstractBlock.IPositionPredicate positionPredicate)
+	public BlockBuilder<OWNER, BLOCK, PARENT> emissiveRendering(BlockBehaviour.StatePredicate positionPredicate)
 	{
 		return properties(properties -> properties.emissiveRendering(positionPredicate));
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> requiresCorrectToolForDrops()
 	{
-		return properties(AbstractBlock.Properties::requiresCorrectToolForDrops);
+		return properties(BlockBehaviour.Properties::requiresCorrectToolForDrops);
+	}
+
+	public BlockBuilder<OWNER, BLOCK, PARENT> color(MaterialColor materialColor)
+	{
+		return properties(properties -> properties.color(materialColor));
+	}
+
+	public BlockBuilder<OWNER, BLOCK, PARENT> destroyTime(float destroyTime)
+	{
+		return properties(properties -> properties.destroyTime(destroyTime));
+	}
+
+	public BlockBuilder<OWNER, BLOCK, PARENT> explosionResistance(float explosionResistance)
+	{
+		return properties(properties -> properties.explosionResistance(explosionResistance));
 	}
 	// endregion
 
@@ -295,17 +299,17 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 		return owner.blockItem(getName(), this, toSupplier(), blockItemFactory);
 	}
 
-	public <BLOCK_ENTITY extends TileEntity> BlockBuilder<OWNER, BLOCK, PARENT> simpleBlockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
+	public <BLOCK_ENTITY extends BlockEntity> BlockBuilder<OWNER, BLOCK, PARENT> simpleBlockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
 		return blockEntity(blockEntityFactory).build();
 	}
 
-	public <BLOCK_ENTITY extends TileEntity> BlockEntityBuilder<OWNER, BLOCK_ENTITY, BlockBuilder<OWNER, BLOCK, PARENT>> blockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
+	public <BLOCK_ENTITY extends BlockEntity> BlockEntityBuilder<OWNER, BLOCK_ENTITY, BlockBuilder<OWNER, BLOCK, PARENT>> blockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
 		return owner.blockEntity(getName(), this, blockEntityFactory);
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> color(NonnullSupplier<NonnullSupplier<IBlockColor>> colorHandler)
+	public BlockBuilder<OWNER, BLOCK, PARENT> color(NonnullSupplier<NonnullSupplier<BlockColor>> colorHandler)
 	{
 		this.colorHandler = colorHandler;
 		return this;
@@ -347,13 +351,13 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 	}
 
 	@SafeVarargs
-	public final BlockBuilder<OWNER, BLOCK, PARENT> tag(ITag.INamedTag<Block>... tags)
+	public final BlockBuilder<OWNER, BLOCK, PARENT> tag(Tag.Named<Block>... tags)
 	{
 		return tag(ProviderType.BLOCK_TAGS, tags);
 	}
 
 	@SafeVarargs
-	public final BlockBuilder<OWNER, BLOCK, PARENT> removeTag(ITag.INamedTag<Block>... tags)
+	public final BlockBuilder<OWNER, BLOCK, PARENT> removeTag(Tag.Named<Block>... tags)
 	{
 		return removeTag(ProviderType.BLOCK_TAGS, tags);
 	}

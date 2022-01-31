@@ -2,16 +2,16 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 
 import xyz.apex.forge.utility.registrator.entry.similar.StructureLike;
 
-@Mixin(Structure.class)
+@Mixin(StructureFeature.class)
 public class StructureMixin implements StructureLike
 {
 	@Override
-	public Structure<?> asStructure()
+	public StructureFeature<?> asStructure()
 	{
-		return (Structure<?>) (Object) this;
+		return (StructureFeature<?>) (Object) this;
 	}
 }

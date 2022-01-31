@@ -2,7 +2,7 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.entity.merchant.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerProfession;
 
 import xyz.apex.forge.utility.registrator.entry.similar.VillagerProfessionLike;
 

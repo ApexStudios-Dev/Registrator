@@ -2,16 +2,16 @@ package xyz.apex.forge.utility.registrator.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.world.inventory.MenuType;
 
 import xyz.apex.forge.utility.registrator.entry.similar.ContainerTypeLike;
 
-@Mixin(ContainerType.class)
+@Mixin(MenuType.class)
 public class ContainerTypeMixin implements ContainerTypeLike
 {
 	@Override
-	public ContainerType<?> asContainerType()
+	public MenuType<?> asContainerType()
 	{
-		return (ContainerType<?>) (Object) this;
+		return (MenuType<?>) (Object) this;
 	}
 }

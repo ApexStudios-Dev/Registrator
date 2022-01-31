@@ -2,17 +2,17 @@ package xyz.apex.forge.utility.registrator.helper;
 
 import com.google.common.base.Objects;
 
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public final class ItemTier implements IItemTier
+public final class ItemTier implements Tier
 {
 	public final int level;
 	public final int uses;
@@ -82,10 +82,9 @@ public final class ItemTier implements IItemTier
 	{
 		if(this == o)
 			return true;
-		if(o == null || getClass() != o.getClass())
-			return false;
-		ItemTier itemTier = (ItemTier) o;
-		return level == itemTier.level && uses == itemTier.uses && Float.compare(itemTier.speed, speed) == 0 && Float.compare(itemTier.damage, damage) == 0 && enchantmentValue == itemTier.enchantmentValue && Objects.equal(repairIngredient, itemTier.repairIngredient);
+		if(o instanceof ItemTier itemTier)
+			return level == itemTier.level && uses == itemTier.uses && Float.compare(itemTier.speed, speed) == 0 && Float.compare(itemTier.damage, damage) == 0 && enchantmentValue == itemTier.enchantmentValue && Objects.equal(repairIngredient, itemTier.repairIngredient);
+		return false;
 	}
 
 	@Override
@@ -97,7 +96,7 @@ public final class ItemTier implements IItemTier
 	@Override
 	public String toString()
 	{
-		return "ItemTier{level=" + level + ", uses=" + uses + ", speed=" + speed + ", damage=" + damage + ", enchantmentValue=" + enchantmentValue + ", repairIngredient=" + repairIngredient + '}';
+		return "ItemTier{level=%d, uses=%d, speed=%s, damage=%s, enchantmentValue=%d, repairIngredient=%s}".formatted(level, uses, speed, damage, enchantmentValue, repairIngredient);
 	}
 
 	public static Builder builder()
@@ -105,7 +104,7 @@ public final class ItemTier implements IItemTier
 		return new Builder();
 	}
 
-	public static Builder copy(IItemTier itemTier)
+	public static Builder copy(Tier itemTier)
 	{
 		return builder().copy(itemTier);
 	}
@@ -132,7 +131,7 @@ public final class ItemTier implements IItemTier
 			;
 		}
 
-		public Builder copy(IItemTier itemTier)
+		public Builder copy(Tier itemTier)
 		{
 			return level(itemTier.getLevel())
 					.uses(itemTier.getUses())
@@ -179,17 +178,17 @@ public final class ItemTier implements IItemTier
 			return this;
 		}
 
-		public Builder repairIngredient(ITag<Item> repairIngredient)
+		public Builder repairIngredient(Tag<Item> repairIngredient)
 		{
 			return repairIngredient(() -> Ingredient.of(repairIngredient));
 		}
 
-		public Builder repairIngredient(IItemProvider... repairIngredients)
+		public Builder repairIngredient(ItemLike... repairIngredients)
 		{
 			return repairIngredient(() -> Ingredient.of(repairIngredients));
 		}
 
-		public IItemTier build()
+		public ItemTier build()
 		{
 			return new ItemTier(this);
 		}

@@ -4,15 +4,14 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.Validate;
 
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
@@ -22,11 +21,11 @@ import java.util.Comparator;
 import java.util.Map;
 
 @SuppressWarnings("CommentedOutCode")
-public final class ArmorMaterial implements IArmorMaterial
+public final class ArmorMaterial implements net.minecraft.world.item.ArmorMaterial
 {
 	// public static final int[] HEALTH_PER_SLOT = ObfuscationReflectionHelper.getPrivateValue(net.minecraft.item.ArmorMaterial.class, null, "field_77882_bY");
-	public static final int[] HEALTH_PER_SLOT = net.minecraft.item.ArmorMaterial.HEALTH_PER_SLOT;
-	public static final EquipmentSlotType[] ARMOR_SLOT_TYPES = Arrays.stream(EquipmentSlotType.values()).filter(slotType -> slotType.getType() == EquipmentSlotType.Group.ARMOR).toArray(EquipmentSlotType[]::new);
+	public static final int[] HEALTH_PER_SLOT = net.minecraft.world.item.ArmorMaterials.HEALTH_PER_SLOT;
+	public static final EquipmentSlot[] ARMOR_SLOT_TYPES = Arrays.stream(EquipmentSlot.values()).filter(slotType -> slotType.getType() == EquipmentSlot.Type.ARMOR).toArray(EquipmentSlot[]::new);
 
 	public final ResourceLocation name;
 	public final int durabilityMultiplier;
@@ -69,13 +68,13 @@ public final class ArmorMaterial implements IArmorMaterial
 	}
 
 	@Override
-	public int getDurabilityForSlot(EquipmentSlotType slotType)
+	public int getDurabilityForSlot(EquipmentSlot slotType)
 	{
 		return HEALTH_PER_SLOT[slotType.getIndex()] * durabilityMultiplier;
 	}
 
 	@Override
-	public int getDefenseForSlot(EquipmentSlotType slotType)
+	public int getDefenseForSlot(EquipmentSlot slotType)
 	{
 		return slotProtections[slotType.getIndex()];
 	}
@@ -121,10 +120,9 @@ public final class ArmorMaterial implements IArmorMaterial
 	{
 		if(this == o)
 			return true;
-		if(o == null || getClass() != o.getClass())
-			return false;
-		ArmorMaterial that = (ArmorMaterial) o;
-		return durabilityMultiplier == that.durabilityMultiplier && enchantmentValue == that.enchantmentValue && Float.compare(that.toughness, toughness) == 0 && Float.compare(that.knockbackResistance, knockbackResistance) == 0 && Objects.equal(name, that.name) && Objects.equal(slotProtections, that.slotProtections) && Objects.equal(sound, that.sound) && Objects.equal(repairIngredient, that.repairIngredient);
+		if(o instanceof ArmorMaterial material)
+			return durabilityMultiplier == material.durabilityMultiplier && enchantmentValue == material.enchantmentValue && Float.compare(material.toughness, toughness) == 0 && Float.compare(material.knockbackResistance, knockbackResistance) == 0 && Objects.equal(name, material.name) && Objects.equal(slotProtections, material.slotProtections) && Objects.equal(sound, material.sound) && Objects.equal(repairIngredient, material.repairIngredient);
+		return false;
 	}
 
 	@Override
@@ -136,7 +134,7 @@ public final class ArmorMaterial implements IArmorMaterial
 	@Override
 	public String toString()
 	{
-		return "ArmorMaterial{name=" + name + ", durabilityMultiplier=" + durabilityMultiplier + ", slotProtections=" + Arrays.toString(slotProtections) + ", enchantmentValue=" + enchantmentValue + ", sound=" + sound + ", toughness=" + toughness + ", knockbackResistance=" + knockbackResistance + ", repairIngredient=" + repairIngredient + '}';
+		return "ArmorMaterial{name=%s, durabilityMultiplier=%d, slotProtections=%s, enchantmentValue=%d, sound=%s, toughness=%s, knockbackResistance=%s, repairIngredient=%s}".formatted(name, durabilityMultiplier, Arrays.toString(slotProtections), enchantmentValue, sound, toughness, knockbackResistance, repairIngredient);
 	}
 
 	public static Builder builder(ResourceLocation name)
@@ -149,12 +147,12 @@ public final class ArmorMaterial implements IArmorMaterial
 		return builder(new ResourceLocation(namespace, name));
 	}
 
-	public static Builder copy(ResourceLocation name, IArmorMaterial armorMaterial)
+	public static Builder copy(ResourceLocation name, ArmorMaterial armorMaterial)
 	{
 		return builder(name).copy(armorMaterial);
 	}
 
-	public static Builder copy(String namespace, String name, IArmorMaterial armorMaterial)
+	public static Builder copy(String namespace, String name, ArmorMaterial armorMaterial)
 	{
 		return copy(new ResourceLocation(namespace, name), armorMaterial);
 	}
@@ -162,7 +160,7 @@ public final class ArmorMaterial implements IArmorMaterial
 	// calculate the durability multiplier by dividing by the health in current slot
 	// going by vanilla math this will result in correct value
 	// <durability_multiplier> * <slot_health> <=> <durability> / <slot_health>
-	public static int getDurabilityMultiplierForSlot(IArmorMaterial armorMaterial, EquipmentSlotType slotType)
+	public static int getDurabilityMultiplierForSlot(ArmorMaterial armorMaterial, EquipmentSlot slotType)
 	{
 		return armorMaterial.getDurabilityForSlot(slotType) / HEALTH_PER_SLOT[slotType.getIndex()];
 	}
@@ -176,7 +174,7 @@ public final class ArmorMaterial implements IArmorMaterial
 	@SuppressWarnings({ "unused", "UnusedReturnValue" })
 	public static final class Builder
 	{
-		private final Map<EquipmentSlotType, Integer> slotDefenseMap = Maps.newEnumMap(EquipmentSlotType.class);
+		private final Map<EquipmentSlot, Integer> slotDefenseMap = Maps.newEnumMap(EquipmentSlot.class);
 		private final ResourceLocation name;
 
 		private int durabilityMultiplier = -1;
@@ -205,7 +203,7 @@ public final class ArmorMaterial implements IArmorMaterial
 			;
 		}
 
-		public Builder copy(IArmorMaterial armorMaterial)
+		public Builder copy(ArmorMaterial armorMaterial)
 		{
 			slotDefenseMap.clear();
 			Arrays.stream(ARMOR_SLOT_TYPES).forEach(slotType -> defenseForSlot(slotType, armorMaterial.getDefenseForSlot(slotType)));
@@ -220,9 +218,9 @@ public final class ArmorMaterial implements IArmorMaterial
 			;
 		}
 
-		public Builder defenseForSlot(EquipmentSlotType slotType, int slotDefense)
+		public Builder defenseForSlot(EquipmentSlot slotType, int slotDefense)
 		{
-			Validate.isTrue(slotType.getType() == EquipmentSlotType.Group.ARMOR);
+			Validate.isTrue(slotType.getType() == EquipmentSlot.Type.ARMOR);
 			slotDefenseMap.put(slotType, slotDefense);
 			return this;
 		}
@@ -263,17 +261,17 @@ public final class ArmorMaterial implements IArmorMaterial
 			return this;
 		}
 
-		public Builder repairIngredient(ITag<Item> repairIngredient)
+		public Builder repairIngredient(Tag<Item> repairIngredient)
 		{
 			return repairIngredient(() -> Ingredient.of(repairIngredient));
 		}
 
-		public Builder repairIngredient(IItemProvider... repairIngredients)
+		public Builder repairIngredient(ItemLike... repairIngredients)
 		{
 			return repairIngredient(() -> Ingredient.of(repairIngredients));
 		}
 
-		public IArmorMaterial build()
+		public ArmorMaterial build()
 		{
 			return new ArmorMaterial(this);
 		}

@@ -1,10 +1,10 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 @SuppressWarnings("unused")
 @FunctionalInterface
 public interface RecipeSerializerLike
 {
-	IRecipeSerializer<?> asRecipeSerializer();
+	RecipeSerializer<?> asRecipeSerializer();
 }

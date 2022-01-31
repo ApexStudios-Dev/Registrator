@@ -3,14 +3,13 @@ package xyz.apex.forge.utility.registrator.data.template;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 @SuppressWarnings({ "unused", "RedundantThrows", "UnstableApiUsage" })
-public abstract class TemplatePoolProvider implements IDataProvider
+public abstract class TemplatePoolProvider implements DataProvider
 {
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -49,11 +48,11 @@ public abstract class TemplatePoolProvider implements IDataProvider
 	}
 
 	@Override
-	public final void run(DirectoryCache cache) throws IOException
+	public final void run(HashCache cache) throws IOException
 	{
 		poolBuilderMap.clear();
 		registerPools();
-		Path dataPath = generator.getOutputFolder().resolve("data");
+		var dataPath = generator.getOutputFolder().resolve("data");
 		poolBuilderMap.forEach((poolName, poolBuilder) -> saveTemplatePool(cache, poolBuilder, dataPath));
 
 	}
@@ -64,14 +63,14 @@ public abstract class TemplatePoolProvider implements IDataProvider
 		return "TemplatePollProvider";
 	}
 
-	public static void saveTemplatePool(DirectoryCache cache, TemplatePoolBuilder builder, Path dataPath)
+	public static void saveTemplatePool(HashCache cache, TemplatePoolBuilder builder, Path dataPath)
 	{
 		try
 		{
-			ResourceLocation poolName = builder.getPoolName();
-			Path poolPath = dataPath.resolve(Paths.get(poolName.getNamespace(), "worldgen", "template_pool", poolName.getPath() + ".json"));
-			JsonObject serialized = builder.serialize();
-			IDataProvider.save(GSON, cache, serialized, poolPath);
+			var poolName = builder.getPoolName();
+			var poolPath = dataPath.resolve(Paths.get(poolName.getNamespace(), "worldgen", "template_pool", poolName.getPath() + ".json"));
+			var serialized = builder.serialize();
+			DataProvider.save(GSON, cache, serialized, poolPath);
 		}
 		catch(IOException e)
 		{

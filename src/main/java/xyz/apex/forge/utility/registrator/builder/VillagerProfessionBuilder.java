@@ -5,15 +5,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.tterrag.registrate.builders.BuilderCallback;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.merchant.villager.VillagerProfession;
-import net.minecraft.entity.merchant.villager.VillagerTrades;
-import net.minecraft.item.Item;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.village.PointOfInterestType;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.event.village.WandererTradesEvent;
@@ -25,7 +24,10 @@ import xyz.apex.java.utility.nullness.NonnullBiConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullType;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @SuppressWarnings({ "UnstableApiUsage", "unused" })
@@ -34,7 +36,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	private final Set<NonnullSupplier<? extends Item>> requestedItems = Sets.newHashSet();
 	private final Set<NonnullSupplier<? extends Block>> secondaryPoi = Sets.newHashSet();
 	private Supplier<SoundEvent> workSound = () -> null;
-	private NonnullSupplier<PointOfInterestType> poiType = () -> PointOfInterestType.UNEMPLOYED;
+	private NonnullSupplier<PoiType> poiType = () -> PoiType.UNEMPLOYED;
 	private NonnullBiConsumer<VillagerProfession, VillagerTradesRegistrar> villagerTradesConsumer = NonnullBiConsumer.noop();
 	private NonnullBiConsumer<VillagerProfession, WandererTradesRegistrar> wandererTradesConsumer = NonnullBiConsumer.noop();
 
@@ -47,8 +49,8 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 	private void onRegister(VillagerProfession profession)
 	{
-		VillagerTradesRegistrar villagerTrades = new VillagerTradesRegistrar(profession);
-		WandererTradesRegistrar wandererTrades = new WandererTradesRegistrar(profession);
+		var villagerTrades = new VillagerTradesRegistrar(profession);
+		var wandererTrades = new WandererTradesRegistrar(profession);
 
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, VillagerTradesEvent.class, event -> villagerTrades.onEvent(event, villagerTradesConsumer));
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, false, WandererTradesEvent.class, event -> wandererTrades.onEvent(event, wandererTradesConsumer));
@@ -57,16 +59,16 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	@Override
 	protected @NonnullType VillagerProfession createEntry()
 	{
-		String registryName = getRegistryNameFull();
-		PointOfInterestType pointOfInterestType = this.poiType.get();
+		var registryName = getRegistryNameFull();
+		var pointOfInterestType = this.poiType.get();
 		ImmutableSet<Item> requestedItems = this.requestedItems.stream().map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
 		ImmutableSet<Block> secondaryPoi = this.secondaryPoi.stream().map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
-		SoundEvent workSound = this.workSound.get();
+		var workSound = this.workSound.get();
 		return new VillagerProfession(registryName, pointOfInterestType, requestedItems, secondaryPoi, workSound);
 	}
 
 	// region: POI
-	public VillagerProfessionBuilder<OWNER, PARENT> pointOfInterestType(NonnullSupplier<PointOfInterestType> poiType)
+	public VillagerProfessionBuilder<OWNER, PARENT> pointOfInterestType(NonnullSupplier<PoiType> poiType)
 	{
 		this.poiType = poiType;
 		return this;
@@ -74,7 +76,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 	public PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> poi()
 	{
-		PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> poiTypeBuilder = owner.pointOfInterest(getName(), this);
+		var poiTypeBuilder = owner.pointOfInterest(getName(), this);
 		poiType = () -> poiTypeBuilder.asSupplier().get();
 		return poiTypeBuilder;
 	}
@@ -130,7 +132,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 	public SoundBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> workSound(String soundName)
 	{
-		SoundBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> sound = owner.sound(soundName, this);
+		var sound = owner.sound(soundName, this);
 		workSound = sound.asSupplier();
 		return sound;
 	}
@@ -175,7 +177,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 	public static final class VillagerTradesRegistrar
 	{
-		private final Map<TradeLevel, Set<VillagerTrades.ITrade>> tradeMap = Maps.newEnumMap(TradeLevel.class);
+		private final Map<TradeLevel, Set<VillagerTrades.ItemListing>> tradeMap = Maps.newEnumMap(TradeLevel.class);
 		private final VillagerProfession profession;
 
 		private VillagerTradesRegistrar(VillagerProfession profession)
@@ -191,7 +193,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 				if(!tradeMap.isEmpty())
 				{
-					Int2ObjectMap<List<VillagerTrades.ITrade>> trades = event.getTrades();
+					var trades = event.getTrades();
 					tradeMap.forEach((key, value) -> trades.put(key.getLevel(), ImmutableList.copyOf(value)));
 					tradeMap.clear();
 				}
@@ -199,20 +201,20 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 		}
 
 		// region: Generic
-		public VillagerTradesRegistrar register(TradeLevel level, VillagerTrades.ITrade trade)
+		public VillagerTradesRegistrar register(TradeLevel level, VillagerTrades.ItemListing trade)
 		{
 			tradeMap.computeIfAbsent(level, $ -> Sets.newHashSet()).add(trade);
 			return this;
 		}
 
-		public VillagerTradesRegistrar register(TradeLevel level, VillagerTrades.ITrade... trades)
+		public VillagerTradesRegistrar register(TradeLevel level, VillagerTrades.ItemListing... trades)
 		{
-			Set<VillagerTrades.ITrade> tradeSet = tradeMap.computeIfAbsent(level, $ -> Sets.newHashSet());
+			var tradeSet = tradeMap.computeIfAbsent(level, $ -> Sets.newHashSet());
 			Collections.addAll(tradeSet, trades);
 			return this;
 		}
 
-		public VillagerTradesRegistrar register(TradeLevel level, Collection<VillagerTrades.ITrade> trades)
+		public VillagerTradesRegistrar register(TradeLevel level, Collection<VillagerTrades.ItemListing> trades)
 		{
 			tradeMap.computeIfAbsent(level, $ -> Sets.newHashSet()).addAll(trades);
 			return this;
@@ -221,85 +223,85 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 		// region: Levels
 		// region: Level One
-		public VillagerTradesRegistrar one(VillagerTrades.ITrade trade)
+		public VillagerTradesRegistrar one(VillagerTrades.ItemListing trade)
 		{
 			return register(TradeLevel.ONE, trade);
 		}
 
-		public VillagerTradesRegistrar one(VillagerTrades.ITrade... trades)
+		public VillagerTradesRegistrar one(VillagerTrades.ItemListing... trades)
 		{
 			return register(TradeLevel.ONE, trades);
 		}
 
-		public VillagerTradesRegistrar one(Collection<VillagerTrades.ITrade> trades)
+		public VillagerTradesRegistrar one(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(TradeLevel.ONE, trades);
 		}
 		// endregion
 
 		// region: Level Two
-		public VillagerTradesRegistrar two(VillagerTrades.ITrade trade)
+		public VillagerTradesRegistrar two(VillagerTrades.ItemListing trade)
 		{
 			return register(TradeLevel.TWO, trade);
 		}
 
-		public VillagerTradesRegistrar two(VillagerTrades.ITrade... trades)
+		public VillagerTradesRegistrar two(VillagerTrades.ItemListing... trades)
 		{
 			return register(TradeLevel.TWO, trades);
 		}
 
-		public VillagerTradesRegistrar two(Collection<VillagerTrades.ITrade> trades)
+		public VillagerTradesRegistrar two(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(TradeLevel.TWO, trades);
 		}
 		// endregion
 
 		// region: Level Three
-		public VillagerTradesRegistrar three(VillagerTrades.ITrade trade)
+		public VillagerTradesRegistrar three(VillagerTrades.ItemListing trade)
 		{
 			return register(TradeLevel.THREE, trade);
 		}
 
-		public VillagerTradesRegistrar three(VillagerTrades.ITrade... trades)
+		public VillagerTradesRegistrar three(VillagerTrades.ItemListing... trades)
 		{
 			return register(TradeLevel.THREE, trades);
 		}
 
-		public VillagerTradesRegistrar three(Collection<VillagerTrades.ITrade> trades)
+		public VillagerTradesRegistrar three(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(TradeLevel.THREE, trades);
 		}
 		// endregion
 
 		// region: Level Four
-		public VillagerTradesRegistrar four(VillagerTrades.ITrade trade)
+		public VillagerTradesRegistrar four(VillagerTrades.ItemListing trade)
 		{
 			return register(TradeLevel.FOUR, trade);
 		}
 
-		public VillagerTradesRegistrar four(VillagerTrades.ITrade... trades)
+		public VillagerTradesRegistrar four(VillagerTrades.ItemListing... trades)
 		{
 			return register(TradeLevel.FOUR, trades);
 		}
 
-		public VillagerTradesRegistrar four(Collection<VillagerTrades.ITrade> trades)
+		public VillagerTradesRegistrar four(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(TradeLevel.FOUR, trades);
 		}
 		// endregion
 
 		// region: Level Five
-		public VillagerTradesRegistrar five(VillagerTrades.ITrade trade)
+		public VillagerTradesRegistrar five(VillagerTrades.ItemListing trade)
 		{
 			return register(TradeLevel.FIVE, trade);
 		}
 
-		public VillagerTradesRegistrar five(VillagerTrades.ITrade... trades)
+		public VillagerTradesRegistrar five(VillagerTrades.ItemListing... trades)
 		{
 			return register(TradeLevel.FIVE, trades);
 		}
 
-		public VillagerTradesRegistrar five(Collection<VillagerTrades.ITrade> trades)
+		public VillagerTradesRegistrar five(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(TradeLevel.FIVE, trades);
 		}
@@ -309,8 +311,8 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 	public static final class WandererTradesRegistrar
 	{
-		private final Set<VillagerTrades.ITrade> genericTrades = Sets.newHashSet();
-		private final Set<VillagerTrades.ITrade> rareTrades = Sets.newHashSet();
+		private final Set<VillagerTrades.ItemListing> genericTrades = Sets.newHashSet();
+		private final Set<VillagerTrades.ItemListing> rareTrades = Sets.newHashSet();
 		private final VillagerProfession profession;
 
 		private WandererTradesRegistrar(VillagerProfession profession)
@@ -336,53 +338,53 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 		}
 
 		// region: Trades
-		public WandererTradesRegistrar register(boolean rare, VillagerTrades.ITrade trade)
+		public WandererTradesRegistrar register(boolean rare, VillagerTrades.ItemListing trade)
 		{
 			(rare ? rareTrades : genericTrades).add(trade);
 			return this;
 		}
 
-		public WandererTradesRegistrar register(boolean rare, VillagerTrades.ITrade... trades)
+		public WandererTradesRegistrar register(boolean rare, VillagerTrades.ItemListing... trades)
 		{
 			Collections.addAll(rare ? rareTrades : genericTrades, trades);
 			return this;
 		}
 
-		public WandererTradesRegistrar register(boolean rare, Collection<VillagerTrades.ITrade> trades)
+		public WandererTradesRegistrar register(boolean rare, Collection<VillagerTrades.ItemListing> trades)
 		{
 			(rare ? rareTrades : genericTrades).addAll(trades);
 			return this;
 		}
 
 		// region: Generic Trades
-		public WandererTradesRegistrar generic(VillagerTrades.ITrade trade)
+		public WandererTradesRegistrar generic(VillagerTrades.ItemListing trade)
 		{
 			return register(false, trade);
 		}
 
-		public WandererTradesRegistrar generic(VillagerTrades.ITrade... trades)
+		public WandererTradesRegistrar generic(VillagerTrades.ItemListing... trades)
 		{
 			return register(false, trades);
 		}
 
-		public WandererTradesRegistrar generic(Collection<VillagerTrades.ITrade> trades)
+		public WandererTradesRegistrar generic(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(false, trades);
 		}
 		// endregion
 
 		// region: Rare Trades
-		public WandererTradesRegistrar rare(VillagerTrades.ITrade trade)
+		public WandererTradesRegistrar rare(VillagerTrades.ItemListing trade)
 		{
 			return register(true, trade);
 		}
 
-		public WandererTradesRegistrar rare(VillagerTrades.ITrade... trades)
+		public WandererTradesRegistrar rare(VillagerTrades.ItemListing... trades)
 		{
 			return register(true, trades);
 		}
 
-		public WandererTradesRegistrar rare(Collection<VillagerTrades.ITrade> trades)
+		public WandererTradesRegistrar rare(Collection<VillagerTrades.ItemListing> trades)
 		{
 			return register(true, trades);
 		}

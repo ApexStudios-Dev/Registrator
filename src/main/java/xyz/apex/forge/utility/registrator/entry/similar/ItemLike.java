@@ -1,10 +1,10 @@
 package xyz.apex.forge.utility.registrator.entry.similar;
 
-import net.minecraft.item.Item;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.item.Item;
 
 @FunctionalInterface
-public interface ItemLike extends IItemProvider
+public interface ItemLike extends net.minecraft.world.level.ItemLike
 {
-	@Override Item asItem();
+	@Override
+	Item asItem();
 }

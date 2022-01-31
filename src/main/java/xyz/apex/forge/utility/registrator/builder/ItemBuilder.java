@@ -10,25 +10,22 @@ import com.tterrag.registrate.util.NonNullLazyValue;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
-import net.minecraft.item.Food;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.Rarity;
-import net.minecraft.tags.ITag;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.ItemEntry;
 import xyz.apex.forge.utility.registrator.factory.item.ItemFactory;
 import xyz.apex.java.utility.nullness.NonnullBiConsumer;
-import xyz.apex.java.utility.nullness.NonnullCallable;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
 
@@ -40,7 +37,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 	private final ItemFactory<ITEM> itemFactory;
 	private NonnullSupplier<Item.Properties> initialProperties = Item.Properties::new;
 	private NonnullUnaryOperator<Item.Properties> propertiesModifier = NonnullUnaryOperator.identity();
-	@Nullable private NonnullSupplier<NonnullSupplier<IItemColor>> colorHandler;
+	@Nullable private NonnullSupplier<NonnullSupplier<ItemColor>> colorHandler;
 
 	public ItemBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, ItemFactory<ITEM> itemFactory)
 	{
@@ -52,10 +49,10 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 		// apply registrate defaults
 		defaultModel().defaultLang();
 
-		NonNullLazyValue<? extends ItemGroup> currentGroup = ObfuscationReflectionHelper.getPrivateValue(AbstractRegistrate.class, owner.backend, "currentGroup");
+		NonNullLazyValue<? extends CreativeModeTab> currentGroup = ObfuscationReflectionHelper.getPrivateValue(AbstractRegistrate.class, owner.backend, "currentGroup");
 
 		if(currentGroup != null)
-			itemGroup(currentGroup::get);
+			tab(currentGroup::get);
 	}
 
 	private void onRegister(ITEM item)
@@ -73,7 +70,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 	@Override
 	protected @NonnullType ITEM createEntry()
 	{
-		Item.Properties properties = initialProperties.get();
+		var properties = initialProperties.get();
 		properties = propertiesModifier.apply(properties);
 		return itemFactory.create(properties);
 	}
@@ -85,7 +82,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 	}
 
 	// region: Properties Wrappers
-	public ItemBuilder<OWNER, ITEM, PARENT> food(Food food)
+	public ItemBuilder<OWNER, ITEM, PARENT> food(FoodProperties food)
 	{
 		return properties(properties -> properties.food(food));
 	}
@@ -110,7 +107,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 		return properties(properties -> properties.craftRemainder(item.get()));
 	}
 
-	public ItemBuilder<OWNER, ITEM, PARENT> itemGroup(NonnullSupplier<ItemGroup> itemGroup)
+	public ItemBuilder<OWNER, ITEM, PARENT> tab(NonnullSupplier<CreativeModeTab> itemGroup)
 	{
 		return properties(properties -> properties.tab(itemGroup.get()));
 	}
@@ -129,16 +126,6 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 	{
 		return properties(Item.Properties::setNoRepair);
 	}
-
-	public ItemBuilder<OWNER, ITEM, PARENT> addToolType(NonnullSupplier<ToolType> toolType, int toolLevel)
-	{
-		return properties(properties -> properties.addToolType(toolType.get(), toolLevel));
-	}
-
-	public ItemBuilder<OWNER, ITEM, PARENT> setISTER(NonnullSupplier<NonnullCallable<ItemStackTileEntityRenderer>> ister)
-	{
-		return properties(properties -> properties.setISTER(ister::get));
-	}
 	// endregion
 
 	public ItemBuilder<OWNER, ITEM, PARENT> initialProperties(NonnullSupplier<Item.Properties> initialProperties)
@@ -147,7 +134,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 		return this;
 	}
 
-	public ItemBuilder<OWNER, ITEM, PARENT> color(NonnullSupplier<NonnullSupplier<IItemColor>> colorHandler)
+	public ItemBuilder<OWNER, ITEM, PARENT> color(NonnullSupplier<NonnullSupplier<ItemColor>> colorHandler)
 	{
 		this.colorHandler = colorHandler;
 		return this;
@@ -179,13 +166,13 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 	}
 
 	@SafeVarargs
-	public final ItemBuilder<OWNER, ITEM, PARENT> tag(ITag.INamedTag<Item>... tags)
+	public final ItemBuilder<OWNER, ITEM, PARENT> tag(Tag.Named<Item>... tags)
 	{
 		return tag(ProviderType.ITEM_TAGS, tags);
 	}
 
 	@SafeVarargs
-	public final ItemBuilder<OWNER, ITEM, PARENT> removeTag(ITag.INamedTag<Item>... tags)
+	public final ItemBuilder<OWNER, ITEM, PARENT> removeTag(Tag.Named<Item>... tags)
 	{
 		return removeTags(ProviderType.ITEM_TAGS, tags);
 	}
