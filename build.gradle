@@ -218,11 +218,6 @@ task deobfJar(type: Jar) {
 	from sourceSets.main.output
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier 'javadoc'
-	from javadoc.destinationDir
-}
-
 jar {
 	classifier 'slim'
 
@@ -240,7 +235,6 @@ artifacts {
 	archives jar
 	archives sourcesJar
 	archives deobfJar
-	archives javadocJar
 	archives shadowJar
 }
 
@@ -276,7 +270,6 @@ publishing {
 				artifact jar
 				artifact sourcesJar
 				artifact deobfJar
-				artifact javadocJar
 				artifact shadowJar
 			}
 		}
@@ -308,7 +301,6 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			addArtifact jar
 			addArtifact deobfJar
 			addArtifact sourcesJar
-			addArtifact javadocJar
 		}
 	}
 } else if(System.getenv('CURSEFORGE_TOKEN') != null) {
@@ -324,7 +316,6 @@ if(project.hasProperty('apex_curse_gradle_token')) {
 			addArtifact jar
 			addArtifact deobfJar
 			addArtifact sourcesJar
-			addArtifact javadocJar
 		}
 	}
 }
