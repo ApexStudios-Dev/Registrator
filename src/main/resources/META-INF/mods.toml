@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="${forge_version_range}"
 license="MPL 2.0"
+issueTrackerURL="https://github.com/ApexModder/Registrator/issues"
 
 [[mods]]
 	modId="${mod_id}"
