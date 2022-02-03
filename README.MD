@@ -5,7 +5,7 @@
 [![release](https://img.shields.io/github/v/release/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/releases)
 [![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)](https://www.curseforge.com/minecraft/mc-mods/registrator)
 
-[<img src="https://i.imgur.com/qUJzbM4.png" width=20%></img>](http://discord.apexmods.xyz/)
+[<img src="https://i.imgur.com/qUJzbM4.png" width=33%></img>](http://discord.apexmods.xyz/)
 
 ---
 
