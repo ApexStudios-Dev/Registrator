@@ -302,7 +302,7 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public <BLOCK_ENTITY extends TileEntity> BlockEntityBuilder<OWNER, BLOCK_ENTITY, BlockBuilder<OWNER, BLOCK, PARENT>> blockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
-		return owner.blockEntity(getName(), this, blockEntityFactory);
+		return owner.blockEntity(getName(), this, blockEntityFactory).validBlock(() -> asSupplier().get());
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> color(NonnullSupplier<NonnullSupplier<IBlockColor>> colorHandler)
