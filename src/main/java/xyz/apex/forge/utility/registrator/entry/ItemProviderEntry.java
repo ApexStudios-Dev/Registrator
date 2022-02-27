@@ -8,11 +8,10 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.ItemLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super ITEM> & IItemProvider> extends RegistryEntry<ITEM> implements ItemLike, NonnullSupplier<ITEM>
+public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super ITEM> & IItemProvider> extends RegistryEntry<ITEM> implements IItemProvider, NonnullSupplier<ITEM>
 {
 	public ItemProviderEntry(AbstractRegistrator<?> registrator, RegistryObject<ITEM> delegate)
 	{
@@ -46,11 +45,6 @@ public abstract class ItemProviderEntry<ITEM extends IForgeRegistryEntry<? super
 
 	// vanilla wrapper
 	public final boolean isItem(IItemProvider item)
-	{
-		return isItem(item.asItem());
-	}
-
-	public final boolean isItem(ItemLike item)
 	{
 		return isItem(item.asItem());
 	}

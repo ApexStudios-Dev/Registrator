@@ -9,15 +9,13 @@ import net.minecraft.world.IBlockReader;
 import net.minecraftforge.fml.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.BlockEntityTypeLike;
-import xyz.apex.forge.utility.registrator.entry.similar.BlockLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
-public final class BlockEntityEntry<BLOCK_ENTITY extends TileEntity> extends RegistryEntry<TileEntityType<BLOCK_ENTITY>> implements BlockEntityTypeLike, NonnullSupplier<TileEntityType<BLOCK_ENTITY>>
+public final class BlockEntityEntry<BLOCK_ENTITY extends TileEntity> extends RegistryEntry<TileEntityType<BLOCK_ENTITY>> implements NonnullSupplier<TileEntityType<BLOCK_ENTITY>>
 {
 	public BlockEntityEntry(AbstractRegistrator<?> registrator, RegistryObject<TileEntityType<BLOCK_ENTITY>> delegate)
 	{
@@ -56,12 +54,6 @@ public final class BlockEntityEntry<BLOCK_ENTITY extends TileEntity> extends Reg
 		return asBlockEntityType().isValid(block);
 	}
 
-	public boolean isValidBlock(BlockLike block)
-	{
-		return isValidBlock(block.asBlock());
-	}
-
-	@Override
 	public TileEntityType<BLOCK_ENTITY> asBlockEntityType()
 	{
 		return get();

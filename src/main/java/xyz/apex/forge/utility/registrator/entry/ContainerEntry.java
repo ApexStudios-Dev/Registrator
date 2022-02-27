@@ -10,21 +10,19 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.ContainerTypeLike;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
-public final class ContainerEntry<CONTAINER extends Container> extends RegistryEntry<ContainerType<CONTAINER>> implements ContainerTypeLike, IContainerProvider, NonnullSupplier<ContainerType<CONTAINER>>
+public final class ContainerEntry<CONTAINER extends Container> extends RegistryEntry<ContainerType<CONTAINER>> implements IContainerProvider, NonnullSupplier<ContainerType<CONTAINER>>
 {
 	public ContainerEntry(AbstractRegistrator<?> registrator, RegistryObject<ContainerType<CONTAINER>> delegate)
 	{
 		super(registrator, delegate);
 	}
 
-	@Override
 	public ContainerType<CONTAINER> asContainerType()
 	{
 		return get();

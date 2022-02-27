@@ -7,7 +7,7 @@ buildscript {
 	}
 	dependencies {
 		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forge_gradle_version}", changing: true
-		classpath 'org.parchmentmc:librarian:1.+'
+		classpath "org.parchmentmc:librarian:${librarian_version}"
 		classpath "org.spongepowered:mixingradle:${mixin_gradle_version}"
 	}
 }
@@ -36,45 +36,51 @@ configurations {
 
 minecraft {
 	mappings channel: "${mappings_channel}", version: "${mappings_version}"
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	accessTransformer = rootProject.file('accesstransformer.cfg')
 
 	runs {
-		client {
-			taskName 'Client'
-			workingDirectory project.file('run/client')
-			// property 'forge.logging.markers', 'REGISTRIES'
-			// property 'forge.logging.console.level', 'debug'
-			property 'fml.earlyprogresswindow', 'false'
+		if(rootProject.name == project.name) {
+			client {
+				taskName 'Client'
+				workingDirectory rootProject.file('run/client')
+				// property 'forge.logging.markers', 'REGISTRIES'
+				// property 'forge.logging.console.level', 'debug'
+				property 'fml.earlyprogresswindow', 'false'
 
-			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
-				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
-			}
-
-			mods {
-				"${mod_id}" {
-					source sourceSets.main
+				mods {
+					"${mod_id}" {
+						source sourceSets.main
+					}
 				}
 			}
-		}
 
-		server {
-			taskName 'Server'
-			workingDirectory project.file('run/server')
-			// property 'forge.logging.markers', 'REGISTRIES'
-			// property 'forge.logging.console.level', 'debug'
-			property 'fml.earlyprogresswindow', 'false'
-			args 'nogui'
+			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
+				clientAuthed {
+					parent runs.client
+					taskName 'Client-Authed'
+					args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
+				}
+			}
 
-			mods {
-				"${mod_id}" {
-					source sourceSets.main
+			server {
+				taskName 'Server'
+				workingDirectory rootProject.file('run/server')
+				// property 'forge.logging.markers', 'REGISTRIES'
+				// property 'forge.logging.console.level', 'debug'
+				property 'fml.earlyprogresswindow', 'false'
+				args 'nogui'
+
+				mods {
+					"${mod_id}" {
+						source sourceSets.main
+					}
 				}
 			}
 		}
 
 		data {
 			taskName 'Data'
-			workingDirectory project.file('run/client')
+			workingDirectory rootProject.file('run/client')
 			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
@@ -82,6 +88,10 @@ minecraft {
 			// ForgeGradle will just force-exit the Gradle Daemon which fails our builds in case
 			// a daemon is used for any reason.
 			forceExit false
+
+			if(rootProject.name != project.name) {
+				ideaModule "${rootProject.name}.${project.name}.main"
+			}
 
 			mods {
 				"${mod_id}" {
@@ -106,10 +116,11 @@ sourceSets.main.resources {
 }
 
 repositories {
+	mavenCentral()
 	mavenLocal()
+	maven { url 'https://dvs1.progwml6.com/files/maven' }
 	maven { url 'https://maven.tterrag.com/' }
 
-	// GitHub Packages require read access
 	if(project.hasProperty('apex_git_package_token')) {
 		maven {
 			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
@@ -119,7 +130,6 @@ repositories {
 			}
 		}
 	} else if(System.getenv('GITHUB_TOKEN') != null) {
-		// github workflows have a different set of credentials
 		maven {
 			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
 			credentials {
@@ -132,64 +142,33 @@ repositories {
 
 dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-	// Mixin AP
 	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
 
-	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
-	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
+	runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
+
+	implementation fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
 	shade "com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}"
 
-	if(project.hasProperty('apex_local_deps') && project.getProperty('apex_local_deps')) {
-		// runtimeOnly fg.deobf('xyz.apex.forge:devworld:1.16.5-2.0.0')
-		runtimeOnly fg.deobf("xyz.apex.forge:smoothboot:${minecraft_version}-${smooth_boot_version}")
-	}
-
 	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
-		// we have access to Apex's GH Packages pull from there
-		compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
-		runtimeOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
+		implementation "xyz.apex.java.utility:javautilities:${javautilities_version}"
 		shade "xyz.apex.java.utility:javautilities:${javautilities_version}"
 	} else {
-		// no public location
+		// currently there is no public location
+		// this may change in the future
+		// as of now, to be able to load this project yourself
+		// locally you also have to clone my JavaUtilities repo, build & publish it to your local maven
+		// git clone https://github.com/ApexModder/JavaUtilities --branch J8
+		// gradlew publish
+		// after this has finished, the project should import and detect JavaUtilities just fine
 	}
 }
 
 def resourceTargets = [ 'META-INF/mods.toml', 'pack.mcmeta', "${mod_id}.mixins.json".toString() ]
 def intoTargets = [ "${rootDir}/out/production/resources/", "${rootDir}/out/production/${project.name}.main/", "${rootDir}/bin/main/" ]
-def replaceProperties = [
-	minecraft_version: minecraft_version,
-	minecraft_version_range: minecraft_version_range,
-	minecraft_version_short: minecraft_version_short,
-		
-	forge_version: forge_version,
-	forge_version_range: forge_version_range,
-	forge_gradle_version: forge_gradle_version,
-
-	mixin_gradle_version: mixin_gradle_version,
-	mixin_ap_version: mixin_ap_version,
-	
-	mappings_channel: mappings_channel,
-	mappings_version: mappings_version,
-	
-	mod_id: mod_id,
-	mod_name: mod_name,
-	mod_version: mod_version,
-	mod_base_package: mod_base_package,
-	mod_authors: mod_authors,
-
-	registrate_version: registrate_version,
-	registrate_package: registrate_package,
-
-	gradle_shadow_version: gradle_shadow_version,
-	smooth_boot_version: smooth_boot_version,
-	javautilities_version: javautilities_version
-]
+def replaceProperties = project.properties
 
 processResources {
-	inputs.properties replaceProperties
-	replaceProperties.put 'project', project
-
 	filesMatching(resourceTargets) {
 		expand replaceProperties
 	}
@@ -239,6 +218,10 @@ artifacts {
 }
 
 tasks.withType(Jar) {
+	from(rootProject.file('accesstransformer.cfg')) {
+		into '/META-INF'
+	}
+
 	manifest {
 		attributes([
 				'Specification-Title': "${mod_name}",

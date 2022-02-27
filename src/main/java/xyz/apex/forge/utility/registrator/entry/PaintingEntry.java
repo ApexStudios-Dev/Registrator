@@ -4,18 +4,16 @@ import net.minecraft.entity.item.PaintingType;
 import net.minecraftforge.fml.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.PaintingLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public final class PaintingEntry extends RegistryEntry<PaintingType> implements PaintingLike, NonnullSupplier<PaintingType>
+public final class PaintingEntry extends RegistryEntry<PaintingType> implements NonnullSupplier<PaintingType>
 {
 	public PaintingEntry(AbstractRegistrator<?> owner, RegistryObject<PaintingType> delegate)
 	{
 		super(owner, delegate);
 	}
 
-	@Override
 	public PaintingType asPaintingType()
 	{
 		return get();

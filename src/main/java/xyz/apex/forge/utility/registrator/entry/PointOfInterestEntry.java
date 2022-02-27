@@ -7,20 +7,18 @@ import net.minecraft.village.PointOfInterestType;
 import net.minecraftforge.fml.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.forge.utility.registrator.entry.similar.PointOfInterestLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
-public final class PointOfInterestEntry extends RegistryEntry<PointOfInterestType> implements PointOfInterestLike, NonnullSupplier<PointOfInterestType>
+public final class PointOfInterestEntry extends RegistryEntry<PointOfInterestType> implements NonnullSupplier<PointOfInterestType>
 {
 	public PointOfInterestEntry(AbstractRegistrator<?> owner, RegistryObject<PointOfInterestType> delegate)
 	{
 		super(owner, delegate);
 	}
 
-	@Override
 	public PointOfInterestType asPointOfInterestType()
 	{
 		return get();

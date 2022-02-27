@@ -26,13 +26,12 @@ import net.minecraftforge.fml.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.data.template.TemplatePools;
-import xyz.apex.forge.utility.registrator.entry.similar.StructureLike;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public final class StructureEntry<STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> extends RegistryEntry<STRUCTURE> implements StructureLike, NonnullSupplier<STRUCTURE>
+public final class StructureEntry<STRUCTURE extends Structure<FEATURE_CONFIG>, FEATURE_CONFIG extends IFeatureConfig> extends RegistryEntry<STRUCTURE> implements NonnullSupplier<STRUCTURE>
 {
 	private final TemplatePools templatePool;
 
@@ -54,7 +53,6 @@ public final class StructureEntry<STRUCTURE extends Structure<FEATURE_CONFIG>, F
 		return registries.registryOrThrow(Registry.TEMPLATE_POOL_REGISTRY).get(templatePool.getPoolName());
 	}
 
-	@Override
 	public Structure<?> asStructure()
 	{
 		return get();
