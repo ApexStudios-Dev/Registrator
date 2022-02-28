@@ -76,7 +76,10 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode", "NullableProblems" })
@@ -99,15 +102,6 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public static final TagRegistry<Item> ITEM_TAG_REGISTRY = ItemTags.HELPER;
 	public static final TagRegistry<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = EntityTypeTags.HELPER;
 	public static final TagRegistry<Fluid> FLUID_TAG_REGISTRY = FluidTags.HELPER;
-
-	public static final Set<Material> AXE_DIGGABLE_MATERIALS = AxeItem.DIGGABLE_MATERIALS;
-	public static final Set<Block> AXE_DIGGABLE_BLOCKS = AxeItem.OTHER_DIGGABLE_BLOCKS;
-	public static final Map<Block, Block> AXE_STRIPABLES = AxeItem.STRIPABLES;
-	public static final Set<Block> HOE_DIGGABLE_BLOCKS = HoeItem.DIGGABLES;
-	public static final Map<Block, BlockState> HOE_TILLABLES = HoeItem.TILLABLES;
-	public static final Set<Block> PICKAXE_DIGGABLE_BLOCKS = PickaxeItem.DIGGABLES;
-	public static final Set<Block> SHOVEL_DIGGABLE_BLOCKS = ShovelItem.DIGGABLES;
-	public static final Map<Block, BlockState> SHOVEL_FLATTENABLES = ShovelItem.FLATTENABLES;
 	// endregion
 
 	// region: ProviderTypes
