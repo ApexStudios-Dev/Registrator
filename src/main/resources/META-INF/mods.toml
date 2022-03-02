@@ -26,3 +26,9 @@ issueTrackerURL="https://github.com/ApexModder/Registrator/issues"
 	versionRange="${minecraft_version_range}"
 	ordering="AFTER"
 	side="BOTH"
+[[dependencies.${mod_id}]]
+	modId="${jei_mod_id}"
+	mandatory=false
+	versionRange="${jei_version_range}"
+	ordering="BEFORE"
+	side="BOTH"
