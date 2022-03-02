@@ -49,6 +49,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	@Nullable private EntitySpawnPlacementRegistry.PlacementType placementType = null;
 	@Nullable private Heightmap.Type heightMapType = null;
 	@Nullable private EntitySpawnPlacementRegistry.IPlacementPredicate<ENTITY> placementPredicate;
+	@Nullable private ItemBuilder<OWNER, ?, EntityBuilder<OWNER, ENTITY, PARENT>> spawnEggBuilder = null;
 
 	public EntityBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, EntityClassification entityClassification, EntityFactory<ENTITY> entityFactory)
 	{
@@ -88,6 +89,9 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	@Override
 	protected @NonnullType EntityType<ENTITY> createEntry()
 	{
+		if(spawnEggBuilder != null)
+			copyMappingsTo(spawnEggBuilder);
+
 		EntityType.Builder<ENTITY> builder = EntityType.Builder.of(entityFactory::create, entityClassification);
 		builder = propertiesModifier.apply(builder);
 		return builder.build(getRegistryNameFull());
@@ -192,7 +196,10 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 
 	public <ITEM extends ForgeSpawnEggItem<ENTITY>> ItemBuilder<OWNER, ITEM, EntityBuilder<OWNER, ENTITY, PARENT>> spawnEgg(int backgroundColor, int highlightColor, SpawnEggItemFactory<ENTITY, ITEM> itemFactory)
 	{
-		return owner.spawnEggItem(getRegistryName() + SPAWN_EGG_SUFFIX, this, toSupplier(), backgroundColor, highlightColor, itemFactory);
+		if(spawnEggBuilder == null)
+			spawnEggBuilder = owner.spawnEggItem(getRegistryName() + SPAWN_EGG_SUFFIX, this, toSupplier(), backgroundColor, highlightColor, itemFactory);
+
+		return (ItemBuilder<OWNER, ITEM, EntityBuilder<OWNER, ENTITY, PARENT>>) spawnEggBuilder;
 	}
 
 	public ItemBuilder<OWNER, ForgeSpawnEggItem<ENTITY>, EntityBuilder<OWNER, ENTITY, PARENT>> spawnEgg(int backgroundColor, int highlightColor)

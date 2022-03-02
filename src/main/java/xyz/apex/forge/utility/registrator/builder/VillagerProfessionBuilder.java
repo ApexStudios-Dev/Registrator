@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.tterrag.registrate.builders.BuilderCallback;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import org.apache.commons.lang3.Validate;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
@@ -25,6 +26,7 @@ import xyz.apex.java.utility.nullness.NonnullBiConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullType;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -37,6 +39,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	private NonnullSupplier<PointOfInterestType> poiType = () -> PointOfInterestType.UNEMPLOYED;
 	private NonnullBiConsumer<VillagerProfession, VillagerTradesRegistrar> villagerTradesConsumer = NonnullBiConsumer.noop();
 	private NonnullBiConsumer<VillagerProfession, WandererTradesRegistrar> wandererTradesConsumer = NonnullBiConsumer.noop();
+	@Nullable private PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> pointOfInterestBuilder = null;
 
 	public VillagerProfessionBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
@@ -57,6 +60,9 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	@Override
 	protected @NonnullType VillagerProfession createEntry()
 	{
+		if(pointOfInterestBuilder != null)
+			copyMappingsTo(pointOfInterestBuilder);
+
 		String registryName = getRegistryNameFull();
 		PointOfInterestType pointOfInterestType = this.poiType.get();
 		ImmutableSet<Item> requestedItems = this.requestedItems.stream().map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
@@ -68,15 +74,20 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	// region: POI
 	public VillagerProfessionBuilder<OWNER, PARENT> pointOfInterestType(NonnullSupplier<PointOfInterestType> poiType)
 	{
+		Validate.isTrue(pointOfInterestBuilder == null);
 		this.poiType = poiType;
 		return this;
 	}
 
 	public PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> poi()
 	{
-		PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> poiTypeBuilder = owner.pointOfInterest(getName(), this);
-		poiType = () -> poiTypeBuilder.asSupplier().get();
-		return poiTypeBuilder;
+		if(pointOfInterestBuilder == null)
+		{
+			pointOfInterestBuilder = owner.pointOfInterest(getName(), this);
+			poiType = () -> pointOfInterestBuilder.asSupplier().get();
+		}
+
+		return pointOfInterestBuilder;
 	}
 
 	// region: Secondary POI
