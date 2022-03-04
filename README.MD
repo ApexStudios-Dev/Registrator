@@ -106,18 +106,14 @@ To include Registrator in your mods `build.gradle` file, We make use of the [Cur
 Add the following snippet of code to your `repositories { }` section
 
 ```groovy
-maven { // CurseForge
-    url 'https://cursemaven.com'
-    content { includeGroup 'curse.maven' }
-}
+maven { url 'https://apexmodder.jfrog.io/artifactory/mods-maven/' } // ApexMods-Maven
 ```
 
 Add the following snippet of code to your `dependencies { }` section<br>
 See below for table of CurseForge version IDs
 
 ```groovy
-compileOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
-runtimeOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
+implementation fg.deobf("xyz.apex.forge.utility:registrator:<MINECARFT_VERSION>-<REGISTRATOR_VERSION>:deobf")
 ```
 
 <details>
@@ -130,37 +126,4 @@ Search for `Registrator` and click `Add Project` on the right.<br>
 This will add Registrator as a dependency on CurseForge. When users download your mod via the CurseForge launcher (or any launchers using CurseForges API), Registrator will automatically be downloaded alongside it.
 
 </details>
-</details>
-
-<details>
-<summary><b>CurseForge Versions</b></summary>
-
-| Registrator Version  | CurseForge File ID |
-|:--------------------:|:---:|
-| <b><i>1.0.25</i></b> | [3665855](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3665855) |
-| <b><i>1.0.24</i></b> | [3649353](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3649353) |
-| <b><i>1.0.23</i></b> | [3632643](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3632643) |
-| <b><i>1.0.22</i></b> | [3629740](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3629740) |
-| <b><i>1.0.21</i></b> | [3624977](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3624977) |
-| <b><i>1.0.20</i></b> | [3624959](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3624959) |
-| <b><i>1.0.19</i></b> | [3547961](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3547961) |
-| <b><i>1.0.18</i></b> | [3543275](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543275) |
-| <b><i>1.0.17</i></b> | [3543253](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543253) |
-| <b><i>1.0.16</i></b> | [3543232](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543232) |
-| <b><i>1.0.15</i></b> | [3543223](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543223) |
-| <b><i>1.0.14</i></b> | [3543214](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3543214) |
-| <b><i>1.0.13</i></b> | [3541415](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541415) |
-| <b><i>1.0.12</i></b> | [3541261](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541261) |
-| <b><i>1.0.11</i></b> | [3541252](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541252) |
-| <b><i>1.0.10</i></b> | [3541180](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541180) |
-| <b><i>1.0.9</i></b>  | [3541175](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541175) |
-| <b><i>1.0.8</i></b>  | [3541170](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3541170) |
-| <b><i>1.0.7</i></b>  | [3539396](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539396) |
-| <b><i>1.0.6</i></b>  | [3539331](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3539331) |
-| <b><i>1.0.5</i></b>  | [3538337](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3538337) |
-| <b><i>1.0.4</i></b>  | [3537821](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537821) |
-| <b><i>1.0.3</i></b>  | [3537477](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537477) |
-| <b><i>1.0.2</i></b>  | [3537398](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537398) |
-| <b><i>1.0.1</i></b>  | [3537338](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3537338) |
-
 </details>
