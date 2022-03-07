@@ -76,14 +76,9 @@ jobs:
 
       # Generate Minecraft Assets & Data files
       - run: ./gradlew Data # `Data` should match the `runData` gradle task name
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Build package
       - run: ./gradlew build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE: ${{ steps.tagName.outputs.tag }}
 
       # Publish to GitHub Packages
       - run: ./gradlew publish
@@ -93,11 +88,27 @@ jobs:
           APEX_MODS_MAVEN_PASSWORD: ${{ secrets.APEX_MODS_MAVEN_PASSWORD }}
           RELEASE: ${{ steps.tagName.outputs.tag }}
 
-      # Publish to CurseForge
-      - run: ./gradlew curseforge
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+#      # Publish to CurseForge
+#      - run: ./gradlew curseforge
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+
+      # Use 'Publish Minecraft Mods' action to publish to various mod hosting sources
+      - uses: Kir-Antipov/mc-publish@v2.1
+        with:
+          modrinth-id: fw1dEJE1
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          curseforge-id: 550146
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          name: Registrator-1.16.5
+          version: ${{ steps.tagName.outputs.tag }}
+          version-type: release
+          loaders: forge
+          game-versions: 1.16.5
+          java: 8
 
       # Kill gradlew deamon (caching requires gradle to not be running)
       - run: ./gradlew --stop
