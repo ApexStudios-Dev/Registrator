@@ -107,7 +107,7 @@ jobs:
           curseforge-id: 550146
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
-          name: Registrator-1.16.5
+          name: Registrator-1.16.5-${{ steps.vers.outputs.num }}
           version: ${{ steps.vers.outputs.num }}
           version-type: release
           loaders: forge
