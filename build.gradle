@@ -14,7 +14,6 @@ buildscript {
 
 plugins {
 	id 'com.github.johnrengelman.shadow' version "${gradle_shadow_version}"
-	// id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -243,21 +242,3 @@ if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS
 		}
 	}
 }
-
-/*
-if(System.getenv('CURSEFORGE_TOKEN') != null) {
-	curseforge {
-		apiKey = System.getenv('CURSEFORGE_TOKEN')
-
-		project {
-			id = "${registrator_cf_project}"
-			releaseType = 'release'
-			addGameVersion "${minecraft_version}"
-
-			mainArtifact shadowJar
-			addArtifact jar
-			addArtifact deobfJar
-			addArtifact sourcesJar
-		}
-	}
-}*/

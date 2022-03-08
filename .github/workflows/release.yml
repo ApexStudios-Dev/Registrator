@@ -92,12 +92,6 @@ jobs:
           APEX_MODS_MAVEN_USERNAME: ${{ secrets.APEX_MODS_MAVEN_USERNAME }}
           APEX_MODS_MAVEN_PASSWORD: ${{ secrets.APEX_MODS_MAVEN_PASSWORD }}
 
-#      # Publish to CurseForge
-#      - run: ./gradlew curseforge
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-
       # Use 'Publish Minecraft Mods' action to publish to various mod hosting sources
       - uses: Kir-Antipov/mc-publish@v2.1
         with:
