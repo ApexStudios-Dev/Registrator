@@ -146,7 +146,7 @@ dependencies {
 	runtimeOnly fg.deobf("xyz.apex.forge.utility:${smoothboot_mod_id}:${minecraft_version}-${smoothboot_version}:deobf")
 }
 
-def resourceTargets = [ 'META-INF/mods.toml', '**/*.mcmeta' ]
+def resourceTargets = [ 'META-INF/mods.toml', '**/*.mcmeta', "${mod_id}.mixins.json".toString() ]
 def intoTargets = [ "${projectDir}/out/production/resources/", "${projectDir}/out/production/${project.name}.main/", "${projectDir}/bin/main/" ]
 def replaceProperties = project.properties
 
