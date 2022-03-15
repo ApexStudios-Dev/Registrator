@@ -105,18 +105,14 @@ To include Registrator in your mods `build.gradle` file, We make use of the [Cur
 Add the following snippet of code to your `repositories { }` section
 
 ```groovy
-maven { // CurseForge
-    url 'https://cursemaven.com'
-    content { includeGroup 'curse.maven' }
-}
+maven { url 'https://apexmodder.jfrog.io/artifactory/mods-maven/' } // ApexMods-Maven
 ```
 
 Add the following snippet of code to your `dependencies { }` section<br>
 See below for table of CurseForge version IDs
 
 ```groovy
-compileOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
-runtimeOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
+implementation fg.deobf("xyz.apex.forge.utility:registrator:<MINECARFT_VERSION>-<REGISTRATOR_VERSION>:deobf")
 ```
 
 <details>
@@ -129,17 +125,4 @@ Search for `Registrator` and click `Add Project` on the right.<br>
 This will add Registrator as a dependency on CurseForge. When users download your mod via the CurseForge launcher (or any launchers using CurseForges API), Registrator will automatically be downloaded alongside it.
 
 </details>
-</details>
-
-<details>
-<summary><b>CurseForge Versions</b></summary>
-
-| Registrator Version |                                CurseForge File ID                                 |
-|:-------------------:|:---------------------------------------------------------------------------------:|
-| <b><i>3.0.4</i></b> | [3649381](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3649381) |
-| <b><i>3.0.3</i></b> | [3632654](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3632654) |
-| <b><i>3.0.2</i></b> | [3631643](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3631643) |
-| <b><i>3.0.1</i></b> | [3631434](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3631434) |
-| <b><i>3.0.0</i></b> | [3631387](https://www.curseforge.com/minecraft/mc-mods/registrator/files/3631387) |
-
 </details>

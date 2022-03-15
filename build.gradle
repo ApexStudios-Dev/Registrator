@@ -96,9 +96,9 @@ mixin {
 	add sourceSets.main, "${mod_id}.refmap.json"
 	config "${mod_id}.mixins.json"
 
-	debug = true
+	/*debug = true
 	debug.export = true
-	hotSwap = true
+	hotSwap = true*/
 }
 
 sourceSets.main.resources {
@@ -133,59 +133,22 @@ repositories {
 dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-	// Mixin AP
 	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
 
+	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}:sources")
 	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
 	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
-	shade "com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}"
 
-	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
-		// we have access to Apex's GH Packages pull from there
-		compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
-		runtimeOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
-		shade "xyz.apex.java.utility:javautilities:${javautilities_version}"
-	} else {
-		// no public location
-	}
+	compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}:deobf"
+	compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}:sources"
+	runtimeOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
 }
 
-def resourceTargets = [ 'META-INF/mods.toml', 'pack.mcmeta', "${mod_id}.mixins.json".toString() ]
-def intoTargets = [ "${rootDir}/out/production/resources/", "${rootDir}/out/production/${project.name}.main/", "${rootDir}/bin/main/" ]
-def replaceProperties = [
-	minecraft_version: minecraft_version,
-	minecraft_version_range: minecraft_version_range,
-	minecraft_version_short: minecraft_version_short,
-		
-	forge_version: forge_version,
-	forge_version_range: forge_version_range,
-	forge_gradle_version: forge_gradle_version,
-
-	librarian_version: librarian_version,
-
-	mixin_gradle_version: mixin_gradle_version,
-	mixin_ap_version: mixin_ap_version,
-	
-	mappings_channel: mappings_channel,
-	mappings_version: mappings_version,
-	
-	mod_id: mod_id,
-	mod_name: mod_name,
-	mod_version: mod_version,
-	mod_base_package: mod_base_package,
-	mod_authors: mod_authors,
-
-	registrate_version: registrate_version,
-	registrate_package: registrate_package,
-
-	gradle_shadow_version: gradle_shadow_version,
-	javautilities_version: javautilities_version
-]
+def resourceTargets = [ 'META-INF/mods.toml', '**/*.mcmeta' ]
+def intoTargets = [ "${projectDir}/out/production/resources/", "${projectDir}/out/production/${project.name}.main/", "${projectDir}/bin/main/" ]
+def replaceProperties = project.properties
 
 processResources {
-	inputs.properties replaceProperties
-	replaceProperties.put 'project', project
-
 	filesMatching(resourceTargets) {
 		expand replaceProperties
 	}
@@ -255,10 +218,10 @@ reobf {
 
 jar.finalizedBy('reobfJar')
 
-publishing {
-	if(System.getenv('GITHUB_TOKEN') != null) {
+if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS_MAVEN_PASSWORD') != null) {
+	publishing {
 		publications {
-			gpr(MavenPublication) {
+			mavenJava(MavenPublication) {
 				groupId = "${mod_base_package}"
 				artifactId = "${mod_id}"
 				version = "${minecraft_version}-${mod_version}"
@@ -269,49 +232,16 @@ publishing {
 				artifact shadowJar
 			}
 		}
-
 		repositories {
 			maven {
-				name = 'GitHubPackages'
-				url = uri('https://maven.pkg.github.com/ApexModder/Registrator')
+				name 'ApexMods-Maven'
+				url 'https://apexmodder.jfrog.io/artifactory/mods-maven/'
 
 				credentials {
-					username = System.getenv('GITHUB_ACTOR')
-					password = System.getenv('GITHUB_TOKEN')
+					username System.getenv('APEX_MODS_MAVEN_USERNAME')
+					password System.getenv('APEX_MODS_MAVEN_PASSWORD')
 				}
 			}
-		}
-	}
-}
-
-if(project.hasProperty('apex_curse_gradle_token')) {
-	curseforge {
-		apiKey = project.getProperty('apex_curse_gradle_token')
-
-		project {
-			id = "${mod_curseforge_id}"
-			releaseType = 'release'
-			addGameVersion "${minecraft_version}"
-
-			mainArtifact shadowJar
-			addArtifact jar
-			addArtifact deobfJar
-			addArtifact sourcesJar
-		}
-	}
-} else if(System.getenv('CURSEFORGE_TOKEN') != null) {
-	curseforge {
-		apiKey = System.getenv('CURSEFORGE_TOKEN')
-
-		project {
-			id = "${mod_curseforge_id}"
-			releaseType = 'release'
-			addGameVersion "${minecraft_version}"
-
-			mainArtifact shadowJar
-			addArtifact jar
-			addArtifact deobfJar
-			addArtifact sourcesJar
 		}
 	}
 }
