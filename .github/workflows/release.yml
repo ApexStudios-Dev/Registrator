@@ -92,6 +92,25 @@ jobs:
           APEX_MODS_MAVEN_USERNAME: ${{ secrets.APEX_MODS_MAVEN_USERNAME }}
           APEX_MODS_MAVEN_PASSWORD: ${{ secrets.APEX_MODS_MAVEN_PASSWORD }}
 
+      # Use 'Publish Minecraft Mods' action to publish to various mod hosting sources
+      - uses: Kir-Antipov/mc-publish@v2.1
+        with:
+          modrinth-id: fw1dEJE1
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          curseforge-id: 550146
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          name: Registrator-1.18.1-${{ steps.vers.outputs.num }}
+          version: ${{ steps.vers.outputs.num }}
+          version-type: release
+          loaders: forge
+          game-versions: 1.18.1
+          java: 17
+          files: ''
+          files-primary: build/libs/!(*-@(deobf|slim|sources)).jar
+          files-secondary: build/libs/*-@(deobf|slim|sources).jar
+
       # Kill gradlew deamon (caching requires gradle to not be running)
       - run: ./gradlew --stop
 

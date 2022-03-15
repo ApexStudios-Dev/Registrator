@@ -36,7 +36,7 @@ configurations {
 
 minecraft {
 	mappings channel: "${mappings_channel}", version: "${mappings_version}"
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	accessTransformer = file('accesstransformer.cfg')
 
 	runs {
 		client {
@@ -45,6 +45,7 @@ minecraft {
 			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
+			property 'forge.enabledGameTestNamespaces', mod_id
 
 			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
 				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
@@ -63,7 +64,25 @@ minecraft {
 			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
+			property 'forge.enabledGameTestNamespaces', mod_id
 			args 'nogui'
+
+			mods {
+				"${mod_id}" {
+					source sourceSets.main
+				}
+			}
+		}
+
+		gameTestServer {
+			taskName 'GameTestServer'
+			workingDirectory rootProject.file('run/server')
+			// property 'forge.logging.markers', 'REGISTRIES'
+			// property 'forge.logging.console.level', 'debug'
+			property 'fml.earlyprogresswindow', 'false'
+			property 'forge.enabledGameTestNamespaces', mod_id
+			args 'nogui'
+			singleInstance true
 
 			mods {
 				"${mod_id}" {
@@ -106,28 +125,9 @@ sourceSets.main.resources {
 }
 
 repositories {
-	mavenLocal()
+	mavenCentral()
 	maven { url 'https://maven.tterrag.com/' }
-
-	// GitHub Packages require read access
-	if(project.hasProperty('apex_git_package_token')) {
-		maven {
-			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
-			credentials {
-				username = 'Apex-GitHub-PackagesToken'
-				password = project.getProperty('apex_git_package_token')
-			}
-		}
-	} else if(System.getenv('GITHUB_TOKEN') != null) {
-		// github workflows have a different set of credentials
-		maven {
-			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
-			credentials {
-				username = System.getenv('GITHUB_ACTOR')
-				password = System.getenv('GITHUB_TOKEN')
-			}
-		}
-	}
+	maven { url 'https://apexmodder.jfrog.io/artifactory/mods-maven/' }
 }
 
 dependencies {
@@ -198,6 +198,10 @@ artifacts {
 }
 
 tasks.withType(Jar) {
+	from(file('accesstransformer.cfg')) {
+		into '/META-INF'
+	}
+
 	manifest {
 		attributes([
 				'Specification-Title': "${mod_name}",
