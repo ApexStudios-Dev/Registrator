@@ -9,7 +9,7 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -86,13 +86,13 @@ public final class BlockEntityBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 	}
 
 	@SafeVarargs
-	public final BlockEntityBuilder<OWNER, BLOCK_ENTITY, PARENT> tag(Tag.Named<BlockEntityType<?>>... tags)
+	public final BlockEntityBuilder<OWNER, BLOCK_ENTITY, PARENT> tag(TagKey<BlockEntityType<?>>... tags)
 	{
 		return tag(AbstractRegistrator.BLOCK_ENTITY_TAGS_PROVIDER, tags);
 	}
 
 	@SafeVarargs
-	public final BlockEntityBuilder<OWNER, BLOCK_ENTITY, PARENT> removeTag(Tag.Named<BlockEntityType<?>>... tags)
+	public final BlockEntityBuilder<OWNER, BLOCK_ENTITY, PARENT> removeTag(TagKey<BlockEntityType<?>>... tags)
 	{
 		return removeTag(AbstractRegistrator.BLOCK_ENTITY_TAGS_PROVIDER, tags);
 	}

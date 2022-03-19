@@ -2,7 +2,7 @@ package xyz.apex.forge.utility.registrator.helper;
 
 import com.google.common.base.Objects;
 
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -178,7 +178,7 @@ public final class ItemTier implements Tier
 			return this;
 		}
 
-		public Builder repairIngredient(Tag<Item> repairIngredient)
+		public Builder repairIngredient(TagKey<Item> repairIngredient)
 		{
 			return repairIngredient(() -> Ingredient.of(repairIngredient));
 		}

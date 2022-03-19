@@ -3,7 +3,7 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
@@ -65,13 +65,13 @@ public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 	}
 
 	@SafeVarargs
-	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> tag(Tag.Named<Enchantment>... tags)
+	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> tag(TagKey<Enchantment>... tags)
 	{
 		return tag(AbstractRegistrator.ENCHANTMENT_TAGS_PROVIDER, tags);
 	}
 
 	@SafeVarargs
-	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> removeTag(Tag.Named<Enchantment>... tags)
+	public final EnchantmentBuilder<OWNER, ENCHANTMENT, PARENT> removeTag(TagKey<Enchantment>... tags)
 	{
 		return removeTags(AbstractRegistrator.ENCHANTMENT_TAGS_PROVIDER, tags);
 	}

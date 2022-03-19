@@ -13,7 +13,7 @@ import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -62,7 +62,7 @@ public abstract class LegacyRegistratorBuilder<
 	}
 
 	@SafeVarargs
-	public final BUILDER removeTags(ProviderType<? extends RegistrateTagsProvider<BASE>> providerType, Tag.Named<BASE>... tags)
+	public final BUILDER removeTags(ProviderType<? extends RegistrateTagsProvider<BASE>> providerType, TagKey<BASE>... tags)
 	{
 		return removeTag((ProviderType<RegistrateTagsProvider<BASE>>) providerType, tags);
 	}

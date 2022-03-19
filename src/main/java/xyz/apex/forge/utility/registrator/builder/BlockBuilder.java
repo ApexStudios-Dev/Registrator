@@ -15,7 +15,7 @@ import com.tterrag.registrate.util.nullness.NonnullType;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
@@ -351,13 +351,13 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 	}
 
 	@SafeVarargs
-	public final BlockBuilder<OWNER, BLOCK, PARENT> tag(Tag.Named<Block>... tags)
+	public final BlockBuilder<OWNER, BLOCK, PARENT> tag(TagKey<Block>... tags)
 	{
 		return tag(ProviderType.BLOCK_TAGS, tags);
 	}
 
 	@SafeVarargs
-	public final BlockBuilder<OWNER, BLOCK, PARENT> removeTag(Tag.Named<Block>... tags)
+	public final BlockBuilder<OWNER, BLOCK, PARENT> removeTag(TagKey<Block>... tags)
 	{
 		return removeTag(ProviderType.BLOCK_TAGS, tags);
 	}

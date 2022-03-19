@@ -18,9 +18,10 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.tags.*;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -43,13 +44,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.common.ForgeTagHandler;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -74,7 +72,6 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 @SuppressWarnings({ "DeprecatedIsStillUsed", "unchecked", "UnusedReturnValue", "UnstableApiUsage", "unused", "deprecation", "CommentedOutCode" })
@@ -92,11 +89,6 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// public static final StaticTagHelper<Item> ITEM_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(ItemTags.class, null, "field_199906_c");
 	// public static final StaticTagHelper<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(EntityTypeTags.class, null, "field_219766_c");
 	// public static final StaticTagHelper<Fluid> FLUID_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(FluidTags.class, null, "field_206961_c");
-
-	public static final StaticTagHelper<Block> BLOCK_TAG_REGISTRY = BlockTags.HELPER;
-	public static final StaticTagHelper<Item> ITEM_TAG_REGISTRY = ItemTags.HELPER;
-	public static final StaticTagHelper<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = EntityTypeTags.HELPER;
-	public static final StaticTagHelper<Fluid> FLUID_TAG_REGISTRY = FluidTags.HELPER;
 	// endregion
 
 	// region: ProviderTypes
@@ -147,539 +139,164 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	// region: Tags
 	// region: Generic
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tag(StaticTagHelper<BASE> tagHelper, String tagNamespace, String tagPath)
+	public <TYPE> TagKey<TYPE> genericTag(ResourceKey<? extends Registry<TYPE>> tagType, String tagNamespace, String tagName)
 	{
-		return tagHelper.bind(tagNamespace + ':' + tagPath);
+		return TagKey.create(tagType, new ResourceLocation(tagNamespace, tagName));
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagForge(StaticTagHelper<BASE> tagHelper, String tagPath)
+	public <TYPE> TagKey<TYPE> genericTagModded(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
 	{
-		return tag(tagHelper, FORGE_ID, tagPath);
+		return genericTag(tagType, getModId(), tagName);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagVanilla(StaticTagHelper<BASE> tagHelper, String tagPath)
+	public <TYPE> TagKey<TYPE> genericTagVanilla(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
 	{
-		return tag(tagHelper, MINECRAFT_ID, tagPath);
+		return genericTag(tagType, MINECRAFT_ID, tagName);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagRegistrator(StaticTagHelper<BASE> tagHelper, String tagPath)
+	public <TYPE> TagKey<TYPE> genericTagForge(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
 	{
-		return tag(tagHelper, REGISTRATOR_ID, tagPath);
+		return genericTag(tagType, FORGE_ID, tagName);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagModded(StaticTagHelper<BASE> tagHelper, String tagPath)
+	public <TYPE> TagKey<TYPE> genericTagRegistrator(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
 	{
-		return tag(tagHelper, getModId(), tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tag(IForgeRegistry<BASE> tagType, String tagNamespace, String tagPath)
-	{
-		return ForgeTagHandler.makeWrapperTag(tagType, new ResourceLocation(tagNamespace, tagPath));
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagForge(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tag(tagType, FORGE_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagVanilla(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tag(tagType, MINECRAFT_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagRegistrator(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tag(tagType, REGISTRATOR_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tag.Named<BASE> tagModded(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tag(tagType, getModId(), tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(StaticTagHelper<BASE> tagHelper, String tagNamespace, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagHelper.createOptional(new ResourceLocation(tagNamespace, tagPath), defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagHelper, FORGE_ID, tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagHelper, MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagHelper, REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(StaticTagHelper<BASE> tagHelper, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagHelper, getModId(), tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(StaticTagHelper<BASE> tagHelper, String tagNamespace, String tagPath)
-	{
-		return tagOptional(tagHelper, tagNamespace, tagPath, null);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(StaticTagHelper<BASE> tagHelper, String tagPath)
-	{
-		return tagOptional(tagHelper, FORGE_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(StaticTagHelper<BASE> tagHelper, String tagPath)
-	{
-		return tagOptional(tagHelper, MINECRAFT_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(StaticTagHelper<BASE> tagHelper, String tagPath)
-	{
-		return tagOptional(tagHelper, REGISTRATOR_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(StaticTagHelper<BASE> tagHelper, String tagPath)
-	{
-		return tagOptional(tagHelper, getModId(), tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(IForgeRegistry<BASE> tagType, String tagNamespace, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return ForgeTagHandler.createOptionalTag(tagType, new ResourceLocation(tagNamespace, tagPath), defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagType, FORGE_ID, tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagType, MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagType, REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(IForgeRegistry<BASE> tagType, String tagPath, @Nullable Set<Supplier<BASE>> defaults)
-	{
-		return tagOptional(tagType, getModId(), tagPath, defaults);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptional(IForgeRegistry<BASE> tagType, String tagNamespace, String tagPath)
-	{
-		return tagOptional(tagType, tagNamespace, tagPath, null);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalForge(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tagOptional(tagType, FORGE_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalVanilla(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tagOptional(tagType, MINECRAFT_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalRegistrator(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tagOptional(tagType, REGISTRATOR_ID, tagPath);
-	}
-
-	public final <BASE extends IForgeRegistryEntry<BASE>> Tags.IOptionalNamedTag<BASE> tagOptionalModded(IForgeRegistry<BASE> tagType, String tagPath)
-	{
-		return tagOptional(tagType, getModId(), tagPath);
+		return genericTag(tagType, REGISTRATOR_ID, tagName);
 	}
 	// endregion
 
 	// region: Block
-	public final Tag.Named<Block> blockTag(String tagNamespace, String tagPath)
+	public TagKey<Block> blockTag(String tagNamespace, String tagName)
 	{
-		return tag(BLOCK_TAG_REGISTRY, tagNamespace, tagPath);
+		return genericTag(Registry.BLOCK_REGISTRY, tagNamespace, tagName);
 	}
 
-	public final Tag.Named<Block> blockTagForge(String tagPath)
+	public TagKey<Block> blockTagModded(String tagName)
 	{
-		return blockTag(FORGE_ID, tagPath);
+		return blockTag(getModId(), tagName);
 	}
 
-	public final Tag.Named<Block> blockTagVanilla(String tagPath)
+	public TagKey<Block> blockTagVanilla(String tagName)
 	{
-		return blockTag(MINECRAFT_ID, tagPath);
+		return blockTag(MINECRAFT_ID, tagName);
 	}
 
-	public final Tag.Named<Block> blockTagRegistrator(String tagPath)
+	public TagKey<Block> blockTagForge(String tagName)
 	{
-		return blockTag(REGISTRATOR_ID, tagPath);
+		return blockTag(FORGE_ID, tagName);
 	}
 
-	public final Tag.Named<Block> blockTagModded(String tagPath)
+	public TagKey<Block> blockTagRegistrator(String tagName)
 	{
-		return blockTag(getModId(), tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<Block>> defaults)
-	{
-		return tagOptional(BLOCK_TAG_REGISTRY, tagNamespace, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalForge(String tagPath, @Nullable Set<Supplier<Block>> defaults)
-	{
-		return blockTagOptional(FORGE_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<Block>> defaults)
-	{
-		return blockTagOptional(MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<Block>> defaults)
-	{
-		return blockTagOptional(REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalModded(String tagPath, @Nullable Set<Supplier<Block>> defaults)
-	{
-		return blockTagOptional(getModId(), tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptional(String tagNamespace, String tagPath)
-	{
-		return blockTagOptional(tagNamespace, tagPath, null);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalForge(String tagPath)
-	{
-		return blockTagOptional(FORGE_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalVanilla(String tagPath)
-	{
-		return blockTagOptional(MINECRAFT_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalRegistrator(String tagPath)
-	{
-		return blockTagOptional(REGISTRATOR_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Block> blockTagOptionalModded(String tagPath)
-	{
-		return blockTagOptional(getModId(), tagPath);
+		return blockTag(REGISTRATOR_ID, tagName);
 	}
 	// endregion
 
 	// region: Item
-	public final Tag.Named<Item> itemTag(String tagNamespace, String tagPath)
+	public TagKey<Item> itemTag(String tagNamespace, String tagName)
 	{
-		return tag(ITEM_TAG_REGISTRY, tagNamespace, tagPath);
+		return genericTag(Registry.ITEM_REGISTRY, tagNamespace, tagName);
 	}
 
-	public final Tag.Named<Item> itemTagForge(String tagPath)
+	public TagKey<Item> itemTagModded(String tagName)
 	{
-		return itemTag(FORGE_ID, tagPath);
+		return itemTag(getModId(), tagName);
 	}
 
-	public final Tag.Named<Item> itemTagVanilla(String tagPath)
+	public TagKey<Item> itemTagVanilla(String tagName)
 	{
-		return itemTag(MINECRAFT_ID, tagPath);
+		return itemTag(MINECRAFT_ID, tagName);
 	}
 
-	public final Tag.Named<Item> itemTagRegistrator(String tagPath)
+	public TagKey<Item> itemTagForge(String tagName)
 	{
-		return itemTag(REGISTRATOR_ID, tagPath);
+		return itemTag(FORGE_ID, tagName);
 	}
 
-	public final Tag.Named<Item> itemTagModded(String tagPath)
+	public TagKey<Item> itemTagRegistrator(String tagName)
 	{
-		return itemTag(getModId(), tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<Item>> defaults)
-	{
-		return tagOptional(ITEM_TAG_REGISTRY, tagNamespace, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalForge(String tagPath, @Nullable Set<Supplier<Item>> defaults)
-	{
-		return itemTagOptional(FORGE_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<Item>> defaults)
-	{
-		return itemTagOptional(MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<Item>> defaults)
-	{
-		return itemTagOptional(REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalModded(String tagPath, @Nullable Set<Supplier<Item>> defaults)
-	{
-		return itemTagOptional(getModId(), tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptional(String tagNamespace, String tagPath)
-	{
-		return itemTagOptional(tagNamespace, tagPath, null);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalForge(String tagPath)
-	{
-		return itemTagOptional(FORGE_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalVanilla(String tagPath)
-	{
-		return itemTagOptional(MINECRAFT_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalRegistrator(String tagPath)
-	{
-		return itemTagOptional(REGISTRATOR_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Item> itemTagOptionalModded(String tagPath)
-	{
-		return itemTagOptional(getModId(), tagPath);
+		return itemTag(REGISTRATOR_ID, tagName);
 	}
 	// endregion
 
 	// region: EntityType
-	public final Tag.Named<EntityType<?>> entityTypeTag(String tagNamespace, String tagPath)
+	public TagKey<EntityType<?>> entityTypeTag(String tagNamespace, String tagName)
 	{
-		return tag(ENTITY_TYPE_TAG_REGISTRY, tagNamespace, tagPath);
+		return genericTag(Registry.ENTITY_TYPE_REGISTRY, tagNamespace, tagName);
 	}
 
-	public final Tag.Named<EntityType<?>> entityTypeTagForge(String tagPath)
+	public TagKey<EntityType<?>> entityTypeTagModded(String tagName)
 	{
-		return entityTypeTag(FORGE_ID, tagPath);
+		return entityTypeTag(getModId(), tagName);
 	}
 
-	public final Tag.Named<EntityType<?>> entityTypeTagVanilla(String tagPath)
+	public TagKey<EntityType<?>> entityTypeTagVanilla(String tagName)
 	{
-		return entityTypeTag(MINECRAFT_ID, tagPath);
+		return entityTypeTag(MINECRAFT_ID, tagName);
 	}
 
-	public final Tag.Named<EntityType<?>> entityTypeTagRegistrator(String tagPath)
+	public TagKey<EntityType<?>> entityTypeTagForge(String tagName)
 	{
-		return entityTypeTag(REGISTRATOR_ID, tagPath);
+		return entityTypeTag(FORGE_ID, tagName);
 	}
 
-	public final Tag.Named<EntityType<?>> entityTypeTagModded(String tagPath)
+	public TagKey<EntityType<?>> entityTypeTagRegistrator(String tagName)
 	{
-		return entityTypeTag(getModId(), tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<EntityType<?>>> defaults)
-	{
-		return tagOptional(ENTITY_TYPE_TAG_REGISTRY, tagNamespace, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalForge(String tagPath, @Nullable Set<Supplier<EntityType<?>>> defaults)
-	{
-		return entityTypeTagOptional(FORGE_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<EntityType<?>>> defaults)
-	{
-		return entityTypeTagOptional(MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<EntityType<?>>> defaults)
-	{
-		return entityTypeTagOptional(REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalModded(String tagPath, @Nullable Set<Supplier<EntityType<?>>> defaults)
-	{
-		return entityTypeTagOptional(getModId(), tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptional(String tagNamespace, String tagPath)
-	{
-		return entityTypeTagOptional(tagNamespace, tagPath, null);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalForge(String tagPath)
-	{
-		return entityTypeTagOptional(FORGE_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalVanilla(String tagPath)
-	{
-		return entityTypeTagOptional(MINECRAFT_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalRegistrator(String tagPath)
-	{
-		return entityTypeTagOptional(REGISTRATOR_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<EntityType<?>> entityTypeTagOptionalModded(String tagPath)
-	{
-		return entityTypeTagOptional(getModId(), tagPath);
+		return entityTypeTag(REGISTRATOR_ID, tagName);
 	}
 	// endregion
 
 	// region: Fluid
-	public final Tag.Named<Fluid> fluidTag(String tagNamespace, String tagPath)
+	public TagKey<Fluid> fluidTag(String tagNamespace, String tagName)
 	{
-		return tag(FLUID_TAG_REGISTRY, tagNamespace, tagPath);
+		return genericTag(Registry.FLUID_REGISTRY, tagNamespace, tagName);
 	}
 
-	public final Tag.Named<Fluid> fluidTagForge(String tagPath)
+	public TagKey<Fluid> fluidTagModded(String tagName)
 	{
-		return fluidTag(FORGE_ID, tagPath);
+		return fluidTag(getModId(), tagName);
 	}
 
-	public final Tag.Named<Fluid> fluidTagVanilla(String tagPath)
+	public TagKey<Fluid> fluidTagVanilla(String tagName)
 	{
-		return fluidTag(MINECRAFT_ID, tagPath);
+		return fluidTag(MINECRAFT_ID, tagName);
 	}
 
-	public final Tag.Named<Fluid> fluidTagRegistrator(String tagPath)
+	public TagKey<Fluid> fluidTagForge(String tagName)
 	{
-		return fluidTag(REGISTRATOR_ID, tagPath);
+		return fluidTag(FORGE_ID, tagName);
 	}
 
-	public final Tag.Named<Fluid> fluidTagModded(String tagPath)
+	public TagKey<Fluid> fluidTagRegistrator(String tagName)
 	{
-		return fluidTag(getModId(), tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<Fluid>> defaults)
-	{
-		return tagOptional(FLUID_TAG_REGISTRY, tagNamespace, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalForge(String tagPath, @Nullable Set<Supplier<Fluid>> defaults)
-	{
-		return fluidTagOptional(FORGE_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<Fluid>> defaults)
-	{
-		return fluidTagOptional(MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<Fluid>> defaults)
-	{
-		return fluidTagOptional(REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalModded(String tagPath, @Nullable Set<Supplier<Fluid>> defaults)
-	{
-		return fluidTagOptional(getModId(), tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptional(String tagNamespace, String tagPath)
-	{
-		return fluidTagOptional(tagNamespace, tagPath, null);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalForge(String tagPath)
-	{
-		return fluidTagOptional(FORGE_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalVanilla(String tagPath)
-	{
-		return fluidTagOptional(MINECRAFT_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalRegistrator(String tagPath)
-	{
-		return fluidTagOptional(REGISTRATOR_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<Fluid> fluidTagOptionalModded(String tagPath)
-	{
-		return fluidTagOptional(getModId(), tagPath);
+		return fluidTag(REGISTRATOR_ID, tagName);
 	}
 	// endregion
 
 	// region: BlockEntityType
-	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTag(String tagNamespace, String tagPath)
+	public TagKey<BlockEntityType<?>> blockEntityTypeTag(String tagNamespace, String tagName)
 	{
-		return tag(ForgeRegistries.BLOCK_ENTITIES, tagNamespace, tagPath);
+		return genericTag(Registry.BLOCK_ENTITY_TYPE_REGISTRY, tagNamespace, tagName);
 	}
 
-	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagForge(String tagPath)
+	public TagKey<BlockEntityType<?>> blockEntityTypeTagModded(String tagName)
 	{
-		return blockEntityTypeTag(FORGE_ID, tagPath);
+		return blockEntityTypeTag(getModId(), tagName);
 	}
 
-	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagVanilla(String tagPath)
+	public TagKey<BlockEntityType<?>> blockEntityTypeTagVanilla(String tagName)
 	{
-		return blockEntityTypeTag(MINECRAFT_ID, tagPath);
+		return blockEntityTypeTag(MINECRAFT_ID, tagName);
 	}
 
-	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagRegistrator(String tagPath)
+	public TagKey<BlockEntityType<?>> blockEntityTypeTagForge(String tagName)
 	{
-		return blockEntityTypeTag(REGISTRATOR_ID, tagPath);
+		return blockEntityTypeTag(FORGE_ID, tagName);
 	}
 
-	public final Tag.Named<BlockEntityType<?>> blockEntityTypeTagModded(String tagPath)
+	public TagKey<BlockEntityType<?>> blockEntityTypeTagRegistrator(String tagName)
 	{
-		return blockEntityTypeTag(getModId(), tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptional(String tagNamespace, String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
-	{
-		return tagOptional(ForgeRegistries.BLOCK_ENTITIES, tagNamespace, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalForge(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
-	{
-		return blockEntityTypeTagOptional(FORGE_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalVanilla(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
-	{
-		return blockEntityTypeTagOptional(MINECRAFT_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalRegistrator(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
-	{
-		return blockEntityTypeTagOptional(REGISTRATOR_ID, tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalModded(String tagPath, @Nullable Set<Supplier<BlockEntityType<?>>> defaults)
-	{
-		return blockEntityTypeTagOptional(getModId(), tagPath, defaults);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptional(String tagNamespace, String tagPath)
-	{
-		return blockEntityTypeTagOptional(tagNamespace, tagPath, null);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalForge(String tagPath)
-	{
-		return blockEntityTypeTagOptional(FORGE_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalVanilla(String tagPath)
-	{
-		return blockEntityTypeTagOptional(MINECRAFT_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalRegistrator(String tagPath)
-	{
-		return blockEntityTypeTagOptional(REGISTRATOR_ID, tagPath);
-	}
-
-	public final Tags.IOptionalNamedTag<BlockEntityType<?>> blockEntityTypeTagOptionalModded(String tagPath)
-	{
-		return blockEntityTypeTagOptional(getModId(), tagPath);
+		return blockEntityTypeTag(REGISTRATOR_ID, tagName);
 	}
 	// endregion
 	// endregion
@@ -968,22 +585,22 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: DiggerItem
-	public final <ITEM extends DiggerItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> diggerItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables, DiggerItemFactory<ITEM> diggerItemFactory)
+	public final <ITEM extends DiggerItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> diggerItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, TagKey<Block> diggables, DiggerItemFactory<ITEM> diggerItemFactory)
 	{
 		return item(registryName, parent, properties -> diggerItemFactory.create(attackDamage, attackSpeed, itemTier, diggables, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, DiggerItem, PARENT> diggerItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables)
+	public final <PARENT> ItemBuilder<REGISTRATOR, DiggerItem, PARENT> diggerItem(String registryName, PARENT parent, Tier itemTier, float attackDamage, float attackSpeed, TagKey<Block> diggables)
 	{
 		return diggerItem(registryName, parent, itemTier, attackDamage, attackSpeed, diggables, DiggerItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends DiggerItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> diggerItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables, DiggerItemFactory<ITEM> diggerItemFactory)
+	public final <ITEM extends DiggerItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> diggerItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, TagKey<Block> diggables, DiggerItemFactory<ITEM> diggerItemFactory)
 	{
 		return diggerItem(registryName, self, itemTier, attackDamage, attackSpeed, diggables, diggerItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, DiggerItem, REGISTRATOR> diggerItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, Tag<Block> diggables)
+	public final ItemBuilder<REGISTRATOR, DiggerItem, REGISTRATOR> diggerItem(String registryName, Tier itemTier, float attackDamage, float attackSpeed, TagKey<Block> diggables)
 	{
 		return diggerItem(registryName, self, itemTier, attackDamage, attackSpeed, diggables, DiggerItemFactory.DEFAULT);
 	}

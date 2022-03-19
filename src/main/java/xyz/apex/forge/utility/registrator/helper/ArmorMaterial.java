@@ -7,7 +7,7 @@ import org.apache.commons.lang3.Validate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -261,7 +261,7 @@ public final class ArmorMaterial implements net.minecraft.world.item.ArmorMateri
 			return this;
 		}
 
-		public Builder repairIngredient(Tag<Item> repairIngredient)
+		public Builder repairIngredient(TagKey<Item> repairIngredient)
 		{
 			return repairIngredient(() -> Ingredient.of(repairIngredient));
 		}

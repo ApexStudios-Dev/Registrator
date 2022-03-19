@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,7 @@ public final class EntityEntry<ENTITY extends Entity> extends RegistryEntry<Enti
 		super(registrator, delegate);
 	}
 
-	public boolean isInEntityTypeTag(Tag<EntityType<?>> tag)
+	public boolean isInEntityTypeTag(TagKey<EntityType<?>> tag)
 	{
 		return asEntityType().is(tag);
 	}

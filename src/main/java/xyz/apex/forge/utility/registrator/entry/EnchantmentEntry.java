@@ -1,7 +1,6 @@
 package xyz.apex.forge.utility.registrator.entry;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,10 +25,11 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 		return get();
 	}
 
-	public boolean isInEnchantmentTag(Tag<Enchantment> tag)
+	// TODO:
+	/*public boolean isInEnchantmentTag(Tag<Enchantment> tag)
 	{
 		return asEnchantment().is(tag);
-	}
+	}*/
 
 	public boolean isEnchantment(Enchantment enchantment)
 	{

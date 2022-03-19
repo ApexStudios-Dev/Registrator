@@ -1,7 +1,6 @@
 package xyz.apex.forge.utility.registrator.entry;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,10 +22,11 @@ public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends Re
 		super(registrator, delegate);
 	}
 
-	public boolean isInBlockEntityTypeTag(Tag<BlockEntityType<?>> tag)
+	// TODO:
+	/*public boolean isInBlockEntityTypeTag(Tag<BlockEntityType<?>> tag)
 	{
 		return asBlockEntityType().isIn(tag);
-	}
+	}*/
 
 	public boolean isBlockEntityType(BlockEntityType<?> blockEntityType)
 	{

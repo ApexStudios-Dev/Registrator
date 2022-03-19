@@ -6,12 +6,11 @@ import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
-import com.tterrag.registrate.util.NonNullLazyValue;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -30,6 +29,7 @@ import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullUnaryOperator;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 @SuppressWarnings({ "deprecation", "unused", "UnusedReturnValue" })
 public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM extends Item, PARENT> extends RegistratorBuilder<OWNER, Item, ITEM, PARENT, ItemBuilder<OWNER, ITEM, PARENT>, ItemEntry<ITEM>>
@@ -49,7 +49,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 		// apply registrate defaults
 		defaultModel().defaultLang();
 
-		NonNullLazyValue<? extends CreativeModeTab> currentGroup = ObfuscationReflectionHelper.getPrivateValue(AbstractRegistrate.class, owner.backend, "currentTab");
+		Supplier<? extends CreativeModeTab> currentGroup = ObfuscationReflectionHelper.getPrivateValue(AbstractRegistrate.class, owner.backend, "currentTab");
 
 		if(currentGroup != null)
 			tab(currentGroup::get);
@@ -166,13 +166,13 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 	}
 
 	@SafeVarargs
-	public final ItemBuilder<OWNER, ITEM, PARENT> tag(Tag.Named<Item>... tags)
+	public final ItemBuilder<OWNER, ITEM, PARENT> tag(TagKey<Item>... tags)
 	{
 		return tag(ProviderType.ITEM_TAGS, tags);
 	}
 
 	@SafeVarargs
-	public final ItemBuilder<OWNER, ITEM, PARENT> removeTag(Tag.Named<Item>... tags)
+	public final ItemBuilder<OWNER, ITEM, PARENT> removeTag(TagKey<Item>... tags)
 	{
 		return removeTags(ProviderType.ITEM_TAGS, tags);
 	}

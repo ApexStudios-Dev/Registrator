@@ -10,7 +10,7 @@ import com.tterrag.registrate.util.nullness.NonnullType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.Registry;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.level.Level;
@@ -226,13 +226,13 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 	}
 
 	@SafeVarargs
-	public final EntityBuilder<OWNER, ENTITY, PARENT> tag(Tag.Named<EntityType<?>>... tags)
+	public final EntityBuilder<OWNER, ENTITY, PARENT> tag(TagKey<EntityType<?>>... tags)
 	{
 		return tag(ProviderType.ENTITY_TAGS, tags);
 	}
 
 	@SafeVarargs
-	public final EntityBuilder<OWNER, ENTITY, PARENT> removeTag(Tag.Named<EntityType<?>>... tags)
+	public final EntityBuilder<OWNER, ENTITY, PARENT> removeTag(TagKey<EntityType<?>>... tags)
 	{
 		return removeTags(ProviderType.ENTITY_TAGS, tags);
 	}

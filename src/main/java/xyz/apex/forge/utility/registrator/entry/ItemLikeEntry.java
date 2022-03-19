@@ -1,6 +1,6 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -33,9 +33,9 @@ public abstract class ItemLikeEntry<ITEM extends IForgeRegistryEntry<? super ITE
 		return isItem(stack.getItem());
 	}
 
-	public final boolean isInItemTag(Tag<Item> tag)
+	public final boolean isInItemTag(TagKey<Item> tag)
 	{
-		return tag.contains(asItem());
+		return asItem().builtInRegistryHolder().is(tag);
 	}
 
 	public final boolean isItem(Item item)
