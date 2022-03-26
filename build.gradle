@@ -137,7 +137,7 @@ sourceSets.main.resources {
 repositories {
 	mavenCentral()
 	maven { url 'https://maven.tterrag.com/' }
-	maven { url 'https://apexmodder.jfrog.io/artifactory/mods-maven/' }
+	maven { url 'https://maven.apexmods.xyz/' }
 }
 
 dependencies {
@@ -258,7 +258,7 @@ if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS
 		repositories {
 			maven {
 				name 'ApexMods-Maven'
-				url 'https://apexmodder.jfrog.io/artifactory/mods-maven/'
+				url 'https://maven.apexmods.xyz/'
 
 				credentials {
 					username System.getenv('APEX_MODS_MAVEN_USERNAME')
