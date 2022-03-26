@@ -105,7 +105,7 @@ To include Registrator in your mods `build.gradle` file, We make use of the [Cur
 Add the following snippet of code to your `repositories { }` section
 
 ```groovy
-maven { url 'https://apexmodder.jfrog.io/artifactory/mods-maven/' } // ApexMods-Maven
+maven { url 'https://maven.apexmods.xyz/' } // ApexMods-Maven
 ```
 
 Add the following snippet of code to your `dependencies { }` section<br>
