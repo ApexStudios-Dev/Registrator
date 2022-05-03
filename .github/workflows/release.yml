@@ -105,7 +105,7 @@ jobs:
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           color: '#1D1E27'
           file: ./CHANGELOG.md
-          message: '<@&963675410158206976> has been updated to v**_${{ steps.mod_version.outputs.value }}_** for **Minecraft** **_1.18.1_**!'
+          message: 'Registrator has been updated to v**_${{ steps.mod_version.outputs.value }}_** for **Minecraft** **_1.18.1_**!'
 
       - name: Stop Gradle Deamons
         run: ./gradlew --stop
