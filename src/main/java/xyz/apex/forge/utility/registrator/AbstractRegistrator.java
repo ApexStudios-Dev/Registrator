@@ -33,6 +33,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.item.*;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.potion.Potion;
 import net.minecraft.tags.*;
 import net.minecraft.tileentity.BannerPattern;
@@ -65,10 +66,7 @@ import xyz.apex.forge.utility.registrator.entry.RecipeSerializerEntry;
 import xyz.apex.forge.utility.registrator.factory.*;
 import xyz.apex.forge.utility.registrator.factory.item.*;
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
-import xyz.apex.forge.utility.registrator.provider.BlockListReporter;
-import xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider;
-import xyz.apex.forge.utility.registrator.provider.RegistrateSoundProvider;
-import xyz.apex.forge.utility.registrator.provider.RegistrateTemplatePoolProvider;
+import xyz.apex.forge.utility.registrator.provider.*;
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullFunction;
@@ -108,6 +106,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public static final ProviderType<RegistrateLangExtProvider> LANG_EXT_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":lang_ext", (owner, event) -> new RegistrateLangExtProvider(owner, event.getGenerator()));
 	public static final ProviderType<RegistrateSoundProvider> SOUNDS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":sounds", (owner, event) -> new RegistrateSoundProvider(owner, event.getGenerator(), event.getExistingFileHelper()));
 	public static final ProviderType<RegistrateTemplatePoolProvider> TEMPLATE_POOL_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":template_pools", (owner, event) -> new RegistrateTemplatePoolProvider(owner, event.getGenerator()));
+	public static final ProviderType<RegistrateParticleProvider> PARTICLE_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":particles", (owner, event) -> new RegistrateParticleProvider(owner, event.getGenerator(), event.getExistingFileHelper()));
 
 	// region: Tags
 	public static final ProviderType<RegistrateTagsProvider<Potion>> POTION_TYPE_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/potion_type", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "potion_types", event.getGenerator(), Registry.POTION, event.getExistingFileHelper()));
@@ -1541,6 +1540,18 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public final EnchantmentBuilder<REGISTRATOR, Enchantment, REGISTRATOR> enchantment(String registryName, EnchantmentType enchantmentType)
 	{
 		return enchantment(registryName, self, enchantmentType, EnchantmentFactory.DEFAULT);
+	}
+	// endregion
+
+	// region: ParticleType
+	public final <PARTICLE extends IParticleData, PARENT> ParticleBuilder<REGISTRATOR, PARTICLE, PARENT> particle(String registryName, PARENT parent, ParticleFactory<PARTICLE> particleFactory)
+	{
+		return entry(registryName, callback -> new ParticleBuilder<>(self, parent, registryName, callback, particleFactory));
+	}
+
+	public final <PARTICLE extends IParticleData> ParticleBuilder<REGISTRATOR, PARTICLE, REGISTRATOR> particle(String registryName, ParticleFactory<PARTICLE> particleFactory)
+	{
+		return particle(registryName, self, particleFactory);
 	}
 	// endregion
 
