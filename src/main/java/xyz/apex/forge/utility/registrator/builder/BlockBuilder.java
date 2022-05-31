@@ -53,6 +53,8 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 	private NonnullUnaryOperator<BlockBehaviour.Properties> propertiesModifier = NonnullUnaryOperator.identity();
 	private final List<NonnullSupplier<NonnullSupplier<RenderType>>> renderTypes = Lists.newArrayList();
 	@Nullable private NonnullSupplier<NonnullSupplier<BlockColor>> colorHandler = null;
+	@Nullable private ItemBuilder<OWNER, ?, BlockBuilder<OWNER, BLOCK, PARENT>> itemBuilder = null;
+	@Nullable private BlockEntityBuilder<OWNER, ?, BlockBuilder<OWNER, BLOCK, PARENT>> blockEntityBuilder = null;
 
 	public BlockBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, BlockFactory<BLOCK> blockFactory, NonnullSupplier<BlockBehaviour.Properties> initialProperties)
 	{
@@ -99,6 +101,11 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 	@Override
 	protected @NonnullType BLOCK createEntry()
 	{
+		if(itemBuilder != null)
+			copyMappingsTo(itemBuilder);
+		if(blockEntityBuilder != null)
+			copyMappingsTo(blockEntityBuilder);
+
 		var properties = initialProperties.get();
 		properties = propertiesModifier.apply(properties);
 		return blockFactory.create(properties);
@@ -296,7 +303,11 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public <ITEM extends BlockItem> ItemBuilder<OWNER, ITEM, BlockBuilder<OWNER, BLOCK, PARENT>> item(BlockItemFactory<BLOCK, ITEM> blockItemFactory)
 	{
-		return owner.blockItem(getName(), this, toSupplier(), blockItemFactory);
+		// lazy builders, same instance if called multiple times
+		if(itemBuilder == null)
+			itemBuilder = owner.blockItem(getName(), this, toSupplier(), blockItemFactory);
+
+		return (ItemBuilder<OWNER, ITEM, BlockBuilder<OWNER, BLOCK, PARENT>>) itemBuilder;
 	}
 
 	public <BLOCK_ENTITY extends BlockEntity> BlockBuilder<OWNER, BLOCK, PARENT> simpleBlockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
@@ -306,7 +317,11 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public <BLOCK_ENTITY extends BlockEntity> BlockEntityBuilder<OWNER, BLOCK_ENTITY, BlockBuilder<OWNER, BLOCK, PARENT>> blockEntity(BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
-		return owner.blockEntity(getName(), this, blockEntityFactory).validBlock(() -> asSupplier().get());
+		// lazy builders, same instance if called multiple times
+		if(blockEntityBuilder == null)
+			blockEntityBuilder = owner.blockEntity(getName(), this, blockEntityFactory).validBlock(() -> asSupplier().get());
+
+		return (BlockEntityBuilder<OWNER, BLOCK_ENTITY, BlockBuilder<OWNER, BLOCK, PARENT>>) blockEntityBuilder;
 	}
 
 	public BlockBuilder<OWNER, BLOCK, PARENT> color(NonnullSupplier<NonnullSupplier<BlockColor>> colorHandler)

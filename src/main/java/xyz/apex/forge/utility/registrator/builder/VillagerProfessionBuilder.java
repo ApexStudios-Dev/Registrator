@@ -24,6 +24,7 @@ import xyz.apex.java.utility.nullness.NonnullBiConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullType;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -39,6 +40,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	private NonnullSupplier<PoiType> poiType = () -> PoiType.UNEMPLOYED;
 	private NonnullBiConsumer<VillagerProfession, VillagerTradesRegistrar> villagerTradesConsumer = NonnullBiConsumer.noop();
 	private NonnullBiConsumer<VillagerProfession, WandererTradesRegistrar> wandererTradesConsumer = NonnullBiConsumer.noop();
+	@Nullable private PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> pointOfInterestBuilder = null;
 
 	public VillagerProfessionBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
@@ -59,6 +61,9 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	@Override
 	protected @NonnullType VillagerProfession createEntry()
 	{
+		if(pointOfInterestBuilder != null)
+			copyMappingsTo(pointOfInterestBuilder);
+
 		var registryName = getRegistryNameFull();
 		var pointOfInterestType = this.poiType.get();
 		ImmutableSet<Item> requestedItems = this.requestedItems.stream().map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
@@ -76,9 +81,13 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 
 	public PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> poi()
 	{
-		var poiTypeBuilder = owner.pointOfInterest(getName(), this);
-		poiType = () -> poiTypeBuilder.asSupplier().get();
-		return poiTypeBuilder;
+		if(pointOfInterestBuilder == null)
+		{
+			pointOfInterestBuilder = owner.pointOfInterest(getName(), this);
+			poiType = () -> pointOfInterestBuilder.asSupplier().get();
+		}
+
+		return pointOfInterestBuilder;
 	}
 
 	// region: Secondary POI
