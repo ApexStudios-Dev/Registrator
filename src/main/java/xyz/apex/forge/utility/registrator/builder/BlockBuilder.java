@@ -319,7 +319,7 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 	{
 		// lazy builders, same instance if called multiple times
 		if(blockEntityBuilder == null)
-			blockEntityBuilder = owner.blockEntity(getName(), this, blockEntityFactory);
+			blockEntityBuilder = owner.blockEntity(getName(), this, blockEntityFactory).validBlock(() -> asSupplier().get());
 
 		return (BlockEntityBuilder<OWNER, BLOCK_ENTITY, BlockBuilder<OWNER, BLOCK, PARENT>>) blockEntityBuilder;
 	}
