@@ -1,9 +1,11 @@
-# Registrator
+# ![Registrator](./src/main/resources/banner.png)
 [![release](https://github.com/ApexModder/Registrator/actions/workflows/release.yml/badge.svg)](https://github.com/ApexModder/Registrator/actions/workflows/release.yml)
 [![license](https://img.shields.io/github/license/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/blob/master/LICENSE)
 [![last commit](https://img.shields.io/github/last-commit/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/)
 [![release](https://img.shields.io/github/v/release/ApexModder/Registrator)](https://github.com/ApexModder/Registrator/releases)
 [![curseforge](https://cf.way2muchnoise.eu/versions/550146.svg)](https://www.curseforge.com/minecraft/mc-mods/registrator)
+
+[<img src="https://i.imgur.com/qUJzbM4.png" width=33%></img>](http://discord.apexmods.xyz/)
 
 An Auto-Magic registration system built ontop of [**Registrate (_1.17.1-1.0.14_)**](https://github.com/tterrag1098/Registrate/tree/1.17).
 
@@ -97,22 +99,17 @@ To do this, add the following snippet of code to your `mods.toml` file.
     side="BOTH"
 ```
 
-To include Registrator in your mods `build.gradle` file, We make use of the [CurseMaven Gradle plugin](https://www.cursemaven.com/). <br>
+To include Registrator in your mods `build.gradle` file. <br>
 Add the following snippet of code to your `repositories { }` section
 
 ```groovy
-maven { // CurseForge
-    url 'https://cursemaven.com'
-    content { includeGroup 'curse.maven' }
-}
+maven { url 'https://maven.apexmods.xyz/' } // ApexMods-Maven
 ```
 
 Add the following snippet of code to your `dependencies { }` section<br>
-See below for table of CurseForge version IDs
 
 ```groovy
-compileOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
-runtimeOnly fg.deobf('curse.maven:registrator-550146:<REGISTRATOR_CURSE_ID>')
+implementation fg.deobf("xyz.apex.forge.utility:registrator:<MINECARFT_VERSION>-<REGISTRATOR_VERSION>:deobf")
 ```
 
 <details>

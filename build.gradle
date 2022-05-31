@@ -1,8 +1,8 @@
 buildscript {
 	repositories {
-		maven { url = 'https://maven.minecraftforge.net' }
-		maven { url = 'https://maven.parchmentmc.org' }
-		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+		maven { url 'https://maven.minecraftforge.net' }
+		maven { url 'https://maven.parchmentmc.org' }
+		maven { url 'https://repo.spongepowered.org/repository/maven-public/' }
 		mavenCentral()
 	}
 	dependencies {
@@ -15,6 +15,8 @@ buildscript {
 plugins {
 	id 'com.github.johnrengelman.shadow' version "${gradle_shadow_version}"
 	id 'com.matthewprenger.cursegradle' version "${cursegradle_version}"
+	id 'com.modrinth.minotaur' version "${minotaur_version}"
+	id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version "${gradle_changelog_version}"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -36,19 +38,15 @@ configurations {
 
 minecraft {
 	mappings channel: "${mappings_channel}", version: "${mappings_version}"
-	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	accessTransformer = file('accesstransformer.cfg')
 
 	runs {
 		client {
 			taskName 'Client'
-			workingDirectory project.file('run/client')
+			workingDirectory file('run/client')
 			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-
-			if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
-				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
-			}
 
 			mods {
 				"${mod_id}" {
@@ -57,9 +55,17 @@ minecraft {
 			}
 		}
 
+		if(project.hasProperty('mc_uuid') & project.hasProperty('mc_username')) {
+			clientAuthed {
+				parent runs.client
+				taskName 'Client-Authed'
+				args '--uuid', project.getProperty('mc_uuid'), '--username', project.getProperty('mc_username')
+			}
+		}
+
 		server {
 			taskName 'Server'
-			workingDirectory project.file('run/server')
+			workingDirectory file('run/server')
 			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
@@ -74,11 +80,11 @@ minecraft {
 
 		data {
 			taskName 'Data'
-			workingDirectory project.file('run/client')
+			workingDirectory file('run/client')
 			// property 'forge.logging.markers', 'REGISTRIES'
 			// property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+			args '--mod', mod_id, '--client', '--server', '--validate', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 			// ForgeGradle will just force-exit the Gradle Daemon which fails our builds in case
 			// a daemon is used for any reason.
 			forceExit false
@@ -92,13 +98,11 @@ minecraft {
 	}
 }
 
-mixin {
-	add sourceSets.main, "${mod_id}.refmap.json"
-	config "${mod_id}.mixins.json"
-
-	debug = true
-	debug.export = true
-	hotSwap = true
+if(file("./src/main/resources/${mod_id}.mixins.json").exists()) {
+	mixin {
+		add sourceSets.main, "${mod_id}.refmap.json"
+		config "${mod_id}.mixins.json"
+	}
 }
 
 sourceSets.main.resources {
@@ -106,86 +110,32 @@ sourceSets.main.resources {
 }
 
 repositories {
+	mavenCentral()
 	mavenLocal()
+	maven { url 'https://dvs1.progwml6.com/files/maven' }
 	maven { url 'https://maven.tterrag.com/' }
-
-	// GitHub Packages require read access
-	if(project.hasProperty('apex_git_package_token')) {
-		maven {
-			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
-			credentials {
-				username = 'Apex-GitHub-PackagesToken'
-				password = project.getProperty('apex_git_package_token')
-			}
-		}
-	} else if(System.getenv('GITHUB_TOKEN') != null) {
-		// github workflows have a different set of credentials
-		maven {
-			url = uri("https://maven.pkg.github.com/ApexModder/JavaUtilities")
-			credentials {
-				username = System.getenv('GITHUB_ACTOR')
-				password = System.getenv('GITHUB_TOKEN')
-			}
-		}
-	}
+	maven { url 'https://maven.apexmods.xyz/' }
 }
 
 dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-	// Mixin AP
 	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
 
-	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
-	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
+	runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
+
+	implementation fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
 	shade "com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}"
 
-	if(project.hasProperty('apex_git_package_token') || System.getenv('GITHUB_TOKEN') != null) {
-		// we have access to Apex's GH Packages pull from there
-		compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
-		runtimeOnly "xyz.apex.java.utility:javautilities:${javautilities_version}"
-		shade "xyz.apex.java.utility:javautilities:${javautilities_version}"
-	} else {
-		// no public location
-	}
+	implementation "xyz.apex.java.utility:javautilities:${javautilities_version}"
+	shade "xyz.apex.java.utility:javautilities:${javautilities_version}"
 }
 
-def resourceTargets = [ 'META-INF/mods.toml', 'pack.mcmeta', "${mod_id}.mixins.json".toString() ]
-def intoTargets = [ "${rootDir}/out/production/resources/", "${rootDir}/out/production/${project.name}.main/", "${rootDir}/bin/main/" ]
-def replaceProperties = [
-	minecraft_version: minecraft_version,
-	minecraft_version_range: minecraft_version_range,
-	minecraft_version_short: minecraft_version_short,
-		
-	forge_version: forge_version,
-	forge_version_range: forge_version_range,
-	forge_gradle_version: forge_gradle_version,
-
-	librarian_version: librarian_version,
-
-	mixin_gradle_version: mixin_gradle_version,
-	mixin_ap_version: mixin_ap_version,
-	
-	mappings_channel: mappings_channel,
-	mappings_version: mappings_version,
-	
-	mod_id: mod_id,
-	mod_name: mod_name,
-	mod_version: mod_version,
-	mod_base_package: mod_base_package,
-	mod_authors: mod_authors,
-
-	registrate_version: registrate_version,
-	registrate_package: registrate_package,
-
-	gradle_shadow_version: gradle_shadow_version,
-	javautilities_version: javautilities_version
-]
+def resourceTargets = [ 'META-INF/mods.toml', '**/*.mcmeta', "${mod_id}.mixins.json".toString() ]
+def intoTargets = [ "${projectDir}/out/production/resources/", "${projectDir}/out/production/${project.name}.main/", "${projectDir}/bin/main/" ]
+def replaceProperties = project.properties
 
 processResources {
-	inputs.properties replaceProperties
-	replaceProperties.put 'project', project
-
 	filesMatching(resourceTargets) {
 		expand replaceProperties
 	}
@@ -207,11 +157,13 @@ processResources {
 task sourcesJar(type: Jar, dependsOn: classes) {
 	classifier 'sources'
 	from sourceSets.main.allJava
+	from sourceSets.main.resources
 }
 
 task deobfJar(type: Jar) {
 	classifier 'deobf'
 	from sourceSets.main.output
+	exclude '**/*bbmodel'
 }
 
 jar {
@@ -219,12 +171,14 @@ jar {
 
 	from sourceSets.main.output.classesDirs
 	from sourceSets.main.output.resourcesDir
+	exclude '**/*bbmodel'
 }
 
 shadowJar {
 	classifier ''
 	configurations = [ project.configurations.shade ]
 	relocate "${registrate_package}", "xyz.apex.repack.${registrate_package}"
+	exclude '**/*bbmodel'
 }
 
 artifacts {
@@ -234,7 +188,38 @@ artifacts {
 	archives shadowJar
 }
 
+if(System.getenv('GENERATE_CHANGELOG') != null) {
+	def previousGitTag = { ->
+		def code = new ByteArrayOutputStream()
+
+		exec {
+			commandLine 'git', 'describe', '--tags', '--match', 'v*', '--exclude', "v${mod_version}"
+			standardOutput code
+		}
+
+		return code.toString().trim().split('-')[0]
+	}
+
+	task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+		file = file("CHANGELOG.md")
+		fromRepo = file('.')
+		fromRef = "${previousGitTag}"
+		toRef = "v${mod_version}"
+		templateContent = file('.github/changelog.mustache').text
+		                                                    .replace('{mod_version}', "${mod_version}")
+		                                                    .replace('{mod_git_url}', "${mod_git_url}")
+		                                                    .replace('{last_tag}', "${previousGitTag}")
+	}
+}
+
 tasks.withType(Jar) {
+	from(file('accesstransformer.cfg')) {
+		into '/META-INF'
+	}
+
+	from file('CHANGELOG.md')
+	from file('LICENSE')
+
 	manifest {
 		attributes([
 				'Specification-Title': "${mod_name}",
@@ -243,9 +228,14 @@ tasks.withType(Jar) {
 				'Implementation-Title': "${mod_name}",
 				'Implementation-Version': "${project.version}",
 				'Implementation-Vendor' : "${mod_authors}",
-				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-				'MixinConfigs': "${mod_id}.mixins.json"
+				'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
 		])
+	}
+
+	if(file("./src/main/resources/${mod_id}.mixins.json").exists()) {
+		manifest {
+			attributes 'MixinConfigs': "${mod_id}.mixins.json"
+		}
 	}
 }
 
@@ -253,12 +243,15 @@ reobf {
 	shadowJar { }
 }
 
+build.dependsOn shadowJar
+build.dependsOn reobfShadowJar
+
 jar.finalizedBy('reobfJar')
 
-publishing {
-	if(System.getenv('GITHUB_TOKEN') != null) {
+if(System.getenv('APEX_MODS_MAVEN_USERNAME') != null && System.getenv('APEX_MODS_MAVEN_PASSWORD') != null) {
+	publishing {
 		publications {
-			gpr(MavenPublication) {
+			mavenJava(MavenPublication) {
 				groupId = "${mod_base_package}"
 				artifactId = "${mod_id}"
 				version = "${minecraft_version}-${mod_version}"
@@ -269,50 +262,72 @@ publishing {
 				artifact shadowJar
 			}
 		}
-
 		repositories {
 			maven {
-				name = 'GitHubPackages'
-				url = uri('https://maven.pkg.github.com/ApexModder/Registrator')
+				name 'ApexMods-Maven'
+				url 'https://apexmodder.jfrog.io/artifactory/mods-maven/'
 
 				credentials {
-					username = System.getenv('GITHUB_ACTOR')
-					password = System.getenv('GITHUB_TOKEN')
+					username System.getenv('APEX_MODS_MAVEN_USERNAME')
+					password System.getenv('APEX_MODS_MAVEN_PASSWORD')
 				}
 			}
 		}
 	}
-}
-
-/*
-if(project.hasProperty('apex_curse_gradle_token')) {
-	curseforge {
-		apiKey = project.getProperty('apex_curse_gradle_token')
-
-		project {
-			id = "${mod_curseforge_id}"
-			releaseType = 'release'
-			addGameVersion "${minecraft_version}"
-
-			mainArtifact shadowJar
-			addArtifact jar
-			addArtifact deobfJar
-			addArtifact sourcesJar
+} else {
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				groupId = "${mod_base_package}"
+				artifactId = "${mod_id}"
+				version = "${minecraft_version}-${mod_version}"
+				artifact jar
+				artifact sourcesJar
+				artifact deobfJar
+				artifact shadowJar
+			}
+		}
+		repositories {
+			mavenLocal()
 		}
 	}
-} else if(System.getenv('CURSEFORGE_TOKEN') != null) {
+}
+
+if(System.getenv('CURSEFORGE_TOKEN') != null) {
 	curseforge {
 		apiKey = System.getenv('CURSEFORGE_TOKEN')
 
 		project {
 			id = "${mod_curseforge_id}"
-			releaseType = 'release'
+			releaseType = "${mod_release_type}"
 			addGameVersion "${minecraft_version}"
+			changelogType = 'markdown'
+			changelog = file('CHANGELOG.md').text
 
 			mainArtifact shadowJar
 			addArtifact jar
-			addArtifact deobfJar
 			addArtifact sourcesJar
+			addArtifact deobfJar
+		}
+
+		options {
+			detectNewerJava = true
 		}
 	}
-}*/
+}
+
+if(System.getenv('MODRINTH_TOKEN') != null) {
+	modrinth {
+		token = System.getenv('MODRINTH_TOKEN')
+		projectId = "${mod_modrinth_id}"
+		versionNumber = "${mod_version}"
+		versionName = "${mod_name}-${minecraft_version}-${mod_version}"
+		versionType = "${mod_release_type}"
+		uploadFile = shadowJar
+		additionalFiles = [ jar, sourcesJar, deobfJar ]
+		gameVersions = [ "${minecraft_version}" ]
+		changelog = file('CHANGELOG.md').text
+		loaders = [ 'forge' ]
+		dependencies = [ ]
+	}
+}
