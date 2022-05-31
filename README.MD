@@ -102,7 +102,7 @@ To do this, add the following snippet of code to your `mods.toml` file.
     side="BOTH"
 ```
 
-To include Registrator in your mods `build.gradle` file, We make use of the [CurseMaven Gradle plugin](https://www.cursemaven.com/). <br>
+To include Registrator in your mods `build.gradle` file. <br>
 Add the following snippet of code to your `repositories { }` section
 
 ```groovy
@@ -110,7 +110,6 @@ maven { url 'https://maven.apexmods.xyz/' } // ApexMods-Maven
 ```
 
 Add the following snippet of code to your `dependencies { }` section<br>
-See below for table of CurseForge version IDs
 
 ```groovy
 implementation fg.deobf("xyz.apex.forge.utility:registrator:<MINECARFT_VERSION>-<REGISTRATOR_VERSION>:deobf")

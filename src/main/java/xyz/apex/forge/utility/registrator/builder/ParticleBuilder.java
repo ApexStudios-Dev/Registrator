@@ -10,7 +10,6 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
@@ -23,13 +22,14 @@ import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 public final class ParticleBuilder<OWNER extends AbstractRegistrator<OWNER>, PARTICLE extends IParticleData, PARENT> extends RegistratorBuilder<OWNER, ParticleType<?>, ParticleType<PARTICLE>, PARENT, ParticleBuilder<OWNER, PARTICLE, PARENT>, ParticleEntry<PARTICLE>>
 {
 	private final ParticleFactory<PARTICLE> particleFactory;
 
-	@Nullable private NonnullSupplier<IParticleFactory<PARTICLE>> factory = null;
-	@Nullable private NonnullSupplier<ParticleManager.IParticleMetaFactory<PARTICLE>> metaFactory = null;
+	@Nullable private NonnullSupplier<Supplier<IParticleFactory<PARTICLE>>> factory = null;
+	@Nullable private NonnullSupplier<Supplier<ParticleManager.IParticleMetaFactory<PARTICLE>>> metaFactory = null;
 	private NonnullConsumer<ParticleProvider.ParticleDefinition> particleDefinitionConsumer = NonnullConsumer.noop();
 
 	public ParticleBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, ParticleFactory<PARTICLE> particleFactory)
@@ -37,7 +37,20 @@ public final class ParticleBuilder<OWNER extends AbstractRegistrator<OWNER>, PAR
 		super(owner, parent, registryName, callback, ParticleType.class, ParticleEntry::new, ParticleEntry::cast);
 
 		this.particleFactory = particleFactory;
-		onRegister(particleType -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> owner.getModBus().addListener(EventPriority.NORMAL, false, ParticleFactoryRegisterEvent.class, event -> onRegisterParticleFactories(particleType))));
+
+		onRegister(particleType ->
+				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () ->
+						() ->
+								owner.getModBus().addListener(EventPriority.NORMAL, false, ParticleFactoryRegisterEvent.class, event -> {
+									ParticleManager particleEngine = Minecraft.getInstance().particleEngine;
+
+									if(factory != null)
+										particleEngine.register(particleType, factory.get().get());
+									if(metaFactory != null)
+										particleEngine.register(particleType, metaFactory.get().get());
+								})
+				)
+		);
 		setDataGenerator(AbstractRegistrator.PARTICLE_PROVIDER, (ctx, provider) -> particleDefinitionConsumer.accept(provider.definition(ctx.get())));
 	}
 
@@ -53,7 +66,7 @@ public final class ParticleBuilder<OWNER extends AbstractRegistrator<OWNER>, PAR
 		return this;
 	}
 
-	public ParticleBuilder<OWNER, PARTICLE, PARENT> factory(NonnullSupplier<IParticleFactory<PARTICLE>> particleFactory)
+	public ParticleBuilder<OWNER, PARTICLE, PARENT> factory(NonnullSupplier<Supplier<IParticleFactory<PARTICLE>>> particleFactory)
 	{
 		Validate.isTrue(metaFactory == null, "Can only specify a IParticleFactory or IParticleMetaFactory never BOTH!!");
 		Validate.isTrue(factory == null, "IParticleFactory has already been set!");
@@ -63,7 +76,7 @@ public final class ParticleBuilder<OWNER extends AbstractRegistrator<OWNER>, PAR
 		return this;
 	}
 
-	public ParticleBuilder<OWNER, PARTICLE, PARENT> metaFactory(NonnullSupplier<ParticleManager.IParticleMetaFactory<PARTICLE>> particleFactory)
+	public ParticleBuilder<OWNER, PARTICLE, PARENT> metaFactory(NonnullSupplier<Supplier<ParticleManager.IParticleMetaFactory<PARTICLE>>> particleFactory)
 	{
 		Validate.isTrue(factory == null, "Can only specify a IParticleFactory or IParticleMetaFactory never BOTH!!");
 		Validate.isTrue(metaFactory == null, "IParticleMetaFactory has already been set!");
@@ -71,16 +84,5 @@ public final class ParticleBuilder<OWNER extends AbstractRegistrator<OWNER>, PAR
 		metaFactory = particleFactory;
 
 		return this;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	private void onRegisterParticleFactories(ParticleType<PARTICLE> particleType)
-	{
-		ParticleManager particleEngine = Minecraft.getInstance().particleEngine;
-
-		if(factory != null)
-			particleEngine.register(particleType, factory.get());
-		if(metaFactory != null)
-			particleEngine.register(particleType, metaFactory.get());
 	}
 }
