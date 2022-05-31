@@ -8,6 +8,7 @@ import com.tterrag.registrate.builders.Builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.providers.*;
 import com.tterrag.registrate.util.entry.RegistryEntry;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Triple;
 
 import net.minecraft.Util;
@@ -15,6 +16,7 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -48,6 +50,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryBuilder;
@@ -61,6 +64,7 @@ import xyz.apex.forge.utility.registrator.factory.item.*;
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
 import xyz.apex.forge.utility.registrator.provider.BlockListReporter;
 import xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider;
+import xyz.apex.forge.utility.registrator.provider.RegistrateParticleProvider;
 import xyz.apex.forge.utility.registrator.provider.RegistrateSoundProvider;
 import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
@@ -84,16 +88,12 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// region: Reflected Constants
 	// public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityPredicate.Builder.entity().flags(EntityFlagsPredicate.Builder.flags().setOnFire(true).build());
 	public static final EntityPredicate.Builder ENTITY_ON_FIRE = EntityLoot.ENTITY_ON_FIRE;
-
-	// public static final StaticTagHelper<Block> BLOCK_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(BlockTags.class, null, "field_199899_c");
-	// public static final StaticTagHelper<Item> ITEM_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(ItemTags.class, null, "field_199906_c");
-	// public static final StaticTagHelper<EntityType<?>> ENTITY_TYPE_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(EntityTypeTags.class, null, "field_219766_c");
-	// public static final StaticTagHelper<Fluid> FLUID_TAG_REGISTRY = ObfuscationReflectionHelper.getPrivateValue(FluidTags.class, null, "field_206961_c");
 	// endregion
 
 	// region: ProviderTypes
 	public static final ProviderType<RegistrateLangExtProvider> LANG_EXT_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":lang_ext", (owner, event) -> new RegistrateLangExtProvider(owner, event.getGenerator()));
 	public static final ProviderType<RegistrateSoundProvider> SOUNDS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":sounds", (owner, event) -> new RegistrateSoundProvider(owner, event.getGenerator(), event.getExistingFileHelper()));
+	public static final ProviderType<RegistrateParticleProvider> PARTICLE_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":particles", (owner, event) -> new RegistrateParticleProvider(owner, event.getGenerator(), event.getExistingFileHelper()));
 
 	// region: Tags
 	public static final ProviderType<RegistrateTagsProvider<Potion>> POTION_TYPE_TAGS_PROVIDER = ProviderType.register(REGISTRATOR_ID + ":tags/potion_type", type -> (owner, event) -> new RegistrateTagsProvider<>(owner, type, "potion_types", event.getGenerator(), Registry.POTION, event.getExistingFileHelper()));
@@ -139,164 +139,191 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	// region: Tags
 	// region: Generic
-	public <TYPE> TagKey<TYPE> genericTag(ResourceKey<? extends Registry<TYPE>> tagType, String tagNamespace, String tagName)
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> tag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagNamespace, String tagPath)
 	{
-		return TagKey.create(tagType, new ResourceLocation(tagNamespace, tagName));
+		return TagKey.create(tagRegistry, new ResourceLocation(tagNamespace, tagPath));
 	}
 
-	public <TYPE> TagKey<TYPE> genericTagModded(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> vanillaTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
-		return genericTag(tagType, getModId(), tagName);
+		return tag(tagRegistry, MINECRAFT_ID, tagPath);
 	}
 
-	public <TYPE> TagKey<TYPE> genericTagVanilla(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> forgeTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
-		return genericTag(tagType, MINECRAFT_ID, tagName);
+		return tag(tagRegistry, FORGE_ID, tagPath);
 	}
 
-	public <TYPE> TagKey<TYPE> genericTagForge(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> registratorTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
-		return genericTag(tagType, FORGE_ID, tagName);
+		return tag(tagRegistry, REGISTRATOR_ID, tagPath);
 	}
 
-	public <TYPE> TagKey<TYPE> genericTagRegistrator(ResourceKey<? extends Registry<TYPE>> tagType, String tagName)
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> moddedTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
-		return genericTag(tagType, REGISTRATOR_ID, tagName);
+		return tag(tagRegistry, getModId(), tagPath);
+	}
+
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> tag(IForgeRegistry<TYPE> tagRegistry, String tagNamespace, String tagPath)
+	{
+		var tags = tagRegistry.tags();
+		Validate.notNull(tags);
+		return tags.createTagKey(new ResourceLocation(tagNamespace, tagPath));
+	}
+
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> vanillaTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	{
+		return tag(tagRegistry, MINECRAFT_ID, tagPath);
+	}
+
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> forgeTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	{
+		return tag(tagRegistry, FORGE_ID, tagPath);
+	}
+
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> registratorTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	{
+		return tag(tagRegistry, REGISTRATOR_ID, tagPath);
+	}
+
+	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> moddedTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	{
+		return tag(tagRegistry, getModId(), tagPath);
 	}
 	// endregion
 
 	// region: Block
-	public TagKey<Block> blockTag(String tagNamespace, String tagName)
+	public final TagKey<Block> blockTag(String tagNamespace, String tagPath)
 	{
-		return genericTag(Registry.BLOCK_REGISTRY, tagNamespace, tagName);
+		return tag(Registry.BLOCK_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public TagKey<Block> blockTagModded(String tagName)
+	public final TagKey<Block> vanillaBlockTag(String tagPath)
 	{
-		return blockTag(getModId(), tagName);
+		return blockTag(MINECRAFT_ID, tagPath);
 	}
 
-	public TagKey<Block> blockTagVanilla(String tagName)
+	public final TagKey<Block> forgeBlockTag(String tagPath)
 	{
-		return blockTag(MINECRAFT_ID, tagName);
+		return blockTag(FORGE_ID, tagPath);
 	}
 
-	public TagKey<Block> blockTagForge(String tagName)
+	public final TagKey<Block> registratorBlockTag(String tagPath)
 	{
-		return blockTag(FORGE_ID, tagName);
+		return blockTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public TagKey<Block> blockTagRegistrator(String tagName)
+	public final TagKey<Block> moddedBlockTag(String tagPath)
 	{
-		return blockTag(REGISTRATOR_ID, tagName);
+		return blockTag(getModId(), tagPath);
 	}
 	// endregion
 
 	// region: Item
-	public TagKey<Item> itemTag(String tagNamespace, String tagName)
+	public final TagKey<Item> itemTag(String tagNamespace, String tagPath)
 	{
-		return genericTag(Registry.ITEM_REGISTRY, tagNamespace, tagName);
+		return tag(Registry.ITEM_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public TagKey<Item> itemTagModded(String tagName)
+	public final TagKey<Item> vanillaItemTag(String tagPath)
 	{
-		return itemTag(getModId(), tagName);
+		return itemTag(MINECRAFT_ID, tagPath);
 	}
 
-	public TagKey<Item> itemTagVanilla(String tagName)
+	public final TagKey<Item> forgeItemTag(String tagPath)
 	{
-		return itemTag(MINECRAFT_ID, tagName);
+		return itemTag(FORGE_ID, tagPath);
 	}
 
-	public TagKey<Item> itemTagForge(String tagName)
+	public final TagKey<Item> registratorItemTag(String tagPath)
 	{
-		return itemTag(FORGE_ID, tagName);
+		return itemTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public TagKey<Item> itemTagRegistrator(String tagName)
+	public final TagKey<Item> moddedItemTag(String tagPath)
 	{
-		return itemTag(REGISTRATOR_ID, tagName);
+		return itemTag(getModId(), tagPath);
 	}
 	// endregion
 
 	// region: EntityType
-	public TagKey<EntityType<?>> entityTypeTag(String tagNamespace, String tagName)
+	public final TagKey<EntityType<?>> entityTypeTag(String tagNamespace, String tagPath)
 	{
-		return genericTag(Registry.ENTITY_TYPE_REGISTRY, tagNamespace, tagName);
+		return tag(Registry.ENTITY_TYPE_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public TagKey<EntityType<?>> entityTypeTagModded(String tagName)
+	public final TagKey<EntityType<?>> vanillaEntityTypeTag(String tagPath)
 	{
-		return entityTypeTag(getModId(), tagName);
+		return entityTypeTag(MINECRAFT_ID, tagPath);
 	}
 
-	public TagKey<EntityType<?>> entityTypeTagVanilla(String tagName)
+	public final TagKey<EntityType<?>> forgeEntityTypeTag(String tagPath)
 	{
-		return entityTypeTag(MINECRAFT_ID, tagName);
+		return entityTypeTag(FORGE_ID, tagPath);
 	}
 
-	public TagKey<EntityType<?>> entityTypeTagForge(String tagName)
+	public final TagKey<EntityType<?>> registratorEntityTypeTag(String tagPath)
 	{
-		return entityTypeTag(FORGE_ID, tagName);
+		return entityTypeTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public TagKey<EntityType<?>> entityTypeTagRegistrator(String tagName)
+	public final TagKey<EntityType<?>> moddedEntityTypeTag(String tagPath)
 	{
-		return entityTypeTag(REGISTRATOR_ID, tagName);
+		return entityTypeTag(getModId(), tagPath);
 	}
 	// endregion
 
 	// region: Fluid
-	public TagKey<Fluid> fluidTag(String tagNamespace, String tagName)
+	public final TagKey<Fluid> fluidTag(String tagNamespace, String tagPath)
 	{
-		return genericTag(Registry.FLUID_REGISTRY, tagNamespace, tagName);
+		return tag(Registry.FLUID_REGISTRY, tagNamespace, tagPath);
 	}
 
-	public TagKey<Fluid> fluidTagModded(String tagName)
+	public final TagKey<Fluid> vanillaFluidTag(String tagPath)
 	{
-		return fluidTag(getModId(), tagName);
+		return fluidTag(MINECRAFT_ID, tagPath);
 	}
 
-	public TagKey<Fluid> fluidTagVanilla(String tagName)
+	public final TagKey<Fluid> forgeFluidTag(String tagPath)
 	{
-		return fluidTag(MINECRAFT_ID, tagName);
+		return fluidTag(FORGE_ID, tagPath);
 	}
 
-	public TagKey<Fluid> fluidTagForge(String tagName)
+	public final TagKey<Fluid> registratorFluidTag(String tagPath)
 	{
-		return fluidTag(FORGE_ID, tagName);
+		return fluidTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public TagKey<Fluid> fluidTagRegistrator(String tagName)
+	public final TagKey<Fluid> moddedFluidTag(String tagPath)
 	{
-		return fluidTag(REGISTRATOR_ID, tagName);
+		return fluidTag(getModId(), tagPath);
 	}
 	// endregion
 
 	// region: BlockEntityType
-	public TagKey<BlockEntityType<?>> blockEntityTypeTag(String tagNamespace, String tagName)
+	public final TagKey<BlockEntityType<?>> blockEntityTypeTag(String tagNamespace, String tagPath)
 	{
-		return genericTag(Registry.BLOCK_ENTITY_TYPE_REGISTRY, tagNamespace, tagName);
+		return tag(ForgeRegistries.BLOCK_ENTITIES, tagNamespace, tagPath);
 	}
 
-	public TagKey<BlockEntityType<?>> blockEntityTypeTagModded(String tagName)
+	public final TagKey<BlockEntityType<?>> vanillaBlockEntityTypeTag(String tagPath)
 	{
-		return blockEntityTypeTag(getModId(), tagName);
+		return blockEntityTypeTag(MINECRAFT_ID, tagPath);
 	}
 
-	public TagKey<BlockEntityType<?>> blockEntityTypeTagVanilla(String tagName)
+	public final TagKey<BlockEntityType<?>> forgeBlockEntityTypeTag(String tagPath)
 	{
-		return blockEntityTypeTag(MINECRAFT_ID, tagName);
+		return blockEntityTypeTag(FORGE_ID, tagPath);
 	}
 
-	public TagKey<BlockEntityType<?>> blockEntityTypeTagForge(String tagName)
+	public final TagKey<BlockEntityType<?>> registratorBlockEntityTypeTag(String tagPath)
 	{
-		return blockEntityTypeTag(FORGE_ID, tagName);
+		return blockEntityTypeTag(REGISTRATOR_ID, tagPath);
 	}
 
-	public TagKey<BlockEntityType<?>> blockEntityTypeTagRegistrator(String tagName)
+	public final TagKey<BlockEntityType<?>> moddedBlockEntityTypeTag(String tagPath)
 	{
-		return blockEntityTypeTag(REGISTRATOR_ID, tagName);
+		return blockEntityTypeTag(getModId(), tagPath);
 	}
 	// endregion
 	// endregion
@@ -1124,6 +1151,18 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	public final EnchantmentBuilder<REGISTRATOR, Enchantment, REGISTRATOR> enchantment(String registryName, EnchantmentCategory enchantmentCategory)
 	{
 		return enchantment(registryName, self, enchantmentCategory, EnchantmentFactory.DEFAULT);
+	}
+	// endregion
+
+	// region: ParticleType
+	public final <PARTICLE extends ParticleOptions, PARENT> ParticleBuilder<REGISTRATOR, PARTICLE, PARENT> particle(String registryName, PARENT parent, ParticleFactory<PARTICLE> particleFactory)
+	{
+		return entry(registryName, callback -> new ParticleBuilder<>(self, parent, registryName, callback, particleFactory));
+	}
+
+	public final <PARTICLE extends ParticleOptions> ParticleBuilder<REGISTRATOR, PARTICLE, REGISTRATOR> particle(String registryName, ParticleFactory<PARTICLE> particleFactory)
+	{
+		return particle(registryName, self, particleFactory);
 	}
 	// endregion
 

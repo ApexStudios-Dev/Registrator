@@ -1,5 +1,6 @@
 package xyz.apex.forge.utility.registrator.builder;
 
+import com.google.common.collect.Maps;
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.AbstractBuilder;
 import com.tterrag.registrate.builders.Builder;
@@ -12,8 +13,12 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
+import org.apache.logging.log4j.LogManager;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.tags.TagKey;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -24,6 +29,8 @@ import xyz.apex.java.utility.nullness.NonnullBiConsumer;
 import xyz.apex.java.utility.nullness.NonnullConsumer;
 import xyz.apex.java.utility.nullness.NonnullFunction;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
+
+import java.util.Map;
 
 @SuppressWarnings({ "unchecked", "DeprecatedIsStillUsed" })
 public abstract class LegacyRegistratorBuilder<
@@ -38,6 +45,8 @@ public abstract class LegacyRegistratorBuilder<
 	protected final OWNER owner;
 	private final NonnullFunction<com.tterrag.registrate.util.entry.RegistryEntry<TYPE>, ENTRY> registryEntryCastor;
 	private final LazyRegistryEntry<TYPE> safeSupplier = new LazyRegistryEntry<TYPE>(() -> (RegistryEntry<TYPE>) get());
+	private final Map<String, Map<String, RegistryEvent.MissingMappings.Action>> mappings = Maps.newHashMap();
+	private boolean registeredMappingsEvent = false;
 
 	public LegacyRegistratorBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, Class<? super BASE> registryType, NonnullFunction<com.tterrag.registrate.util.entry.RegistryEntry<TYPE>, ENTRY> registryEntryCastor)
 	{
@@ -45,6 +54,87 @@ public abstract class LegacyRegistratorBuilder<
 
 		this.owner = owner;
 		this.registryEntryCastor = registryEntryCastor;
+	}
+
+	protected <OTHER_BASE extends IForgeRegistryEntry<OTHER_BASE>, OTHER_TYPE extends OTHER_BASE, OTHER_PARENT, OTHER_BUILDER extends LegacyRegistratorBuilder<OWNER, OTHER_BASE, OTHER_TYPE, OTHER_PARENT, OTHER_BUILDER, OTHER_ENTRY>, OTHER_ENTRY extends RegistryEntry<OTHER_TYPE>> void copyMappingsTo(LegacyRegistratorBuilder<OWNER, OTHER_BASE, OTHER_TYPE, OTHER_PARENT, OTHER_BUILDER, OTHER_ENTRY> other)
+	{
+		if(!mappings.isEmpty())
+		{
+			mappings.forEach((gameVersion, updates) -> {
+				var otherUpdates = other.mappings.computeIfAbsent(gameVersion, $ -> Maps.newHashMap());
+
+				updates.forEach((mappingName, action) -> {
+					if(!otherUpdates.containsKey(mappingName))
+					{
+						var modId = owner.getModId();
+						var registryType = getRegistryType().getSimpleName();
+						LogManager.getLogger().debug("Copied mapping '{}#{}:{}' from '{}#'", registryType, modId, mappingName, getRegistryNameFull());
+						otherUpdates.put(mappingName, action);
+					}
+				});
+			});
+		}
+	}
+
+	public final BUILDER mapping(String gameVersion, String oldMapping, RegistryEvent.MissingMappings.Action action)
+	{
+		if(!registeredMappingsEvent)
+		{
+			MinecraftForge.EVENT_BUS.addGenericListener(getRegistryType(), this::onMissingMappings);
+			registeredMappingsEvent = true;
+		}
+
+		mappings.computeIfAbsent(gameVersion, $ -> Maps.newHashMap()).put(oldMapping, action);
+		return (BUILDER) this;
+	}
+
+	public final BUILDER mapping(String gameVersion, String oldMapping)
+	{
+		return mapping(gameVersion, oldMapping, RegistryEvent.MissingMappings.Action.REMAP);
+	}
+
+	private void onMissingMappings(RegistryEvent.MissingMappings<BASE> event)
+	{
+		var gameVersion = SharedConstants.getCurrentVersion().getReleaseTarget();
+
+		if(mappings.containsKey(gameVersion))
+		{
+			var updates = mappings.get(gameVersion);
+
+			for(var mapping : event.getAllMappings())
+			{
+				if(mapping.key != null && mapping.key.getNamespace().equals(owner.getModId()))
+				{
+					var mappingName = mapping.key.getPath();
+
+					if(updates.containsKey(mappingName))
+					{
+						switch(updates.get(mappingName))
+						{
+							case WARN:
+								mapping.warn();
+								break;
+
+							case FAIL:
+								mapping.fail();
+								break;
+
+							case IGNORE:
+								mapping.ignore();
+								break;
+
+							case REMAP:
+								mapping.remap(safeSupplier.get());
+								break;
+
+							default:
+							case DEFAULT:
+								break;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override
