@@ -146,10 +146,10 @@ dependencies {
 
 	annotationProcessor "org.spongepowered:mixin:${mixin_ap_version}:processor"
 
-	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}:sources")
-	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
-	runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
-	shade fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}")
+	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}:sources")
+	compileOnly fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
+	library fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
+	shade fg.deobf("com.tterrag.registrate:Registrate:MC${minecraft_version_short}-${registrate_version}")
 
 	compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}:deobf"
 	compileOnly "xyz.apex.java.utility:javautilities:${javautilities_version}:sources"
@@ -212,27 +212,27 @@ artifacts {
 }
 
 if(System.getenv('GENERATE_CHANGELOG') != null) {
-    def previousGitTag = { ->
-        def code = new ByteArrayOutputStream()
+	def previousGitTag = { ->
+		def code = new ByteArrayOutputStream()
 
-        exec {
-            commandLine 'git', 'describe', '--tags', '--match', 'v*', '--exclude', "v${mod_version}"
-            standardOutput code
-        }
+		exec {
+			commandLine 'git', 'describe', '--tags', '--match', 'v*', '--exclude', "v${mod_version}"
+			standardOutput code
+		}
 
-        return code.toString().trim().split('-')[0]
-    }
+		return code.toString().trim().split('-')[0]
+	}
 
-    task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
-        file = file("CHANGELOG.md")
-        fromRepo = file('.')
-        fromRef = "${previousGitTag}"
-        toRef = "v${mod_version}"
-        templateContent = file('.github/changelog.mustache').text
-		        .replace('{mod_version}', "${mod_version}")
-		        .replace('{mod_git_url}', "${mod_git_url}")
-		        .replace('{last_tag}', "${previousGitTag}")
-    }
+	task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+		file = file("CHANGELOG.md")
+		fromRepo = file('.')
+		fromRef = "${previousGitTag}"
+		toRef = "v${mod_version}"
+		templateContent = file('.github/changelog.mustache').text
+		                                                    .replace('{mod_version}', "${mod_version}")
+		                                                    .replace('{mod_git_url}', "${mod_git_url}")
+		                                                    .replace('{last_tag}', "${previousGitTag}")
+	}
 }
 
 tasks.withType(Jar) {
@@ -309,7 +309,6 @@ if(System.getenv('CURSEFORGE_TOKEN') != null) {
 			addGameVersion "${minecraft_version}"
 			changelogType = 'markdown'
 			changelog = file('CHANGELOG.md').text
-
 			mainArtifact shadowJar
 			addArtifact jar
 			addArtifact sourcesJar
