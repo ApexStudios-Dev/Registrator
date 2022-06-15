@@ -3,19 +3,21 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
-import net.minecraft.world.entity.decoration.Motive;
+import net.minecraft.core.Registry;
+import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.PaintingEntry;
 
-public final class PaintingBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, Motive, Motive, PARENT, PaintingBuilder<OWNER, PARENT>, PaintingEntry>
+public final class PaintingBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT> extends RegistratorBuilder<OWNER, PaintingVariant, PaintingVariant, PARENT, PaintingBuilder<OWNER, PARENT>, PaintingEntry>
 {
 	private int width = 16;
 	private int height = 16;
 
 	public PaintingBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
-		super(owner, parent, registryName, callback, Motive.class, PaintingEntry::new, PaintingEntry::cast);
+		super(owner, parent, registryName, callback, Registry.PAINTING_VARIANT_REGISTRY, ForgeRegistries.PAINTING_VARIANTS, PaintingEntry::new, PaintingEntry::cast);
 	}
 
 	public PaintingBuilder<OWNER, PARENT> width(int width)
@@ -36,8 +38,8 @@ public final class PaintingBuilder<OWNER extends AbstractRegistrator<OWNER>, PAR
 	}
 
 	@Override
-	protected @NonnullType Motive createEntry()
+	protected @NonnullType PaintingVariant createEntry()
 	{
-		return new Motive(width, height);
+		return new PaintingVariant(width, height);
 	}
 }

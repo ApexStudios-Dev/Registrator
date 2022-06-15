@@ -5,11 +5,13 @@ import com.tterrag.registrate.builders.BuilderCallback;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.core.Registry;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.MenuEntry;
@@ -26,7 +28,7 @@ public final class MenuBuilder<OWNER extends AbstractRegistrator<OWNER>, MENU ex
 
 	public MenuBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, MenuFactory<MENU> menuFactory, @Nullable NonnullSupplier<MenuFactory.ScreenFactory<MENU, SCREEN>> screenFactory)
 	{
-		super(owner, parent, registryName, callback, MenuType.class, MenuEntry::new, MenuEntry::cast);
+		super(owner, parent, registryName, callback, Registry.MENU_REGISTRY, ForgeRegistries.CONTAINERS, MenuEntry::new, MenuEntry::cast);
 
 		this.menuFactory = menuFactory;
 		this.screenFactory = screenFactory;

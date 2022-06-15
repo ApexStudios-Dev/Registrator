@@ -5,8 +5,8 @@ import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.providers.RegistrateProvider;
 import org.apache.commons.lang3.Validate;
 
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
@@ -176,7 +176,7 @@ public final class RegistrateLangExtProvider implements RegistrateProvider
 	}
 
 	@Override
-	public void run(HashCache cache) throws IOException
+	public void run(CachedOutput cache) throws IOException
 	{
 		owner.genData(AbstractRegistrator.LANG_EXT_PROVIDER, this);
 

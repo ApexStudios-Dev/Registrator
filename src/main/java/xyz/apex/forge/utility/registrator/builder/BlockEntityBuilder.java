@@ -9,6 +9,7 @@ import net.minecraft.Util;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
@@ -18,6 +19,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.BlockEntityEntry;
@@ -38,7 +40,7 @@ public final class BlockEntityBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 
 	public BlockEntityBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, BlockEntityFactory<BLOCK_ENTITY> blockEntityFactory)
 	{
-		super(owner, parent, registryName, callback, BlockEntityType.class, BlockEntityEntry::new, BlockEntityEntry::cast);
+		super(owner, parent, registryName, callback, Registry.BLOCK_ENTITY_TYPE_REGISTRY, ForgeRegistries.BLOCK_ENTITIES, BlockEntityEntry::new, BlockEntityEntry::cast);
 
 		this.blockEntityFactory = blockEntityFactory;
 		onRegister(this::onRegister);

@@ -1,20 +1,20 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.world.entity.decoration.Motive;
+import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 @SuppressWarnings("unused")
-public final class PaintingEntry extends RegistryEntry<Motive> implements NonnullSupplier<Motive>
+public final class PaintingEntry extends RegistryEntry<PaintingVariant> implements NonnullSupplier<PaintingVariant>
 {
-	public PaintingEntry(AbstractRegistrator<?> owner, RegistryObject<Motive> delegate)
+	public PaintingEntry(AbstractRegistrator<?> owner, RegistryObject<PaintingVariant> delegate)
 	{
 		super(owner, delegate);
 	}
 
-	public Motive asPaintingType()
+	public PaintingVariant asPaintingType()
 	{
 		return get();
 	}
@@ -29,12 +29,12 @@ public final class PaintingEntry extends RegistryEntry<Motive> implements Nonnul
 		return asPaintingType().getHeight();
 	}
 
-	public static PaintingEntry cast(RegistryEntry<Motive> registryEntry)
+	public static PaintingEntry cast(RegistryEntry<PaintingVariant> registryEntry)
 	{
 		return cast(PaintingEntry.class, registryEntry);
 	}
 
-	public static PaintingEntry cast(com.tterrag.registrate.util.entry.RegistryEntry<Motive> registryEntry)
+	public static PaintingEntry cast(com.tterrag.registrate.util.entry.RegistryEntry<PaintingVariant> registryEntry)
 	{
 		return cast(PaintingEntry.class, registryEntry);
 	}

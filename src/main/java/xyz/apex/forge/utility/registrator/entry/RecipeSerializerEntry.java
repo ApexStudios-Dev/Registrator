@@ -1,5 +1,6 @@
 package xyz.apex.forge.utility.registrator.entry;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -18,7 +19,7 @@ public final class RecipeSerializerEntry<RECIPE_TYPE extends RecipeSerializer<RE
 		super(owner, delegate);
 
 		recipeType = Lazy.of(() -> RecipeType.register(delegate.getId().toString()));
-		owner.addRegisterCallback(RecipeSerializer.class, () -> recipeType.get());
+		owner.addRegisterCallback(Registry.RECIPE_TYPE_REGISTRY, recipeType::get);
 	}
 
 	public RecipeSerializer<RECIPE> asRecipeSerializer()

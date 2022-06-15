@@ -15,6 +15,7 @@ import com.tterrag.registrate.util.nullness.NonnullType;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
@@ -30,6 +31,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.BlockEntry;
@@ -58,7 +60,7 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 
 	public BlockBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, BlockFactory<BLOCK> blockFactory, NonnullSupplier<BlockBehaviour.Properties> initialProperties)
 	{
-		super(owner, parent, registryName, callback, Block.class, BlockEntry::new, BlockEntry::cast);
+		super(owner, parent, registryName, callback, Registry.BLOCK_REGISTRY, ForgeRegistries.BLOCKS, BlockEntry::new, BlockEntry::cast);
 
 		this.blockFactory = blockFactory;
 		this.initialProperties = initialProperties;
@@ -208,9 +210,9 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 		return properties(BlockBehaviour.Properties::dynamicShape);
 	}
 
-	public BlockBuilder<OWNER, BLOCK, PARENT> noDrops()
+	public BlockBuilder<OWNER, BLOCK, PARENT> noLootTable()
 	{
-		return properties(BlockBehaviour.Properties::noDrops);
+		return properties(BlockBehaviour.Properties::noLootTable);
 	}
 
 	@Deprecated

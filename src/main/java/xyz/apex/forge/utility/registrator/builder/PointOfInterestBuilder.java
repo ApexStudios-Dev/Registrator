@@ -3,9 +3,12 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.PointOfInterestEntry;
@@ -25,7 +28,7 @@ public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNE
 
 	public PointOfInterestBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
-		super(owner, parent, registryName, callback, PoiType.class, PointOfInterestEntry::new, PointOfInterestEntry::cast);
+		super(owner, parent, registryName, callback, Registry.POINT_OF_INTEREST_TYPE_REGISTRY, ForgeRegistries.POI_TYPES, PointOfInterestEntry::new, PointOfInterestEntry::cast);
 	}
 
 	public PointOfInterestBuilder<OWNER, PARENT> matchingBlock(NonnullSupplier<? extends Block> block)
@@ -57,9 +60,9 @@ public final class PointOfInterestBuilder<OWNER extends AbstractRegistrator<OWNE
 	{
 		var result = new AtomicReference<PoiType>();
 		NonnullPredicate<PoiType> predicate = poiType -> this.predicate.apply(poiType, result.get());
-		var matchingBlockStates = PoiType.getBlockStates(block.get());
+		var matchingBlockStates = PoiTypes.getBlockStates(block.get());
 		var registryName = getRegistryNameFull();
-		var poiType = new PoiType(registryName, matchingBlockStates, maxTickets, predicate, validRange);
+		var poiType = new PoiType(matchingBlockStates, maxTickets, validRange);
 		result.set(poiType);
 		return poiType;
 	}

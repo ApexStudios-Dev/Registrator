@@ -6,6 +6,7 @@ import org.apache.commons.lang3.Validate;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,6 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.data.ParticleProvider;
@@ -34,7 +36,7 @@ public final class ParticleBuilder<OWNER extends AbstractRegistrator<OWNER>, PAR
 
 	public ParticleBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, ParticleFactory<PARTICLE> particleFactory)
 	{
-		super(owner, parent, registryName, callback, ParticleType.class, ParticleEntry::new, ParticleEntry::cast);
+		super(owner, parent, registryName, callback, Registry.PARTICLE_TYPE_REGISTRY, ForgeRegistries.PARTICLE_TYPES, ParticleEntry::new, ParticleEntry::cast);
 
 		this.particleFactory = particleFactory;
 		onRegister(particleType -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> owner.getModBus().addListener(EventPriority.NORMAL, false, ParticleFactoryRegisterEvent.class, event -> onRegisterParticleFactories(particleType))));

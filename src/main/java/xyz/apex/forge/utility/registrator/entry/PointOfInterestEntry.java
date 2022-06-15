@@ -1,18 +1,17 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import com.google.common.collect.ImmutableSet;
-
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
+import xyz.apex.java.utility.nullness.NonnullPredicate;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
-import java.util.function.Predicate;
+import java.util.Set;
 
 @SuppressWarnings("unused")
-public final class PointOfInterestEntry extends RegistryEntry<PoiType> implements NonnullSupplier<PoiType>
+public final class PointOfInterestEntry extends RegistryEntry<PoiType> implements NonnullSupplier<PoiType>, NonnullPredicate<BlockState>
 {
 	public PointOfInterestEntry(AbstractRegistrator<?> owner, RegistryObject<PoiType> delegate)
 	{
@@ -26,22 +25,28 @@ public final class PointOfInterestEntry extends RegistryEntry<PoiType> implement
 
 	public int getMaxTickets()
 	{
-		return asPointOfInterestType().getMaxTickets();
-	}
-
-	public Predicate<PoiType> getPredicate()
-	{
-		return asPointOfInterestType().getPredicate();
+		return asPointOfInterestType().maxTickets();
 	}
 
 	public int getValidRange()
 	{
-		return asPointOfInterestType().getValidRange();
+		return asPointOfInterestType().validRange();
 	}
 
-	public ImmutableSet<BlockState> getBlockStates()
+	public Set<BlockState> getBlockStates()
 	{
-		return asPointOfInterestType().getBlockStates();
+		return asPointOfInterestType().matchingStates();
+	}
+
+	public boolean matches(BlockState blockState)
+	{
+		return asPointOfInterestType().is(blockState);
+	}
+
+	@Override
+	public boolean test(BlockState blockState)
+	{
+		return matches(blockState);
 	}
 
 	public static PointOfInterestEntry cast(RegistryEntry<PoiType> registryEntry)

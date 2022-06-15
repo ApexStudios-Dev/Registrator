@@ -2,6 +2,7 @@ package xyz.apex.forge.utility.registrator.entry;
 
 import com.google.common.collect.ImmutableSet;
 
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -13,6 +14,7 @@ import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public final class VillagerProfessionEntry extends RegistryEntry<VillagerProfession> implements NonnullSupplier<VillagerProfession>
@@ -32,25 +34,30 @@ public final class VillagerProfessionEntry extends RegistryEntry<VillagerProfess
 		return other != null && asVillagerProfession() == other;
 	}
 
-	public PoiType getJobPoiType()
+	public Predicate<Holder<PoiType>> getHeldJobSite()
 	{
-		return asVillagerProfession().getJobPoiType();
+		return asVillagerProfession().heldJobSite();
+	}
+
+	public Predicate<Holder<PoiType>> getAcquirableJobSite()
+	{
+		return asVillagerProfession().acquirableJobSite();
 	}
 
 	public ImmutableSet<Item> getRequiredItems()
 	{
-		return asVillagerProfession().getRequestedItems();
+		return asVillagerProfession().requestedItems();
 	}
 
 	public ImmutableSet<Block> getSecondaryPoi()
 	{
-		return asVillagerProfession().getSecondaryPoi();
+		return asVillagerProfession().secondaryPoi();
 	}
 
 	@Nullable
 	public SoundEvent getWorkSound()
 	{
-		return asVillagerProfession().getWorkSound();
+		return asVillagerProfession().workSound();
 	}
 
 	public static VillagerProfessionEntry cast(RegistryEntry<VillagerProfession> registryEntry)

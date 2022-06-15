@@ -1,19 +1,19 @@
 package xyz.apex.forge.utility.registrator.provider;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 
 import net.minecraft.Util;
+import net.minecraft.core.Registry;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 
@@ -24,8 +24,6 @@ import java.util.Objects;
 @SuppressWarnings("UnstableApiUsage")
 public final class BlockListReporter implements DataProvider
 {
-	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
 	private final AbstractRegistrator<?> registrator;
 	private final DataGenerator generator;
 
@@ -36,11 +34,11 @@ public final class BlockListReporter implements DataProvider
 	}
 
 	@Override
-	public void run(HashCache cache) throws IOException
+	public void run(CachedOutput cache) throws IOException
 	{
 		var path = generator.getOutputFolder().resolve(Paths.get("reports", registrator.getModId(), "blocks.json"));
 		var json = serializeBlocks();
-		DataProvider.save(GSON, cache, json, path);
+		DataProvider.saveStable(cache, json, path);
 	}
 
 	@Override
@@ -51,10 +49,8 @@ public final class BlockListReporter implements DataProvider
 
 	private Iterable<Block> getBlocks()
 	{
-		// return ForgeRegistries.BLOCKS;
-
 		return registrator
-				.getAll(Block.class)
+				.getAll(Registry.BLOCK_REGISTRY)
 				.stream()
 				.filter(RegistryEntry::isPresent)
 				.sorted((a, b) -> a.getId().compareNamespaced(b.getId()))
@@ -67,7 +63,7 @@ public final class BlockListReporter implements DataProvider
 	private JsonObject serializeBlocks()
 	{
 		var json = new JsonObject();
-		getBlocks().forEach(block -> json.add(Objects.requireNonNull(block.getRegistryName()).toString(), serializeBlock(block)));
+		getBlocks().forEach(block -> json.add(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString(), serializeBlock(block)));
 		return json;
 	}
 

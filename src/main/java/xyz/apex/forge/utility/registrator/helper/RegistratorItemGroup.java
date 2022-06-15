@@ -4,8 +4,8 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -34,7 +34,7 @@ public class RegistratorItemGroup extends CreativeModeTab implements Lazy<ItemSt
 		this.registrator = registrator;
 		this.maxCycleTime = maxCycleTime;
 
-		registrator.backend.addRegisterCallback(Item.class, this::initialize);
+		registrator.backend.addRegisterCallback(Registry.ITEM_REGISTRY, this::initialize);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class RegistratorItemGroup extends CreativeModeTab implements Lazy<ItemSt
 
 	private void initialize()
 	{
-		for(var registryEntry : registrator.getAll(Item.class))
+		for(var registryEntry : registrator.getAll(Registry.ITEM_REGISTRY))
 		{
 			if(registryEntry instanceof ItemLikeEntry provider)
 				allIcons.add(provider.asItemStack());

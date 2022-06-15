@@ -1,18 +1,16 @@
 package xyz.apex.forge.utility.registrator.entry;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.java.utility.Lazy;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 
 import javax.annotation.Nullable;
@@ -21,9 +19,6 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends RegistryEntry<BlockEntityType<BLOCK_ENTITY>> implements NonnullSupplier<BlockEntityType<BLOCK_ENTITY>>
 {
-	// TODO: Figure out of there is an actually built in way to do this
-	private final Lazy<Holder.Reference<BlockEntityType<?>>> holder = Lazy.of(() -> Registry.BLOCK_ENTITY_TYPE.createIntrusiveHolder(asBlockEntityType()));
-
 	public BlockEntityEntry(AbstractRegistrator<?> registrator, RegistryObject<BlockEntityType<BLOCK_ENTITY>> delegate)
 	{
 		super(registrator, delegate);
@@ -31,7 +26,8 @@ public final class BlockEntityEntry<BLOCK_ENTITY extends BlockEntity> extends Re
 
 	public boolean isInBlockEntityTypeTag(TagKey<BlockEntityType<?>> tag)
 	{
-		return holder.get().is(tag);
+		var tags = ForgeRegistries.BLOCK_ENTITIES.tags();
+		return tags != null && tags.getTag(tag).contains(asBlockEntityType());
 	}
 
 	public boolean isBlockEntityType(BlockEntityType<?> blockEntityType)

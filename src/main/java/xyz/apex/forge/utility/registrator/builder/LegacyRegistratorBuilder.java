@@ -16,10 +16,12 @@ import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import org.apache.logging.log4j.LogManager;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.MissingMappingsEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
@@ -35,7 +37,7 @@ import java.util.Map;
 @SuppressWarnings({ "unchecked", "DeprecatedIsStillUsed" })
 public abstract class LegacyRegistratorBuilder<
 		OWNER extends AbstractRegistrator<OWNER>,
-		BASE extends IForgeRegistryEntry<BASE>,
+		BASE,
 		TYPE extends BASE,
 		PARENT,
 		BUILDER extends LegacyRegistratorBuilder<OWNER, BASE, TYPE, PARENT, BUILDER, ENTRY>,
@@ -45,18 +47,18 @@ public abstract class LegacyRegistratorBuilder<
 	protected final OWNER owner;
 	private final NonnullFunction<com.tterrag.registrate.util.entry.RegistryEntry<TYPE>, ENTRY> registryEntryCastor;
 	private final LazyRegistryEntry<TYPE> safeSupplier = new LazyRegistryEntry<TYPE>(() -> (RegistryEntry<TYPE>) get());
-	private final Map<String, Map<String, RegistryEvent.MissingMappings.Action>> mappings = Maps.newHashMap();
+	private final Map<String, Map<String, MissingMappingsEvent.Action>> mappings = Maps.newHashMap();
 	private boolean registeredMappingsEvent = false;
 
-	public LegacyRegistratorBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, Class<? super BASE> registryType, NonnullFunction<com.tterrag.registrate.util.entry.RegistryEntry<TYPE>, ENTRY> registryEntryCastor)
+	public LegacyRegistratorBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, ResourceKey<? extends Registry<BASE>> registryType, IForgeRegistry<BASE> forgeRegistry, NonnullFunction<com.tterrag.registrate.util.entry.RegistryEntry<TYPE>, ENTRY> registryEntryCastor)
 	{
-		super(owner.backend, parent, registryName, callback, registryType);
+		super(owner.backend, parent, registryName, callback, registryType, forgeRegistry);
 
 		this.owner = owner;
 		this.registryEntryCastor = registryEntryCastor;
 	}
 
-	protected <OTHER_BASE extends IForgeRegistryEntry<OTHER_BASE>, OTHER_TYPE extends OTHER_BASE, OTHER_PARENT, OTHER_BUILDER extends LegacyRegistratorBuilder<OWNER, OTHER_BASE, OTHER_TYPE, OTHER_PARENT, OTHER_BUILDER, OTHER_ENTRY>, OTHER_ENTRY extends RegistryEntry<OTHER_TYPE>> void copyMappingsTo(LegacyRegistratorBuilder<OWNER, OTHER_BASE, OTHER_TYPE, OTHER_PARENT, OTHER_BUILDER, OTHER_ENTRY> other)
+	protected <OTHER_BASE, OTHER_TYPE extends OTHER_BASE, OTHER_PARENT, OTHER_BUILDER extends LegacyRegistratorBuilder<OWNER, OTHER_BASE, OTHER_TYPE, OTHER_PARENT, OTHER_BUILDER, OTHER_ENTRY>, OTHER_ENTRY extends RegistryEntry<OTHER_TYPE>> void copyMappingsTo(LegacyRegistratorBuilder<OWNER, OTHER_BASE, OTHER_TYPE, OTHER_PARENT, OTHER_BUILDER, OTHER_ENTRY> other)
 	{
 		if(!mappings.isEmpty())
 		{
@@ -67,7 +69,7 @@ public abstract class LegacyRegistratorBuilder<
 					if(!otherUpdates.containsKey(mappingName))
 					{
 						var modId = owner.getModId();
-						var registryType = getRegistryType().getSimpleName();
+						var registryType = getRegistryType().registry();
 						LogManager.getLogger().debug("Copied mapping '{}#{}:{}' from '{}#'", registryType, modId, mappingName, getRegistryNameFull());
 						otherUpdates.put(mappingName, action);
 					}
@@ -76,11 +78,11 @@ public abstract class LegacyRegistratorBuilder<
 		}
 	}
 
-	public final BUILDER mapping(String gameVersion, String oldMapping, RegistryEvent.MissingMappings.Action action)
+	public final BUILDER mapping(String gameVersion, String oldMapping, MissingMappingsEvent.Action action)
 	{
 		if(!registeredMappingsEvent)
 		{
-			MinecraftForge.EVENT_BUS.addGenericListener(getRegistryType(), this::onMissingMappings);
+			MinecraftForge.EVENT_BUS.addListener(this::onMissingMappings);
 			registeredMappingsEvent = true;
 		}
 
@@ -90,46 +92,53 @@ public abstract class LegacyRegistratorBuilder<
 
 	public final BUILDER mapping(String gameVersion, String oldMapping)
 	{
-		return mapping(gameVersion, oldMapping, RegistryEvent.MissingMappings.Action.REMAP);
+		return mapping(gameVersion, oldMapping, MissingMappingsEvent.Action.REMAP);
 	}
 
-	private void onMissingMappings(RegistryEvent.MissingMappings<BASE> event)
+	private void onMissingMappings(MissingMappingsEvent event)
 	{
-		var gameVersion = SharedConstants.getCurrentVersion().getReleaseTarget();
+		ResourceKey<? extends Registry<BASE>> registryType = getRegistryType();
 
-		if(mappings.containsKey(gameVersion))
+		if(event.getRegistry().getRegistryKey().isFor(registryType))
 		{
-			var updates = mappings.get(gameVersion);
+			var gameVersion = SharedConstants.getCurrentVersion().getReleaseTarget();
 
-			for(var mapping : event.getAllMappings())
+			if(mappings.containsKey(gameVersion))
 			{
-				if(mapping.key != null && mapping.key.getNamespace().equals(owner.getModId()))
+				var updates = mappings.get(gameVersion);
+
+				for(var mapping : event.getAllMappings(registryType))
 				{
-					var mappingName = mapping.key.getPath();
+					var mappingKey = mapping.getKey();
 
-					if(updates.containsKey(mappingName))
+					if(mappingKey != null && mappingKey.getNamespace().equals(owner.getModId()))
 					{
-						switch(updates.get(mappingName))
+						var mappingName = mappingKey.getPath();
+
+						if(updates.containsKey(mappingName))
 						{
-							case WARN:
-								mapping.warn();
-								break;
+							switch(updates.get(mappingName))
+							{
+								case WARN:
+									mapping.warn();
+									break;
 
-							case FAIL:
-								mapping.fail();
-								break;
+								case FAIL:
+									mapping.fail();
+									break;
 
-							case IGNORE:
-								mapping.ignore();
-								break;
+								case IGNORE:
+									mapping.ignore();
+									break;
 
-							case REMAP:
-								mapping.remap(safeSupplier.get());
-								break;
+								case REMAP:
+									mapping.remap(safeSupplier.get());
+									break;
 
-							default:
-							case DEFAULT:
-								break;
+								default:
+								case DEFAULT:
+									break;
+							}
 						}
 					}
 				}
@@ -183,7 +192,7 @@ public abstract class LegacyRegistratorBuilder<
 		return addMiscData(providerType, consumer::accept);
 	}
 
-	public final <OWNER_T extends AbstractRegistrator<OWNER_T>, BASE_T extends IForgeRegistryEntry<BASE_T>, TYPE_T extends BASE_T, PARENT_T, BUILDER_T extends LegacyRegistratorBuilder<OWNER_T, BASE_T, TYPE_T, PARENT_T, BUILDER_T, ENTRY_T>, ENTRY_T extends RegistryEntry<TYPE_T>> BUILDER_T transformer(NonnullFunction<BUILDER, BUILDER_T> transformer)
+	public final <OWNER_T extends AbstractRegistrator<OWNER_T>, BASE_T, TYPE_T extends BASE_T, PARENT_T, BUILDER_T extends LegacyRegistratorBuilder<OWNER_T, BASE_T, TYPE_T, PARENT_T, BUILDER_T, ENTRY_T>, ENTRY_T extends RegistryEntry<TYPE_T>> BUILDER_T transformer(NonnullFunction<BUILDER, BUILDER_T> transformer)
 	{
 		return transform(transformer::apply);
 	}
@@ -221,7 +230,7 @@ public abstract class LegacyRegistratorBuilder<
 	}
 
 	@Override
-	public final Class<? super BASE> getRegistryType()
+	public final ResourceKey<? extends Registry<BASE>> getRegistryType()
 	{
 		return super.getRegistryType();
 	}
@@ -282,7 +291,7 @@ public abstract class LegacyRegistratorBuilder<
 
 	@Deprecated
 	@Override
-	public final <BASE_T extends IForgeRegistryEntry<BASE_T>, TYPE_T extends BASE_T, PARENT_T, BUILDER_T extends Builder<BASE_T, TYPE_T, PARENT_T, BUILDER_T>> BUILDER_T transform(NonNullFunction<BUILDER, BUILDER_T> transformer)
+	public final <BASE_T, TYPE_T extends BASE_T, PARENT_T, BUILDER_T extends Builder<BASE_T, TYPE_T, PARENT_T, BUILDER_T>> BUILDER_T transform(NonNullFunction<BUILDER, BUILDER_T> transformer)
 	{
 		return super.transform(transformer);
 	}

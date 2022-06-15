@@ -6,6 +6,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.tterrag.registrate.builders.BuilderCallback;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -17,10 +19,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.event.village.WandererTradesEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.VillagerProfessionEntry;
 import xyz.apex.java.utility.nullness.NonnullBiConsumer;
+import xyz.apex.java.utility.nullness.NonnullPredicate;
 import xyz.apex.java.utility.nullness.NonnullSupplier;
 import xyz.apex.java.utility.nullness.NonnullType;
 
@@ -37,14 +41,15 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 	private final Set<NonnullSupplier<? extends Item>> requestedItems = Sets.newHashSet();
 	private final Set<NonnullSupplier<? extends Block>> secondaryPoi = Sets.newHashSet();
 	private Supplier<SoundEvent> workSound = () -> null;
-	private NonnullSupplier<PoiType> poiType = () -> PoiType.UNEMPLOYED;
+	private NonnullPredicate<Holder<PoiType>> heldJobSite = PoiType.NONE::test;
+	private NonnullPredicate<Holder<PoiType>> acquirableJobSite = VillagerProfession.ALL_ACQUIRABLE_JOBS::test;
 	private NonnullBiConsumer<VillagerProfession, VillagerTradesRegistrar> villagerTradesConsumer = NonnullBiConsumer.noop();
 	private NonnullBiConsumer<VillagerProfession, WandererTradesRegistrar> wandererTradesConsumer = NonnullBiConsumer.noop();
 	@Nullable private PointOfInterestBuilder<OWNER, VillagerProfessionBuilder<OWNER, PARENT>> pointOfInterestBuilder = null;
 
 	public VillagerProfessionBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
-		super(owner, parent, registryName, callback, VillagerProfession.class, VillagerProfessionEntry::new, VillagerProfessionEntry::cast);
+		super(owner, parent, registryName, callback, Registry.VILLAGER_PROFESSION_REGISTRY, ForgeRegistries.PROFESSIONS, VillagerProfessionEntry::new, VillagerProfessionEntry::cast);
 
 		onRegister(this::onRegister);
 	}
@@ -65,17 +70,22 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 			copyMappingsTo(pointOfInterestBuilder);
 
 		var registryName = getRegistryNameFull();
-		var pointOfInterestType = this.poiType.get();
 		ImmutableSet<Item> requestedItems = this.requestedItems.stream().map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
 		ImmutableSet<Block> secondaryPoi = this.secondaryPoi.stream().map(NonnullSupplier::get).collect(ImmutableSet.toImmutableSet());
 		var workSound = this.workSound.get();
-		return new VillagerProfession(registryName, pointOfInterestType, requestedItems, secondaryPoi, workSound);
+		return new VillagerProfession(registryName, heldJobSite, acquirableJobSite, requestedItems, secondaryPoi, workSound);
 	}
 
 	// region: POI
-	public VillagerProfessionBuilder<OWNER, PARENT> pointOfInterestType(NonnullSupplier<PoiType> poiType)
+	public VillagerProfessionBuilder<OWNER, PARENT> heldJobSite(NonnullPredicate<Holder<PoiType>> heldJobSite)
 	{
-		this.poiType = poiType;
+		this.heldJobSite = heldJobSite;
+		return this;
+	}
+
+	public VillagerProfessionBuilder<OWNER, PARENT> acquirableJobSite(NonnullPredicate<Holder<PoiType>> acquirableJobSite)
+	{
+		this.acquirableJobSite = acquirableJobSite;
 		return this;
 	}
 
@@ -84,7 +94,7 @@ public final class VillagerProfessionBuilder<OWNER extends AbstractRegistrator<O
 		if(pointOfInterestBuilder == null)
 		{
 			pointOfInterestBuilder = owner.pointOfInterest(getName(), this);
-			poiType = () -> pointOfInterestBuilder.asSupplier().get();
+			heldJobSite = p -> p.isBound() && p.get() == pointOfInterestBuilder.getEntry();
 		}
 
 		return pointOfInterestBuilder;

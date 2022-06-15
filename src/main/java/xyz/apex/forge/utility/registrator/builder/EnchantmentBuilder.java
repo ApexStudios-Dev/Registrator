@@ -3,10 +3,12 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
+import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.EnchantmentEntry;
@@ -25,7 +27,7 @@ public final class EnchantmentBuilder<OWNER extends AbstractRegistrator<OWNER>, 
 
 	public EnchantmentBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, EnchantmentCategory enchantmentCategory, EnchantmentFactory<ENCHANTMENT> enchantmentFactory)
 	{
-		super(owner, parent, registryName, callback, Enchantment.class, EnchantmentEntry::new, EnchantmentEntry::cast);
+		super(owner, parent, registryName, callback, Registry.ENCHANTMENT_REGISTRY, ForgeRegistries.ENCHANTMENTS, EnchantmentEntry::new, EnchantmentEntry::cast);
 
 		this.enchantmentCategory = enchantmentCategory;
 		this.enchantmentFactory = enchantmentFactory;

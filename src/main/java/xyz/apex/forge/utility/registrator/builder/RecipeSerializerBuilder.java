@@ -3,9 +3,11 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.RecipeSerializerEntry;
@@ -17,7 +19,7 @@ public final class RecipeSerializerBuilder<OWNER extends AbstractRegistrator<OWN
 
 	public RecipeSerializerBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, RecipeSerializerFactory<RECIPE_TYPE, RECIPE, INVENTORY> recipeSerializerFactory)
 	{
-		super(owner, parent, registryName, callback, RecipeSerializer.class, RecipeSerializerEntry::new, RecipeSerializerEntry::cast);
+		super(owner, parent, registryName, callback, Registry.RECIPE_SERIALIZER_REGISTRY, ForgeRegistries.RECIPE_SERIALIZERS, RecipeSerializerEntry::new, RecipeSerializerEntry::cast);
 
 		this.recipeSerializerFactory = recipeSerializerFactory;
 	}

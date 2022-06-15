@@ -21,6 +21,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.PlayMessages;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.EntityEntry;
@@ -50,7 +51,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 
 	public EntityBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, MobCategory mobCategory, EntityFactory<ENTITY> entityFactory)
 	{
-		super(owner, parent, registryName, callback, EntityType.class, EntityEntry::new, EntityEntry::cast);
+		super(owner, parent, registryName, callback, Registry.ENTITY_TYPE_REGISTRY, ForgeRegistries.ENTITIES, EntityEntry::new, EntityEntry::cast);
 
 		this.mobCategory = mobCategory;
 		this.entityFactory = entityFactory;
@@ -71,7 +72,7 @@ public final class EntityBuilder<OWNER extends AbstractRegistrator<OWNER>, ENTIT
 				}
 				catch(Exception e)
 				{
-					throw new IllegalStateException("Failed to register renderer for Entity " + entityType.getRegistryName(), e);
+					throw new IllegalStateException("Failed to register renderer for Entity " + ForgeRegistries.ENTITIES.getKey(entityType), e);
 				}
 			}));
 		}

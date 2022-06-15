@@ -3,9 +3,11 @@ package xyz.apex.forge.utility.registrator.builder;
 import com.tterrag.registrate.builders.BuilderCallback;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.common.data.SoundDefinition;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.SoundEntry;
@@ -18,7 +20,7 @@ public final class SoundBuilder<OWNER extends AbstractRegistrator<OWNER>, PARENT
 
 	public SoundBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback)
 	{
-		super(owner, parent, registryName, callback, SoundEvent.class, SoundEntry::new, SoundEntry::cast);
+		super(owner, parent, registryName, callback, Registry.SOUND_EVENT_REGISTRY, ForgeRegistries.SOUND_EVENTS, SoundEntry::new, SoundEntry::cast);
 
 		owner.addSoundGenerator(provider -> provider.add(getRegistryNameFull(), definitionModifier.apply(SoundDefinition.definition())));
 	}

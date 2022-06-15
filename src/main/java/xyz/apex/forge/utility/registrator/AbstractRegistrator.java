@@ -19,7 +19,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLoot;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -52,7 +53,6 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.versions.forge.ForgeVersion;
 
@@ -61,6 +61,7 @@ import xyz.apex.forge.utility.registrator.entry.PaintingEntry;
 import xyz.apex.forge.utility.registrator.entry.RecipeSerializerEntry;
 import xyz.apex.forge.utility.registrator.factory.*;
 import xyz.apex.forge.utility.registrator.factory.item.*;
+import xyz.apex.forge.utility.registrator.helper.ArmorMaterial;
 import xyz.apex.forge.utility.registrator.helper.ForgeSpawnEggItem;
 import xyz.apex.forge.utility.registrator.provider.BlockListReporter;
 import xyz.apex.forge.utility.registrator.provider.RegistrateLangExtProvider;
@@ -139,54 +140,54 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 
 	// region: Tags
 	// region: Generic
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> tag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagNamespace, String tagPath)
+	public final <TYPE> TagKey<TYPE> tag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagNamespace, String tagPath)
 	{
 		return TagKey.create(tagRegistry, new ResourceLocation(tagNamespace, tagPath));
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> vanillaTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> vanillaTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, MINECRAFT_ID, tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> forgeTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> forgeTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, FORGE_ID, tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> registratorTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> registratorTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, REGISTRATOR_ID, tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> moddedTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> moddedTag(ResourceKey<? extends Registry<TYPE>> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, getModId(), tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> tag(IForgeRegistry<TYPE> tagRegistry, String tagNamespace, String tagPath)
+	public final <TYPE> TagKey<TYPE> tag(IForgeRegistry<TYPE> tagRegistry, String tagNamespace, String tagPath)
 	{
 		var tags = tagRegistry.tags();
 		Validate.notNull(tags);
 		return tags.createTagKey(new ResourceLocation(tagNamespace, tagPath));
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> vanillaTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> vanillaTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, MINECRAFT_ID, tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> forgeTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> forgeTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, FORGE_ID, tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> registratorTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> registratorTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, REGISTRATOR_ID, tagPath);
 	}
 
-	public final <TYPE extends IForgeRegistryEntry<TYPE>> TagKey<TYPE> moddedTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
+	public final <TYPE> TagKey<TYPE> moddedTag(IForgeRegistry<TYPE> tagRegistry, String tagPath)
 	{
 		return tag(tagRegistry, getModId(), tagPath);
 	}
@@ -525,22 +526,22 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: BannerPatternItem
-	public final <ITEM extends BannerPatternItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> bannerPatternItem(String registryName, PARENT parent, BannerPattern bannerPattern, BannerPatternItemFactory<ITEM> bannerPatternItemFactory)
+	public final <ITEM extends BannerPatternItem, PARENT> ItemBuilder<REGISTRATOR, ITEM, PARENT> bannerPatternItem(String registryName, PARENT parent, TagKey<BannerPattern> bannerPattern, BannerPatternItemFactory<ITEM> bannerPatternItemFactory)
 	{
 		return item(registryName, parent, properties -> bannerPatternItemFactory.create(bannerPattern, properties));
 	}
 
-	public final <PARENT> ItemBuilder<REGISTRATOR, BannerPatternItem, PARENT> bannerPatternItem(String registryName, PARENT parent, BannerPattern bannerPattern)
+	public final <PARENT> ItemBuilder<REGISTRATOR, BannerPatternItem, PARENT> bannerPatternItem(String registryName, PARENT parent, TagKey<BannerPattern> bannerPattern)
 	{
 		return bannerPatternItem(registryName, parent, bannerPattern, BannerPatternItemFactory.DEFAULT);
 	}
 
-	public final <ITEM extends BannerPatternItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> bannerPatternItem(String registryName, BannerPattern bannerPattern, BannerPatternItemFactory<ITEM> bannerPatternItemFactory)
+	public final <ITEM extends BannerPatternItem> ItemBuilder<REGISTRATOR, ITEM, REGISTRATOR> bannerPatternItem(String registryName, TagKey<BannerPattern> bannerPattern, BannerPatternItemFactory<ITEM> bannerPatternItemFactory)
 	{
 		return bannerPatternItem(registryName, self, bannerPattern, bannerPatternItemFactory);
 	}
 
-	public final ItemBuilder<REGISTRATOR, BannerPatternItem, REGISTRATOR> bannerPatternItem(String registryName, BannerPattern bannerPattern)
+	public final ItemBuilder<REGISTRATOR, BannerPatternItem, REGISTRATOR> bannerPatternItem(String registryName, TagKey<BannerPattern> bannerPattern)
 	{
 		return bannerPatternItem(registryName, self, bannerPattern, BannerPatternItemFactory.DEFAULT);
 	}
@@ -1167,31 +1168,31 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 	// endregion
 
 	// region: Registrate Wrappers
-	public final <BASE extends IForgeRegistryEntry<BASE>, TYPE extends BASE> RegistryEntry<TYPE> get(String registryName, Class<? super BASE> registryType)
+	public final <BASE, TYPE extends BASE> RegistryEntry<TYPE> get(String registryName, ResourceKey<? extends Registry<BASE>> registryType)
 	{
-		return backend.<BASE, TYPE>get(registryName, registryType);
+		return backend.get(registryName, registryType);
 	}
 
 	@Beta
-	public final <BASE extends IForgeRegistryEntry<BASE>, TYPE extends BASE> RegistryEntry<TYPE> getOptional(String registryName, Class<? super BASE> registryType)
+	public final <BASE, TYPE extends BASE> RegistryEntry<TYPE> getOptional(String registryName, ResourceKey<? extends Registry<BASE>> registryType)
 	{
-		return backend.<BASE, TYPE>getOptional(registryName, registryType);
+		return backend.getOptional(registryName, registryType);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> Collection<RegistryEntry<BASE>> getAll(Class<? super BASE> registryType)
+	public final <BASE> Collection<RegistryEntry<BASE>> getAll(ResourceKey<? extends Registry<BASE>> registryType)
 	{
-		return backend.<BASE>getAll(registryType);
+		return backend.getAll(registryType);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> REGISTRATOR addRegisterCallback(Class<? super BASE> registryType, Runnable callback)
+	public final <BASE> REGISTRATOR addRegisterCallback(ResourceKey<? extends Registry<BASE>> registryType, Runnable callback)
 	{
-		backend.<BASE>addRegisterCallback(registryType, callback);
+		backend.addRegisterCallback(registryType, callback);
 		return self;
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>> boolean isRegistered(Class<? super BASE> registryType)
+	public final <BASE> boolean isRegistered(ResourceKey<? extends Registry<BASE>> registryType)
 	{
-		return backend.<BASE>isRegistered(registryType);
+		return backend.isRegistered(registryType);
 	}
 
 	public final <PROVIDER extends RegistrateProvider> Optional<PROVIDER> getDataProvider(ProviderType<PROVIDER> providerType)
@@ -1205,22 +1206,22 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return self;
 	}
 
-	public final TranslatableComponent addLang(String translationKey, String localizedValue)
+	public final MutableComponent addLang(String translationKey, String localizedValue)
 	{
 		return backend.addLang(translationKey, localizedValue);
 	}
 
-	public final TranslatableComponent addLang(String type, ResourceLocation id, String localizedValue)
+	public final MutableComponent addLang(String type, ResourceLocation id, String localizedValue)
 	{
 		return backend.addLang(type, id, localizedValue);
 	}
 
-	public final TranslatableComponent addLang(String type, ResourceLocation id, String suffix, String localizedValue)
+	public final MutableComponent addLang(String type, ResourceLocation id, String suffix, String localizedValue)
 	{
 		return backend.addLang(type, id, suffix, localizedValue);
 	}
 
-	public final TranslatableComponent addRawLang(String translationKey, String localizedValue)
+	public final MutableComponent addRawLang(String translationKey, String localizedValue)
 	{
 		return backend.addLang(translationKey, localizedValue);
 	}
@@ -1253,47 +1254,47 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 		return transformer.apply(self);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>, TYPE extends BASE, PARENT, BUILDER extends RegistratorBuilder<REGISTRATOR, BASE, TYPE, PARENT, BUILDER, ENTRY>, ENTRY extends xyz.apex.forge.utility.registrator.entry.RegistryEntry<TYPE>> BUILDER transform(NonnullFunction<REGISTRATOR, BUILDER> transformer)
+	public final <BASE, TYPE extends BASE, PARENT, BUILDER extends RegistratorBuilder<REGISTRATOR, BASE, TYPE, PARENT, BUILDER, ENTRY>, ENTRY extends xyz.apex.forge.utility.registrator.entry.RegistryEntry<TYPE>> BUILDER transform(NonnullFunction<REGISTRATOR, BUILDER> transformer)
 	{
 		return transformer.apply(self);
 	}
 
-	public final <BASE extends IForgeRegistryEntry<BASE>, TYPE extends BASE, PARENT, BACKEND_BUILDER extends Builder<BASE, TYPE, PARENT, BACKEND_BUILDER>>  BACKEND_BUILDER entry(String registryName, NonnullFunction<BuilderCallback, BACKEND_BUILDER> backendBuilderFactory)
+	public final <BASE, TYPE extends BASE, PARENT, BACKEND_BUILDER extends Builder<BASE, TYPE, PARENT, BACKEND_BUILDER>>  BACKEND_BUILDER entry(String registryName, NonnullFunction<BuilderCallback, BACKEND_BUILDER> backendBuilderFactory)
 	{
 		return backend.entry(registryName, backendBuilderFactory::apply);
 	}
 
 	@Beta
-	public final <BASE extends IForgeRegistryEntry<BASE>>  Supplier<IForgeRegistry<BASE>> makeRegistry(String registryName, Class<? super BASE> registryType, NonnullSupplier<RegistryBuilder<BASE>> registryBuilder)
+	public final <BASE>  Supplier<IForgeRegistry<BASE>> makeRegistry(String registryName, ResourceKey<? extends Registry<BASE>> registryType, NonnullSupplier<RegistryBuilder<BASE>> registryBuilder)
 	{
 		return backend.makeRegistry(registryName, registryType, registryBuilder);
 	}
 	// endregion
 
 	// region: Translation
-	public final TranslatableComponent addLang(String languageKey, String translationKey, String localizedValue)
+	public final MutableComponent addLang(String languageKey, String translationKey, String localizedValue)
 	{
 		var prefixedKey = getModId() + '.' + translationKey;
 		addDataGenerator(LANG_EXT_PROVIDER, provider -> provider.add(languageKey, prefixedKey, localizedValue));
-		return new TranslatableComponent(prefixedKey);
+		return Component.translatable(prefixedKey);
 	}
 
-	public final TranslatableComponent addLang(String languageKey, String type, ResourceLocation id, String localizedValue)
+	public final MutableComponent addLang(String languageKey, String type, ResourceLocation id, String localizedValue)
 	{
 		return addRawLang(languageKey, Util.makeDescriptionId(type, id), localizedValue);
 	}
 
-	public final TranslatableComponent addLang(String languageKey, String type, ResourceLocation id, String suffix, String localizedValue)
+	public final MutableComponent addLang(String languageKey, String type, ResourceLocation id, String suffix, String localizedValue)
 	{
 		return addRawLang(languageKey, Util.makeDescriptionId(type, id) + '.' + suffix, localizedValue);
 	}
 
-	public final TranslatableComponent addRawLang(String languageKey, String translationKey, String localizedValue)
+	public final MutableComponent addRawLang(String languageKey, String translationKey, String localizedValue)
 	{
 		if(backend.isDataGenerationEnabled())
 			backend.extraLang.get().add(Triple.of(languageKey, translationKey, localizedValue));
 
-		return new TranslatableComponent(translationKey);
+		return Component.translatable(translationKey);
 	}
 	// endregion
 
@@ -1337,7 +1338,7 @@ public abstract class AbstractRegistrator<REGISTRATOR extends AbstractRegistrato
 			DataGenerator generator = event.getGenerator();
 
 			if(event.includeReports())
-				generator.addProvider(new BlockListReporter(AbstractRegistrator.this, generator));
+				generator.addProvider(true, new BlockListReporter(AbstractRegistrator.this, generator));
 		}
 
 		public boolean isDataGenerationEnabled()

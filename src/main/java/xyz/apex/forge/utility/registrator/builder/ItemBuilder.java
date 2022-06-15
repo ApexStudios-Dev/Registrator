@@ -10,6 +10,7 @@ import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonnullType;
 
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
@@ -20,6 +21,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
 import xyz.apex.forge.utility.registrator.entry.ItemEntry;
@@ -41,7 +43,7 @@ public final class ItemBuilder<OWNER extends AbstractRegistrator<OWNER>, ITEM ex
 
 	public ItemBuilder(OWNER owner, PARENT parent, String registryName, BuilderCallback callback, ItemFactory<ITEM> itemFactory)
 	{
-		super(owner, parent, registryName, callback, Item.class, ItemEntry::new, ItemEntry::cast);
+		super(owner, parent, registryName, callback, Registry.ITEM_REGISTRY, ForgeRegistries.ITEMS, ItemEntry::new, ItemEntry::cast);
 
 		this.itemFactory = itemFactory;
 		onRegister(this::onRegister);
