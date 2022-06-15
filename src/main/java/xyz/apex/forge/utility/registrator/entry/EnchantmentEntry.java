@@ -1,7 +1,5 @@
 package xyz.apex.forge.utility.registrator.entry;
 
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -10,18 +8,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
-import xyz.apex.java.utility.Lazy;
 
 import java.util.Map;
 
 public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends RegistryEntry<ENCHANTMENT>
 {
-	// TODO: Figure out of there is an actually built in way to do this
-	private final Lazy<Holder.Reference<Enchantment>> holder = Lazy.of(() -> Registry.ENCHANTMENT.createIntrusiveHolder(asEnchantment()));
-
 	public EnchantmentEntry(AbstractRegistrator<?> registrator, RegistryObject<ENCHANTMENT> delegate)
 	{
 		super(registrator, delegate);
@@ -34,7 +29,8 @@ public final class EnchantmentEntry<ENCHANTMENT extends Enchantment> extends Reg
 
 	public boolean isInEnchantmentTag(TagKey<Enchantment> tag)
 	{
-		return holder.get().is(tag);
+		var tags = ForgeRegistries.ENCHANTMENTS.tags();
+		return tags != null && tags.getTag(tag).contains(asEnchantment());
 	}
 
 	public boolean isEnchantment(Enchantment enchantment)

@@ -11,6 +11,7 @@ import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.providers.loot.RegistrateLootTableProvider;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.nullness.NonnullType;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -208,6 +209,11 @@ public final class BlockBuilder<OWNER extends AbstractRegistrator<OWNER>, BLOCK 
 		return properties(BlockBehaviour.Properties::dynamicShape);
 	}
 
+	/**
+	 * @deprecated Replaced with {@code #noLoot()} in <i>5.0.0</i>
+	 */
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
 	public BlockBuilder<OWNER, BLOCK, PARENT> noDrops()
 	{
 		return properties(BlockBehaviour.Properties::noDrops);

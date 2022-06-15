@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.data.DataGenerator;
@@ -25,6 +26,11 @@ import java.util.Set;
 
 public abstract class ParticleProvider implements DataProvider
 {
+	/**
+	 * @deprecated No longer required in <i>5.0.0</i>
+	 */
+	@Deprecated(forRemoval = true)
+	@ApiStatus.ScheduledForRemoval(inVersion = "5.0.0")
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	public static final Logger LOGGER = LogManager.getLogger();
 

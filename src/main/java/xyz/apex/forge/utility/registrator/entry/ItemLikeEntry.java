@@ -4,6 +4,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -35,7 +36,8 @@ public abstract class ItemLikeEntry<ITEM extends IForgeRegistryEntry<? super ITE
 
 	public final boolean isInItemTag(TagKey<Item> tag)
 	{
-		return asItem().builtInRegistryHolder().is(tag);
+		var tags = ForgeRegistries.ITEMS.tags();
+		return tags != null && tags.getTag(tag).contains(asItem());
 	}
 
 	public final boolean isItem(Item item)

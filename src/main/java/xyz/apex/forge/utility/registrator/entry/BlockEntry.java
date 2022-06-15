@@ -3,6 +3,7 @@ package xyz.apex.forge.utility.registrator.entry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import xyz.apex.forge.utility.registrator.AbstractRegistrator;
@@ -28,7 +29,8 @@ public final class BlockEntry<BLOCK extends Block> extends ItemLikeEntry<BLOCK> 
 
 	public boolean isInBlockTag(TagKey<Block> tag)
 	{
-		return asBlock().builtInRegistryHolder().is(tag);
+		var tags = ForgeRegistries.BLOCKS.tags();
+		return tags != null && tags.getTag(tag).contains(asBlock());
 	}
 
 	public boolean isBlock(Block block)
