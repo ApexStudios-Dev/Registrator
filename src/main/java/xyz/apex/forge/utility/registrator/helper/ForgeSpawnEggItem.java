@@ -25,7 +25,7 @@ import java.util.Map;
 @SuppressWarnings("ConstantConditions")
 public class ForgeSpawnEggItem<ENTITY extends Entity> extends SpawnEggItem
 {
-	private static final Field EGGS = ObfuscationReflectionHelper.findField(SpawnEggItem.class, "BY_ID");
+	private static final Field EGGS = ObfuscationReflectionHelper.findField(SpawnEggItem.class, "f_43201_");
 	private static final DispenseItemBehavior DEFAULT_DISPENSE_BEHAVIOR = (source, stack) -> {
 		var direction = source.getBlockState().getValue(DispenserBlock.FACING);
 		var entityType = ((SpawnEggItem) stack.getItem()).getType(stack.getTag());
