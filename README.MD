@@ -1,5 +1,5 @@
 # This project is no longer being updated. [**See here**](https://github.com/ApexStudios-Dev/Registrate) for future updates.
-## All future uodates merged directly into [**ApexCore**](https://github.com/ApexStudios-Dev/ApexCore)
+## All future updates merged directly into [**ApexCore**](https://github.com/ApexStudios-Dev/ApexCore)
 
 # ![Registrator](./src/main/resources/banner.png)
 [![release](https://github.com/ApexModder/Registrator/actions/workflows/release.yml/badge.svg)](https://github.com/ApexModder/Registrator/actions/workflows/release.yml)
